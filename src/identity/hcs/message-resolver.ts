@@ -91,9 +91,6 @@ export abstract class MessageResolver<T extends Message> {
      * @param envelope The parsed message envelope in a PLAIN mode.
      */
     private handleMessage(envelope: MessageEnvelope<T>): void {
-        console.log("handleMessage");
-
-
         this.lastMessageArrivalTime = Long.fromInt(Date.now());
 
         if (!this.matchesSearchCriteria(envelope.open())) {
