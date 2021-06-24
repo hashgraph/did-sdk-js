@@ -30,7 +30,7 @@ export class HcsVcDocumentHashBase {
         if (this.issuer)
             rootObject[HcsVcDocumentJsonProperties.ISSUER] = this.issuer.toJsonTree();
         if (this.issuanceDate)
-            rootObject[HcsVcDocumentJsonProperties.ISSUANCE_DATE] = TimestampUtils.toJSON(this.issuanceDate, TimestampUtils.ISO8601);
+            rootObject[HcsVcDocumentJsonProperties.ISSUANCE_DATE] = TimestampUtils.toJSON(this.issuanceDate);
         return rootObject;
     }
 
@@ -44,7 +44,7 @@ export class HcsVcDocumentHashBase {
         if (root[HcsVcDocumentJsonProperties.ISSUER])
             result.issuer = Issuer.fromJsonTree(root[HcsVcDocumentJsonProperties.ISSUER]);
         if (root[HcsVcDocumentJsonProperties.ISSUANCE_DATE])
-            result.issuanceDate = TimestampUtils.fromJson(root[HcsVcDocumentJsonProperties.ISSUANCE_DATE], TimestampUtils.ISO8601);
+            result.issuanceDate = TimestampUtils.fromJson(root[HcsVcDocumentJsonProperties.ISSUANCE_DATE]);
         return result;
     }
 

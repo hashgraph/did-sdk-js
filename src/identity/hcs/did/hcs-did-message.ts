@@ -91,11 +91,11 @@ export class HcsDidMessage extends Message {
         if (this.created != null || this.updated != null) {
             const root = JSON.parse(document);
             if (this.created != null) {
-                root[DidDocumentJsonProperties.CREATED] = TimestampUtils.toJSON(this.created, TimestampUtils.ISO8601);
+                root[DidDocumentJsonProperties.CREATED] = TimestampUtils.toJSON(this.created);
             }
 
             if (this.updated != null) {
-                root[DidDocumentJsonProperties.UPDATED] = TimestampUtils.toJSON(this.updated, TimestampUtils.ISO8601);
+                root[DidDocumentJsonProperties.UPDATED] = TimestampUtils.toJSON(this.updated);
             }
             document = JSON.stringify(root);
         }

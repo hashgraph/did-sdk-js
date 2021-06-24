@@ -33,6 +33,7 @@ import {Message} from "./identity/hcs/message";
 import {SerializableMirrorConsensusResponse} from "./identity/hcs/serializable-mirror-consensus-response";
 import {TimestampUtils} from "./utils/timestamp-utils";
 import {Validator} from "./utils/validator";
+import {Issuer} from "./identity/hcs/vc/issuer";
 
 export {
     AddressBook,
@@ -70,4 +71,5 @@ export {
     SerializableMirrorConsensusResponse,
     TimestampUtils,
     Validator,
+    Issuer
 }

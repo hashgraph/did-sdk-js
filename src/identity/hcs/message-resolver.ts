@@ -91,13 +91,16 @@ export abstract class MessageResolver<T extends Message> {
      * @param envelope The parsed message envelope in a PLAIN mode.
      */
     private handleMessage(envelope: MessageEnvelope<T>): void {
+        console.log("handleMessage");
+
+
         this.lastMessageArrivalTime = Long.fromInt(Date.now());
 
         if (!this.matchesSearchCriteria(envelope.open())) {
             return;
         }
 
-        if (this.existingSignatures.find(envelope.getSignature)) {
+        if (this.existingSignatures.indexOf(envelope.getSignature()) != -1) {
             return;
         }
 
@@ -154,8 +157,8 @@ export abstract class MessageResolver<T extends Message> {
      * @param timeout The timeout in milliseconds to wait for new messages from the topic.
      * @return This resolver instance.
      */
-    public setTimeout(timeout: Long): MessageResolver<T> {
-        this.noMoreMessagesTimeout = timeout;
+    public setTimeout(timeout: Long | number): MessageResolver<T> {
+        this.noMoreMessagesTimeout = Long.fromValue(timeout);
         return this;
     }
 

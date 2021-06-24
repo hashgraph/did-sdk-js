@@ -54,7 +54,7 @@ export class HcsIdentityNetworkBuilder {
             this.didServers = [];
         }
 
-        if (!this.didServers.find(v => serverUrl === v)) {
+        if (this.didServers.indexOf(serverUrl) == -1) {
             this.didServers.push(serverUrl);
         }
 
