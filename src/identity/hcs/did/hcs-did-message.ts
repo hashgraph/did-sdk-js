@@ -147,7 +147,7 @@ export class HcsDidMessage extends Message {
             }
 
             // Verify that the message was sent to the right topic, if the DID contains the topic
-            if (didTopicId != null && hcsDid.getDidTopicId() != null && didTopicId != hcsDid.getDidTopicId()) {
+            if (!didTopicId && !hcsDid.getDidTopicId() && (didTopicId.toString() != hcsDid.getDidTopicId().toString())) {
                 return false;
             }
         } catch (e) {

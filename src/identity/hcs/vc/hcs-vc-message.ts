@@ -27,7 +27,7 @@ export class HcsVcMessage extends Message {
      * @return True if the message is valid and False otherwise.
      */
     public isValid(): boolean {
-        return (this.credentialHash != null && this.operation != null)
+        return (!this.credentialHash && !this.operation);
     }
 
     public getOperation(): HcsVcOperation {
