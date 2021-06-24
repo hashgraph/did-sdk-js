@@ -145,7 +145,7 @@ export class HcsDidMessage extends Message {
             if (HcsDid.publicKeyToIdString(publicKey) != hcsDid.getIdString()) {
                 return false;
             }
-            
+
             // Verify that the message was sent to the right topic, if the DID contains the topic
             if (!!didTopicId && !!hcsDid.getDidTopicId() && (didTopicId.toString() != hcsDid.getDidTopicId().toString())) {
                 return false;

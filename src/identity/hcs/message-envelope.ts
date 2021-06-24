@@ -160,9 +160,9 @@ export class MessageEnvelope<T extends Message> {
      * @param publicKeyProvider Provider of a public key of this envelope signer.
      * @return True if the message is valid, false otherwise.
      */
-    public isSignatureValid(publicKeyProvider: PublicKeyProvider<T>): boolean;
-    public isSignatureValid(publicKey: PublicKey): boolean;
-    public isSignatureValid(...args: any[]): boolean {
+    public async isSignatureValid(publicKeyProvider: PublicKeyProvider<T>): Promise<boolean>;
+    public async isSignatureValid(publicKey: PublicKey): Promise<boolean>;
+    public async isSignatureValid(...args: any[]): Promise<boolean> {
         if (!this.signature || !this.message) {
             return false;
         }
@@ -170,7 +170,7 @@ export class MessageEnvelope<T extends Message> {
         let publicKey: PublicKey;
         if (typeof args[0] == "function") {
             const publicKeyProvider = args[0] as PublicKeyProvider<T>;
-            publicKey = publicKeyProvider(this);
+            publicKey = await publicKeyProvider(this);
         } else {
             publicKey = args[0] as PublicKey;
         }
