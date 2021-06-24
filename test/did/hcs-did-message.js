@@ -41,9 +41,9 @@ describe('HcsDidMessage', function() {
 
         const envelope = MessageEnvelope.fromJson(Buffer.from(message).toString("utf8"), HcsDidMessage);
 
-        assert.isTrue(await envelope.isSignatureValid(e => e.open().extractDidRootKey()));
-        assert.isTrue(await envelope.open().isValid(DID_TOPIC_ID1));
-        assert.deepEqual(await originalEnvelope.open().getTimestamp(), await envelope.open().getTimestamp());
+        assert.isTrue(envelope.isSignatureValid(e => e.open().extractDidRootKey()));
+        assert.isTrue(envelope.open().isValid(DID_TOPIC_ID1));
+        assert.deepEqual(originalEnvelope.open().getTimestamp(), envelope.open().getTimestamp());
     });
 
     it('Test Encrypted Message', async function() {
@@ -64,8 +64,8 @@ describe('HcsDidMessage', function() {
         const decryptedMsg = await encryptedSignedMsg.open(HcsDidMessage.getDecrypter((m, t) => decrypt(m, secret)));
 
         assert.exists(decryptedMsg);
-        assert.equal(await originalEnvelope.open().getDidDocumentBase64(), decryptedMsg.getDidDocumentBase64());
-        assert.equal(await originalEnvelope.open().getDid(), decryptedMsg.getDid());
+        assert.equal(originalEnvelope.open().getDidDocumentBase64(), decryptedMsg.getDidDocumentBase64());
+        assert.equal(originalEnvelope.open().getDid(), decryptedMsg.getDid());
     });
 
     it('Test Invalid Did', async function() {
@@ -75,7 +75,7 @@ describe('HcsDidMessage', function() {
 
         const didJson = doc.toJSON();
         const message = HcsDidMessage.fromDidDocumentJson(didJson, DidMethodOperation.CREATE).sign(msg => privateKey.sign(msg));
-        const msg = await MessageEnvelope.fromJson(Buffer.from(message).toString("utf8"), HcsDidMessage).open();
+        const msg = MessageEnvelope.fromJson(Buffer.from(message).toString("utf8"), HcsDidMessage).open();
 
         const differentDid = new HcsDid(network, HcsDid.generateDidRootKey().publicKey, ADDRESS_BOOK_FID);
         msg.did = differentDid.toDid();
@@ -105,7 +105,7 @@ describe('HcsDidMessage', function() {
         const didJson = doc.toJSON();
         const message = HcsDidMessage.fromDidDocumentJson(didJson, DidMethodOperation.CREATE).sign(msg => privateKey.sign(msg));
 
-        const validMsg = await MessageEnvelope.fromJson(Buffer.from(message).toString("utf8"), HcsDidMessage).open();
+        const validMsg = MessageEnvelope.fromJson(Buffer.from(message).toString("utf8"), HcsDidMessage).open();
 
         let msg = new HcsDidMessage(operation, null, validMsg.getDidDocumentBase64());
         assert.isFalse(msg.isValid());
@@ -126,6 +126,6 @@ describe('HcsDidMessage', function() {
         const message = HcsDidMessage.fromDidDocumentJson(didJson, DidMethodOperation.CREATE).sign(msg => HcsDid.generateDidRootKey().sign(msg));
         const envelope = MessageEnvelope.fromJson(Buffer.from(message).toString("utf8"), HcsDidMessage);
 
-        assert.isFalse(await envelope.isSignatureValid(async e => await e.open().extractDidRootKey()));
+        assert.isFalse(envelope.isSignatureValid(e => e.open().extractDidRootKey()));
     });
 });
