@@ -1,3 +1,4 @@
+const {OPERATOR_KEY, OPERATOR_ID, NETWORK} = require("./variables");
 const {
     AccountId,
     PrivateKey,
@@ -26,12 +27,12 @@ let client,
     network;
 
 describe('HcsIdentityNetwork', function() {
-    beforeEach(async function() {
+    before(async function() {
         this.timeout(60000);
 
-        operatorId = AccountId.fromString("0.0.1548173");
-        operatorKey = PrivateKey.fromString("302e020100300506032b657004220420e749aa65835ce90cab1cfb7f0fa11038e867e74946abca993f543cf9509c8edc");
-        network = "testnet";
+        operatorId = AccountId.fromString(OPERATOR_ID);
+        operatorKey = PrivateKey.fromString(OPERATOR_KEY);
+        network = NETWORK;
         client = Client.forTestnet();
         client.setMirrorNetwork(["hcs." + network + ".mirrornode.hedera.com:5600"]);
         client.setOperator(operatorId, operatorKey);

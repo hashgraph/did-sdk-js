@@ -15,7 +15,7 @@
     "build:dev": "tsc --sourceMap -w",
     "start": "node dist/index.js",
     "start:dev": "nodemon --inspect dist/index.js",
-    "test": "mocha test/**/*"
+    "test": "mocha test/**/*.js"
   },
   "repository": {
     "type": "git",

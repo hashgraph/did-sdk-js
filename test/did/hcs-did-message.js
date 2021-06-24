@@ -1,8 +1,8 @@
+const {encrypt, decrypt} = require("../aes-encryption-util");
 const {
     FileId,
     TopicId,
 } = require('@hashgraph/sdk');
-const bs58 = require('bs58');
 const {
     HcsDidMessage,
     MessageEnvelope,
@@ -10,7 +10,6 @@ const {
     HcsDid,
     ArraysUtils
 } = require("../../dist");
-const crypto = require('crypto');
 
 const {assert} = require('chai');
 
@@ -18,16 +17,6 @@ const network = 'network';
 const ADDRESS_BOOK_FID = FileId.fromString('0.0.1');
 const DID_TOPIC_ID1 = TopicId.fromString('0.0.2');
 const DID_TOPIC_ID2 = TopicId.fromString('0.0.3');
-
-function encrypt(plainText, key, outputEncoding = "base64") {
-    const cipher = crypto.createCipheriv("aes-128-ecb", crypto.createHash('sha256').update(String(key)).digest('base64').substr(0, 16), null);
-    return Buffer.concat([cipher.update(plainText, 'utf8'), cipher.final()]).toString(outputEncoding);
-}
-
-function decrypt(cipherText, key, outputEncoding = "utf8") {
-    const cipher = crypto.createDecipheriv("aes-128-ecb", crypto.createHash('sha256').update(String(key)).digest('base64').substr(0, 16), null);
-    return Buffer.concat([cipher.update(cipherText, 'base64'), cipher.final()]).toString(outputEncoding);
-}
 
 describe('HcsDidMessage', function() {
     it('Test Valid Message', async function() {

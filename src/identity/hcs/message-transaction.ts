@@ -7,7 +7,7 @@ import moment from "moment";
 import { ArraysUtils } from "../../utils/arrays-utils";
 
 export abstract class MessageTransaction<T extends Message> {
-    private static SUBTRACT_TIME = 100; // seconds
+    private static SUBTRACT_TIME = 1; // seconds
 
     protected topicId: TopicId;
     protected message: MessageEnvelope<T>;
