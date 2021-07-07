@@ -1,7 +1,7 @@
 import {FileId} from "@hashgraph/sdk";
 
 /**
- * Appent's address book for HCS identity network.
+ * Appnet's address book for HCS identity network.
  */
 export class AddressBook {
     private fileId: FileId;

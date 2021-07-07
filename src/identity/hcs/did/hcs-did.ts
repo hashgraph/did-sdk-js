@@ -151,18 +151,18 @@ export class HcsDid implements HederaDid {
             topicId: TopicId,
             addressBookFileId: FileId;
 
+        const didParts = mainParts.shift().split(DidSyntax.DID_METHOD_SEPARATOR);
+
+        if (didParts.shift() !== DidSyntax.DID_PREFIX) {
+            throw new Error('DID string is invalid: invalid prefix.');
+        }
+
+        const methodName = didParts.shift();
+        if (DidSyntax.Method.HEDERA_HCS !== methodName) {
+            throw new Error('DID string is invalid: invalid method name: ' + methodName);
+        }
+
         try {
-            const didParts = mainParts.shift().split(DidSyntax.DID_METHOD_SEPARATOR);
-
-            if (didParts.shift() !== DidSyntax.DID_PREFIX) {
-                throw new Error('DID string is invalid: invalid prefix.');
-            }
-
-            const methodName = didParts.shift();
-            if (DidSyntax.Method.HEDERA_HCS !== methodName) {
-                throw new Error('DID string is invalid: invalid method name: ' + methodName);
-            }
-
             const networkName = didParts.shift();
 
             const params = this.extractParameters(mainParts, methodName, networkName);
