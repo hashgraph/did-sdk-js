@@ -76,7 +76,7 @@ npm run build:dev
 ```
 
 # Tests
-For run tests you need to create and fill ```test/variables.js``` file before. There is ```variables.js.sample``` file as example.
+For run tests you need to create and fill ```test/variables.js``` file before. There is ```test/variables.js.sample``` file as example.
 
 Run tests
 ```
