@@ -141,3 +141,7 @@ npm run test
 - <https://www.hedera.com/>
 - <https://www.w3.org/TR/did-core/>
 - <https://www.w3.org/TR/vc-data-model/>
+
+## License Information
+
+Licensed under _license placeholder_.
