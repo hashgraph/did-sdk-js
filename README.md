@@ -1,7 +1,26 @@
 # did-sdk-js
-Support for the Hedera Hashgraph DID Method and Verifiable Credentials on the Hedera JavaScript/TypeScript SDK
+Support for the Hedera Hashgraph DID Method and Verifiable Credentials on the Hedera JavaScript/TypeScript SDK.
 
-# Usage
+did-sdk-js based on [did-sdk-java](https://github.com/hashgraph/did-sdk-java), so both of them contain similar methods and classes.
+
+## Overview
+
+Identity networks are set of artifacts on Hedera Consensus Service that allow applications to share common channels to publish and resolve DID documents, issue verifiable credentials and control their validity status. These artifacts include:
+
+- address book - a file on Hedera File Service that provides information about HCS topics and appnet servers,
+- DID topic - an HCS topic intended for publishing DID documents,
+- and VC topic - an HCS topic playing a role of verifiable credentials registry.
+
+This SDK is designed to simplify :
+
+- creation of identity networks within appnets, that is: creation and initialization of the artifacts mentioned above,
+- generation of decentralized identifiers for [Hedera DID Method][did-method-spec] and creation of their basic DID documents,
+- creation (publishing), update, deletion and resolution of DID documents in appnet identity networks,
+- issuance, revocation and status verification of [Verifiable Credentials][vc-data-model].
+
+The SDK does not impose any particular way of how the DID or verifiable credential documents are constructed. Each appnet creators can choose their best way of creating those documents and as long as these are valid JSON-LD files adhering to W3C standards, they will be handled by the SDK.
+
+## Usage
 ```
 npm install --save did-sdk-js
 ```
@@ -61,7 +80,20 @@ Example:
 	  .execute(client);
 ```
 
-# Development
+## References
+
+- <https://github.com/hashgraph/did-method>
+- <https://github.com/hashgraph/hedera-sdk-js>
+- <https://docs.hedera.com/hedera-api/>
+- <https://www.hedera.com/>
+- <https://www.w3.org/TR/did-core/>
+- <https://www.w3.org/TR/vc-data-model/>
+
+[did-method-spec]: https://github.com/hashgraph/did-method
+[did-core]: https://www.w3.org/TR/did-core/
+[vc-data-model]: https://www.w3.org/TR/vc-data-model/
+
+## Development
 ```
 git clone git@github.com:hashgraph/did-sdk-js.git
 ```
@@ -75,10 +107,15 @@ Run build in dev mode (with sourcemap generation and following changes)
 npm run build:dev
 ```
 
-# Tests
+## Tests
 For run tests you need to create and fill ```test/variables.js``` file before. There is ```test/variables.js.sample``` file as example.
 
 Run tests
 ```
 npm run test
 ```
+
+
+## License Information
+
+Licensed under [Apache License, Version 2.0](LICENSE).
