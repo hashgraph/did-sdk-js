@@ -98,15 +98,6 @@ await identityNetwork.createDidTransaction(DidMethodOperation.CREATE)
   .execute(client);
 ```
 
-## References
-
-- <https://github.com/hashgraph/did-method>
-- <https://github.com/hashgraph/hedera-sdk-js>
-- <https://docs.hedera.com/hedera-api/>
-- <https://www.hedera.com/>
-- <https://www.w3.org/TR/did-core/>
-- <https://www.w3.org/TR/vc-data-model/>
-
 [did-method-spec]: https://github.com/hashgraph/did-method
 [did-core]: https://www.w3.org/TR/did-core/
 [vc-data-model]: https://www.w3.org/TR/vc-data-model/
@@ -143,7 +134,10 @@ Run tests
 npm run test
 ```
 
-
-## License Information
-
-Licensed under [Apache License, Version 2.0](LICENSE).
+## References
+- <https://github.com/hashgraph/did-method>
+- <https://github.com/hashgraph/hedera-sdk-js>
+- <https://docs.hedera.com/hedera-api/>
+- <https://www.hedera.com/>
+- <https://www.w3.org/TR/did-core/>
+- <https://www.w3.org/TR/vc-data-model/>
