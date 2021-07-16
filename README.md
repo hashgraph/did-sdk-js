@@ -24,60 +24,76 @@ The SDK does not impose any particular way of how the DID or verifiable credenti
 ```
 npm install --save did-sdk-js
 ```
-Example:
+
+## Example:
+
+### Identity Network
 ```
-// DID Generation
+const client = ... // Client
 
-// from already instantiated network:
+const identityNetwork = new HcsIdentityNetworkBuilder()
+  .setNetwork("testnet")
+  .setAppnetName("MyIdentityAppnet")
+  .addAppnetDidServer("https://appnet-did-server-url:port/path-to-did-api")
+  .setPublicKey(publicKey)
+  .setMaxTransactionFee(new Hbar(2))
+  .setDidTopicMemo("MyIdentityAppnet DID topic")
+  .setVCTopicMemo("MyIdentityAppnet VC topic")
+  .execute(client);
+```
 
-	const identityNetwork = ...; //HcsIdentityNetwork
-	// From a given DID root key:
-	const didRootKey = ...; //PrivateKey
-	const hcsDid = identityNetwork.generateDid(didRootKey.publicKey, false);
+### DID Generation
+From already instantiated network:
+```
+const identityNetwork = ...; //HcsIdentityNetwork
+// From a given DID root key:
+const didRootKey = ...; //PrivateKey
+const hcsDid = identityNetwork.generateDid(didRootKey.publicKey, false);
+```
+or:
+```
+// Without having a DID root key - it will be generated automatically:
+// Here we decided to add DID topic ID parameter `tid` to the DID.
+const hcsDidWithDidRootKey = identityNetwork.generateDid(true);
+const didRootKeyPrivateKey = hcsDidWithDidRootKey.getPrivateDidRootKey().get();
+```
+or by directly constructing HcsDid object:
+```
+const didRootKey = HcsDid.generateDidRootKey();
+const addressBookFileId = FileId.fromString("<hedera.address-book-file.id>");
 
-// Or:
+const hcsDid = new HcsDid(HederaNetwork.TESTNET, didRootKey.publicKey, addressBookFileId);
+```
+Existing Hedera DID strings can be parsed into HcsDid object by calling fromString method:
+```
+const didString = "did:hedera:testnet:7c38oC4ytrYDGCqsaZ1AXt7ZPQ8etzfwaxoKjfJNzfoc;hedera:testnet:fid=0.0.1";
+const did = HcsDid.fromString(didString);
+```
 
-	// Without having a DID root key - it will be generated automatically:
-	// Here we decided to add DID topic ID parameter `tid` to the DID.
-	const hcsDidWithDidRootKey = identityNetwork.generateDid(true);
-	const didRootKeyPrivateKey = hcsDidWithDidRootKey.getPrivateDidRootKey().get();
+### Transaction
+```
+const client = ...; //Client
+const identityNetwork = ...; //HcsIdentityNetwork
 
-// or by directly constructing HcsDid object:
+const didRootKey = ...; //PrivateKey
+const hcsDid = ...; //HcsDid
 
-	const didRootKey = HcsDid.generateDidRootKey();
-	const addressBookFileId = FileId.fromString("<hedera.address-book-file.id>");
+const didDocument = hcsDid.generateDidDocument().toJson();
 
-	const hcsDid = new HcsDid(HederaNetwork.TESTNET, didRootKey.publicKey, addressBookFileId);
-
-// Existing Hedera DID strings can be parsed into HcsDid object by calling fromString method:
-
-	const didString = "did:hedera:testnet:7c38oC4ytrYDGCqsaZ1AXt7ZPQ8etzfwaxoKjfJNzfoc;hedera:testnet:fid=0.0.1";
-	const did = HcsDid.fromString(didString);
-
-// Transaction
-
-	const client = ...; //Client
-	const identityNetwork = ...; //HcsIdentityNetwork
-
-	const didRootKey = ...; //PrivateKey
-	const hcsDid = ...; //HcsDid
-
-	const didDocument = hcsDid.generateDidDocument().toJson();
-
-	// Build and execute transaction
-	await identityNetwork.createDidTransaction(DidMethodOperation.CREATE)
-	  // Provide DID document as JSON string
-	  .setDidDocument(didDocument)
-	  // Sign it with DID root key
-	  .signMessage(doc => didRootKey.sign(doc))
-	  // Configure ConsensusMessageSubmitTransaction, build it and sign if required by DID topic
-	  .buildAndSignTransaction(tx => tx.setMaxTransactionFee(new Hbar(2)))
-	  // Define callback function when consensus was reached and DID document came back from mirror node
-	  .onMessageConfirmed(msg => {
-		//DID document published!
-	  })
-	  // Execute transaction
-	  .execute(client);
+// Build and execute transaction
+await identityNetwork.createDidTransaction(DidMethodOperation.CREATE)
+  // Provide DID document as JSON string
+  .setDidDocument(didDocument)
+  // Sign it with DID root key
+  .signMessage(doc => didRootKey.sign(doc))
+  // Configure ConsensusMessageSubmitTransaction, build it and sign if required by DID topic
+  .buildAndSignTransaction(tx => tx.setMaxTransactionFee(new Hbar(2)))
+  // Define callback function when consensus was reached and DID document came back from mirror node
+  .onMessageConfirmed(msg => {
+    //DID document published!
+  })
+  // Execute transaction
+  .execute(client);
 ```
 
 ## References
