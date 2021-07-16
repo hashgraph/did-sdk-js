@@ -1,6 +1,8 @@
 # did-sdk-js
 Support for the Hedera Hashgraph DID Method and Verifiable Credentials on the Hedera JavaScript/TypeScript SDK.
 
+This repository contains the Javascript SDK for managing [DID Documents][did-core] & [Verifiable Credentials][vc-data-model] registry using the Hedera Consensus Service.
+
 did-sdk-js based on [did-sdk-java](https://github.com/hashgraph/did-sdk-java), so both of them contain similar methods and classes.
 
 ## Overview
