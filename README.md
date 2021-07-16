@@ -126,6 +126,16 @@ npm run build:dev
 ## Tests
 For run tests you need to create and fill ```test/variables.js``` file before. There is ```test/variables.js.sample``` file as example.
 
+Update the following environment variables with your `testnet` account details
+
+* OPERATOR_ID=0.0.xxxx
+* OPERATOR_KEY=302...
+
+You may also edit the following to use a different network (ensure your OPERATOR_ID and OPERATOR_KEY are valid)
+
+* NETWORK=testnet (can be `testnet`, `previewnet` or `mainnet`)
+* MIRROR_PROVIDER=hedera (can be `hedera` or `kabuto` (note `kabuto` not available on `previewnet`))
+
 Run tests
 ```
 npm run test
