@@ -103,7 +103,11 @@ export class AddressBook {
         return this.fileId;
     }
 
-    public setFileId(fileId: FileId): void {
-        this.fileId = fileId;
+    public setFileId(fileId: FileId | string): void {
+        if (typeof fileId === 'string') {
+            this.fileId = FileId.fromString(fileId);
+        } else {
+            this.fileId = fileId;
+        }
     }
 }
