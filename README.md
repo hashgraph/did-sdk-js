@@ -24,7 +24,7 @@ The SDK does not impose any particular way of how the DID or verifiable credenti
 
 ## Usage
 ```
-npm install --save did-sdk-js
+npm install --save @hashgraph/did-sdk-js
 ```
 
 ## Example:
