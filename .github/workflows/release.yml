@@ -12,7 +12,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        node: [ '12', '14', '16' ]
+        node: [ '14', '16' ]
     steps:
       - uses: actions/checkout@v2
       - uses: actions/setup-node@v2
@@ -20,7 +20,10 @@ jobs:
           cache: 'npm'
           node-version: ${{ matrix.node }}
       - run: npm ci
-      #- run: npm test
+      - run: npm test
+        env:
+          OPERATOR_ID: ${{ secrets.OPERATOR_ID }}
+          OPERATOR_KEY: ${{ secrets.OPERATOR_KEY }}
 
   publish:
     needs: build
@@ -35,4 +38,4 @@ jobs:
       - run: npm ci
       - run: npm publish
         env:
-          NODE_AUTH_TOKEN: ${{secrets.npm_token}}
+          NODE_AUTH_TOKEN: ${{secrets.NODE_AUTH_TOKEN }}
