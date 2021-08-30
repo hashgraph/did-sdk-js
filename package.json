@@ -1,6 +1,6 @@
 {
-  "name": "did-sdk-js",
-  "version": "0.0.1",
+  "name": "@hashgraph/did-sdk-js",
+  "version": "0.1.0",
   "description": "Support for the Hedera Hashgraph DID Method and Verifiable Credentials on the Hedera JavaScript/TypeScript SDK",
   "main": "dist/index.js",
   "module": "dist/index.js",
@@ -21,7 +21,7 @@
     "type": "git",
     "url": "git+https://github.com/hashgraph/did-sdk-js.git"
   },
-  "author": "",
+  "author": "Hedera Hashgraph, LLC",
   "license": "Apache-2.0",
   "bugs": {
     "url": "https://github.com/hashgraph/did-sdk-js/issues"
