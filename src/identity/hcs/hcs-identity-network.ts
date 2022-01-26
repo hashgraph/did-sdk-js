@@ -1,17 +1,17 @@
-import {AddressBook} from "./address-book";
-import {Client, FileContentsQuery, FileId, PrivateKey, PublicKey, TopicId} from "@hashgraph/sdk";
-import {HcsDid} from "./did/hcs-did";
-import {DidMethodOperation} from "../did-method-operation";
-import {HcsDidTransaction} from "./did/hcs-did-transaction";
-import {MessageEnvelope} from "./message-envelope";
-import {HcsVcMessage} from "./vc/hcs-vc-message";
-import {HcsDidMessage} from "./did/hcs-did-message";
-import {HcsVcTransaction} from "./vc/hcs-vc-transaction";
-import {HcsVcOperation} from "./vc/hcs-vc-operation";
-import {HcsDidResolver} from "./did/hcs-did-resolver";
-import {HcsDidTopicListener} from "./did/hcs-did-topic-listener";
-import {HcsVcStatusResolver} from "./vc/hcs-vc-status-resolver";
-import {HcsVcTopicListener} from "./vc/hcs-vc-topic-listener";
+import { Client, FileContentsQuery, FileId, PrivateKey, PublicKey, TopicId } from "@hashgraph/sdk";
+import { DidMethodOperation } from "../did-method-operation";
+import { AddressBook } from "./address-book";
+import { HcsDid } from "./did/hcs-did";
+import { HcsDidMessage } from "./did/hcs-did-message";
+import { HcsDidResolver } from "./did/hcs-did-resolver";
+import { HcsDidTopicListener } from "./did/hcs-did-topic-listener";
+import { HcsDidTransaction } from "./did/hcs-did-transaction";
+import { MessageEnvelope } from "./message-envelope";
+import { HcsVcMessage } from "./vc/hcs-vc-message";
+import { HcsVcOperation } from "./vc/hcs-vc-operation";
+import { HcsVcStatusResolver } from "./vc/hcs-vc-status-resolver";
+import { HcsVcTopicListener } from "./vc/hcs-vc-topic-listener";
+import { HcsVcTransaction } from "./vc/hcs-vc-transaction";
 
 /**
  * Appnet's identity network based on Hedera HCS DID method specification.
@@ -70,10 +70,13 @@ export class HcsIdentityNetwork {
      * @param hcsDid The Hedera HCS DID.
      * @return The identity network instance.
      */
-    public static async fromHcsDid(client: Client, hcsDid: HcsDid): Promise<HcsIdentityNetwork> {
-        const addressBookFileId = hcsDid.getAddressBookFileId();
-        return await HcsIdentityNetwork.fromAddressBookFile(client, hcsDid.getNetwork(), addressBookFileId);
-    }
+    /**
+     * TODO: inspect, should probably be removed since fid is no longer available with new format of DID
+     */
+    // public static async fromHcsDid(client: Client, hcsDid: HcsDid): Promise<HcsIdentityNetwork> {
+    //     const addressBookFileId = hcsDid.getAddressBookFileId();
+    //     return await HcsIdentityNetwork.fromAddressBookFile(client, hcsDid.getNetwork(), addressBookFileId);
+    // }
 
     /**
      * Instantiates a {@link HcsDidTransaction} to perform the specified operation on the DID document.
@@ -185,7 +188,7 @@ export class HcsIdentityNetwork {
             const privateKey = HcsDid.generateDidRootKey();
             const tid = withTid ? this.getDidTopicId() : null;
 
-            return new HcsDid(this.getNetwork(), privateKey, this.addressBook.getFileId(), tid);
+            return new HcsDid(this.getNetwork(), privateKey, tid);
         } else if (
             (args.length === 2) &&
             (args[0] instanceof PublicKey) &&
@@ -194,7 +197,7 @@ export class HcsIdentityNetwork {
             const [publicKey, withTid] = args;
             const tid = withTid ? this.getDidTopicId() : null;
 
-            return new HcsDid(this.getNetwork(), publicKey, this.addressBook.getFileId(), tid);
+            return new HcsDid(this.getNetwork(), publicKey, tid);
         } else if (
             (args.length === 2) &&
             (args[0] instanceof PrivateKey) &&
@@ -203,7 +206,7 @@ export class HcsIdentityNetwork {
             const [privateKey, withTid] = args;
             const tid = withTid ? this.getDidTopicId() : null;
 
-            return new HcsDid(this.getNetwork(), privateKey, this.addressBook.getFileId(), tid);
+            return new HcsDid(this.getNetwork(), privateKey, tid);
         }
     }
 

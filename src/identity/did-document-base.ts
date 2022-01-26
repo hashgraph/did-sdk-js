@@ -12,6 +12,9 @@ export class DidDocumentBase {
         this.context = DidSyntax.DID_DOCUMENT_CONTEXT;
     }
 
+    /**
+     * TODO: inverstigate, how fexible this method should be? Should it still support old format?
+     */
     public static fromJson(json: string): DidDocumentBase {
         let result: DidDocumentBase;
 
@@ -58,12 +61,21 @@ export class DidDocumentBase {
         const rootObject = {};
         rootObject[DidDocumentJsonProperties.CONTEXT] = this.context;
         rootObject[DidDocumentJsonProperties.ID] = this.id;
-        rootObject[DidDocumentJsonProperties.PUBLIC_KEY] = [
-            this.didRootKey.toJsonTree()
-        ];
-        rootObject[DidDocumentJsonProperties.AUTHENTICATION] = [
-            this.didRootKey.getId()
-        ];
+
+        /**
+         * TODO: investigate, should we just leave such cases crash?
+         */
+        if (this.didRootKey) {
+            rootObject[DidDocumentJsonProperties.AUTHENTICATION] = [
+                this.didRootKey.getId()
+            ];
+            rootObject[DidDocumentJsonProperties.VERIFICATION_METHOD] = [
+                this.didRootKey.toJsonTree()
+            ];
+        } else {
+            console.warn('WARNING: didRootKey is not set for the document')
+        }
+
         return rootObject;
     }
 
