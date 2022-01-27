@@ -1,4 +1,4 @@
-const { FileId, TopicId } = require("@hashgraph/sdk");
+const { TopicId } = require("@hashgraph/sdk");
 const bs58 = require("bs58");
 const { HcsDid, HcsDidRootKey } = require("../../dist");
 
