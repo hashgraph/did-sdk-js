@@ -1,4 +1,3 @@
-import {AddressBook} from "./identity/hcs/address-book";
 import {ArraysUtils} from "./utils/arrays-utils";
 import {CredentialSubject} from "./identity/hcs/vc/credential-subject";
 import {DidDocumentBase} from "./identity/did-document-base";
@@ -36,7 +35,6 @@ import {Validator} from "./utils/validator";
 import {Issuer} from "./identity/hcs/vc/issuer";
 
 export {
-    AddressBook,
     ArraysUtils,
     CredentialSubject,
     DidDocumentBase,
