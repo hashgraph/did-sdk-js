@@ -9,24 +9,24 @@ export class Hashing {
         },
         decode: function (data: string): Uint8Array {
             return bs58.decode(data);
-        }
-    }
+        },
+    };
     public static readonly sha256 = {
         digest: function (data: Uint8Array | string): Uint8Array {
             const sha256 = crypto
-                .createHash('sha256') // may need to change in the future.
+                .createHash("sha256") // may need to change in the future.
                 .update(data)
                 .digest();
             return sha256;
-        }
-    }
+        },
+    };
 
     public static readonly base64 = {
         decode: function (encodedString: string): string {
-            return Base64.fromBase64(encodedString);;
+            return Base64.fromBase64(encodedString);
         },
         encode: function (decodedBytes: string): string {
             return Base64.toBase64(decodedBytes);
-        }
-    }
+        },
+    };
 }

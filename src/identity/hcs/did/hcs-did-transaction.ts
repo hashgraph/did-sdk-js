@@ -1,12 +1,12 @@
-import {MessageTransaction} from "../message-transaction";
-import {HcsDidMessage} from "./hcs-did-message";
-import {DidMethodOperation} from "../../did-method-operation";
-import {PublicKey, TopicId} from "@hashgraph/sdk";
-import {MessageEnvelope} from "../message-envelope";
-import {Validator} from "../../../utils/validator";
-import {MessageListener} from "../message-listener";
-import {HcsDidTopicListener} from "./hcs-did-topic-listener";
-import {Encrypter} from "../message";
+import { MessageTransaction } from "../message-transaction";
+import { HcsDidMessage } from "./hcs-did-message";
+import { DidMethodOperation } from "../../did-method-operation";
+import { PublicKey, TopicId } from "@hashgraph/sdk";
+import { MessageEnvelope } from "../message-envelope";
+import { Validator } from "../../../utils/validator";
+import { MessageListener } from "../message-listener";
+import { HcsDidTopicListener } from "./hcs-did-topic-listener";
+import { Encrypter } from "../message";
 
 /**
  * The DID document creation, update or deletion transaction.
@@ -32,11 +32,7 @@ export class HcsDidTransaction extends MessageTransaction<HcsDidMessage> {
      */
     constructor(operation: DidMethodOperation, topicId: TopicId);
     constructor(...args) {
-        if (
-            (args[0] instanceof MessageEnvelope) &&
-            (args[1] instanceof TopicId) &&
-            (args.length === 2)
-        ) {
+        if (args[0] instanceof MessageEnvelope && args[1] instanceof TopicId && args.length === 2) {
             const [message, topicId] = args;
             super(topicId, message);
             this.operation = null;
@@ -45,7 +41,7 @@ export class HcsDidTransaction extends MessageTransaction<HcsDidMessage> {
             super(topicId);
             this.operation = operation;
         } else {
-            throw new Error('Invalid arguments')
+            throw new Error("Invalid arguments");
         }
     }
 
@@ -62,8 +58,8 @@ export class HcsDidTransaction extends MessageTransaction<HcsDidMessage> {
 
     protected validate(validator: Validator): void {
         super.validate(validator);
-        validator.require(!!this.didDocument || !!this.message, 'DID document is mandatory.');
-        validator.require(!!this.operation || !!this.message, 'DID method operation is not defined.');
+        validator.require(!!this.didDocument || !!this.message, "DID document is mandatory.");
+        validator.require(!!this.operation || !!this.message, "DID method operation is not defined.");
     }
 
     protected buildMessage(): MessageEnvelope<HcsDidMessage> {

@@ -1,4 +1,4 @@
 export enum MessageMode {
-    PLAIN = 'plain',
-    ENCRYPTED = 'encrypted'
+    PLAIN = "plain",
+    ENCRYPTED = "encrypted",
 }

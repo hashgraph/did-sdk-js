@@ -1,7 +1,7 @@
 export function Sleep(sleepTime: number): Promise<void> {
-    return new Promise(resolve => {
+    return new Promise((resolve) => {
         setTimeout(() => {
             resolve();
-        }, sleepTime)
-    })
+        }, sleepTime);
+    });
 }
