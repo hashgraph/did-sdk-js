@@ -1,6 +1,4 @@
-const {
-    CredentialSubject
-} = require("../../dist");
+const { CredentialSubject } = require("../../dist");
 
 /**
  * Example Credential.

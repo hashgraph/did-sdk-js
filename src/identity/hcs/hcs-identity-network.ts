@@ -16,7 +16,6 @@ import { HcsVcTransaction } from "./vc/hcs-vc-transaction";
  * Identity network based on Hedera HCS DID method specification.
  */
 export class HcsIdentityNetwork {
-
     /**
      * The Hedera network on which this identity network is created.
      */
@@ -25,7 +24,6 @@ export class HcsIdentityNetwork {
     private didTopicId: TopicId;
 
     private vcTopicId: TopicId;
-
 
     /**
      * Instantiates existing identity network using a DID generated for this network.
@@ -40,17 +38,21 @@ export class HcsIdentityNetwork {
         return result;
     }
 
-        /**
+    /**
      * Instantiates existing identity network using a DID generated for this network.
      *
      * @param network The Hedera network.
      * @return The identity network instance.
      */
-    public static async fromHcsDidAndVCTopic(network: string, didTopicId: TopicId, vcTopicId: TopicId): Promise<HcsIdentityNetwork> {
+    public static async fromHcsDidAndVCTopic(
+        network: string,
+        didTopicId: TopicId,
+        vcTopicId: TopicId
+    ): Promise<HcsIdentityNetwork> {
         const result = new HcsIdentityNetwork();
         result.network = network;
         result.didTopicId = didTopicId;
-        result.vcTopicId =  vcTopicId;
+        result.vcTopicId = vcTopicId;
         return result;
     }
 
@@ -71,20 +73,17 @@ export class HcsIdentityNetwork {
     public createDidTransaction(message: MessageEnvelope<HcsDidMessage>): HcsDidTransaction;
 
     public createDidTransaction(...args): HcsDidTransaction {
-        if (
-            (args.length === 1) &&
-            (args[0] instanceof MessageEnvelope)
-        ) {
+        if (args.length === 1 && args[0] instanceof MessageEnvelope) {
             const [message] = args;
             return new HcsDidTransaction(message, this.didTopicId);
         } else if (
-            (args.length === 1)
+            args.length === 1
             // (args[0] instanceof DidMethodOperation)
         ) {
             const [operation] = args;
             return new HcsDidTransaction(operation, this.didTopicId);
         } else {
-            throw new Error('Invalid arguments');
+            throw new Error("Invalid arguments");
         }
     }
 
@@ -96,7 +95,11 @@ export class HcsIdentityNetwork {
      * @param signerPublicKey Public key of the signer (issuer).
      * @return The transaction instance.
      */
-    public createVcTransaction(operation: HcsVcOperation, credentialHash: string, signerPublicKey: PublicKey): HcsVcTransaction;
+    public createVcTransaction(
+        operation: HcsVcOperation,
+        credentialHash: string,
+        signerPublicKey: PublicKey
+    ): HcsVcTransaction;
 
     /**
      * Instantiates a {@link HcsVcTransaction} to perform the specified operation on the VC document status.
@@ -109,22 +112,18 @@ export class HcsIdentityNetwork {
 
     public createVcTransaction(...args): HcsVcTransaction {
         if (
-            (args.length === 3) &&
+            args.length === 3 &&
             // (args[0] instanceof HcsVcOperation) &&
-            (typeof args[1] === 'string') &&
-            (args[2] instanceof PublicKey)
+            typeof args[1] === "string" &&
+            args[2] instanceof PublicKey
         ) {
             const [operation, credentialHash, signerPublicKey] = args;
             return new HcsVcTransaction(this.vcTopicId, operation, credentialHash, signerPublicKey);
-        } else if (
-            (args.length === 2) &&
-            (args[0] instanceof MessageEnvelope) &&
-            (args[1] instanceof PublicKey)
-        ) {
+        } else if (args.length === 2 && args[0] instanceof MessageEnvelope && args[1] instanceof PublicKey) {
             const [message, signerPublicKey] = args;
             return new HcsVcTransaction(this.vcTopicId, message, signerPublicKey);
         } else {
-            throw new Error('Invalid arguments');
+            throw new Error("Invalid arguments");
         }
     }
 
@@ -172,21 +171,13 @@ export class HcsIdentityNetwork {
      */
     public generateDid(publicKey: PublicKey): HcsDid;
     public generateDid(...args): HcsDid {
-        if (
-            (args.length === 0)
-        ) {
+        if (args.length === 0) {
             const privateKey = HcsDid.generateDidRootKey();
             return new HcsDid(this.getNetwork(), privateKey, this.didTopicId);
-        } else if (
-            (args.length === 1) &&
-            (args[0] instanceof PublicKey) 
-        ) {
+        } else if (args.length === 1 && args[0] instanceof PublicKey) {
             const [publicKey] = args;
             return new HcsDid(this.getNetwork(), publicKey, this.didTopicId);
-        } else if (
-            (args.length === 1) &&
-            (args[0] instanceof PrivateKey)
-        ) {
+        } else if (args.length === 1 && args[0] instanceof PrivateKey) {
             const [privateKey] = args;
             return new HcsDid(this.getNetwork(), privateKey, this.didTopicId);
         }
@@ -201,7 +192,6 @@ export class HcsIdentityNetwork {
         return new HcsDidResolver(this.didTopicId);
     }
 
-
     /**
      * Returns a DID topic listener for this network.
      *
@@ -210,7 +200,6 @@ export class HcsIdentityNetwork {
     public getDidTopicListener(): HcsDidTopicListener {
         return new HcsDidTopicListener(this.didTopicId);
     }
-
 
     /**
      * Returns a VC status resolver for this network.
@@ -236,7 +225,7 @@ export class HcsIdentityNetwork {
             const [publicKeysProvider] = args;
             return new HcsVcStatusResolver(this.vcTopicId, publicKeysProvider);
         } else {
-            throw Error('Invalid arguments');
+            throw Error("Invalid arguments");
         }
     }
 
@@ -264,8 +253,7 @@ export class HcsIdentityNetwork {
             const [publicKeysProvider] = args;
             return new HcsVcTopicListener(this.vcTopicId, publicKeysProvider);
         } else {
-            throw new Error('Invalid arguments');
+            throw new Error("Invalid arguments");
         }
     }
-
 }

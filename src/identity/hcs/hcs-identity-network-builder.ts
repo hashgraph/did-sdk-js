@@ -9,8 +9,8 @@ export class HcsIdentityNetworkBuilder {
     private didServers: string[];
     private publicKey: PublicKey;
     private maxTransactionFee: Hbar = new Hbar(2);
-    private didTopicMemo: string = '';
-    private vcTopicMemo: string = '';
+    private didTopicMemo: string = "";
+    private vcTopicMemo: string = "";
 
     public async execute(client: Client): Promise<HcsIdentityNetwork> {
         const didTopicCreateTransaction = new TopicCreateTransaction()

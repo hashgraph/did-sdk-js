@@ -1,21 +1,10 @@
-const {
-    HcsVcDocumentBase,
-    Issuer
-} = require("../../dist");
-const {
-    Timestamp
-} = require('@hashgraph/sdk');
-const {
-    DemoAccessCredential
-} = require("./demo-access-credential");
-const {
-    DemoVerifiableCredentialDocument
-} = require("./demo-verifiable-credential-document");
-const {
-    NetworkReadyTestBase
-} = require("../network-ready-test-base");
+const { HcsVcDocumentBase, Issuer } = require("../../dist");
+const { Timestamp } = require("@hashgraph/sdk");
+const { DemoAccessCredential } = require("./demo-access-credential");
+const { DemoVerifiableCredentialDocument } = require("./demo-verifiable-credential-document");
+const { NetworkReadyTestBase } = require("../network-ready-test-base");
 
-const { expect, assert } = require('chai');
+const { expect, assert } = require("chai");
 
 describe("HcsVcDocumentBaseTest", function () {
     const network = new NetworkReadyTestBase();
@@ -33,7 +22,7 @@ describe("HcsVcDocumentBaseTest", function () {
         network.cleanup();
     });
 
-    it('Test VcDocumentConstruction', async function () {
+    it("Test VcDocumentConstruction", async function () {
         const vc = new HcsVcDocumentBase();
 
         // Should fail as no issuer is set.
@@ -78,8 +67,7 @@ describe("HcsVcDocumentBaseTest", function () {
         assert.isTrue(vc.isComplete());
     });
 
-
-    it('Test VcJsonConversion', async function () {
+    it("Test VcJsonConversion", async function () {
         const vc = new HcsVcDocumentBase();
         vc.setId("example:test:vc:id");
         vc.setIssuer(new Issuer(issuer.toDid(), "My Company Ltd."));
@@ -90,7 +78,7 @@ describe("HcsVcDocumentBaseTest", function () {
 
         // Convert to JSON
         const json = vc.toJSON();
-        assert.isFalse(!(json));
+        assert.isFalse(!json);
 
         // Convert back to VC document and compare
         const vcFromJson = HcsVcDocumentBase.fromJson(json, DemoAccessCredential);
@@ -116,7 +104,7 @@ describe("HcsVcDocumentBaseTest", function () {
         assert.equal(subject.getRedLevel(), subjectFromJson.getRedLevel());
     });
 
-    it('Test CredentialHash', async function () {
+    it("Test CredentialHash", async function () {
         const vc = new DemoVerifiableCredentialDocument();
         vc.setId("example:test:vc:id");
         vc.setIssuer(issuer);

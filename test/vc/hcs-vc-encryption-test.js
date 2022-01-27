@@ -1,28 +1,12 @@
-const {
-    Hbar, Timestamp,
-} = require('@hashgraph/sdk');
+const { Hbar, Timestamp } = require("@hashgraph/sdk");
 
-const {
-    HcsVcDocumentBase,
-    HcsVcOperation,
-    HcsVcMessage,
-    MessageEnvelope,
-    ArraysUtils
-} = require("../../dist");
-const {
-    DemoAccessCredential
-} = require("./demo-access-credential");
-const {
-    DemoVerifiableCredentialDocument
-} = require("./demo-verifiable-credential-document");
-const {
-    NetworkReadyTestBase, until, sleep
-} = require("../network-ready-test-base");
-const {
-    encrypt, decrypt
-} = require("../aes-encryption-util");
+const { HcsVcDocumentBase, HcsVcOperation, HcsVcMessage, MessageEnvelope, ArraysUtils } = require("../../dist");
+const { DemoAccessCredential } = require("./demo-access-credential");
+const { DemoVerifiableCredentialDocument } = require("./demo-verifiable-credential-document");
+const { NetworkReadyTestBase, until, sleep } = require("../network-ready-test-base");
+const { encrypt, decrypt } = require("../aes-encryption-util");
 
-const { expect, assert } = require('chai');
+const { expect, assert } = require("chai");
 
 /**
  * Tests operations on verifiable credentials and their status resolution.
@@ -69,18 +53,19 @@ describe("HcsVcEncryptionTest", function () {
         network.cleanup();
     });
 
-    it('Test IssueValidEncryptedMessage', async function () {
+    it("Test IssueValidEncryptedMessage", async function () {
         this.timeout(60000);
 
         const messageRef = [];
 
         // Build and execute transaction with encrypted message
-        await network.didNetwork.createVcTransaction(HcsVcOperation.ISSUE, credentialHash, issuersPrivateKey.publicKey)
-            .signMessage(doc => issuersPrivateKey.sign(doc))
-            .buildAndSignTransaction(tx => tx.setMaxTransactionFee(FEE))
-            .onMessageConfirmed(msg => messageRef.push(msg))
+        await network.didNetwork
+            .createVcTransaction(HcsVcOperation.ISSUE, credentialHash, issuersPrivateKey.publicKey)
+            .signMessage((doc) => issuersPrivateKey.sign(doc))
+            .buildAndSignTransaction((tx) => tx.setMaxTransactionFee(FEE))
+            .onMessageConfirmed((msg) => messageRef.push(msg))
             .onError(EXPECT_NO_ERROR)
-            .onEncrypt(m => encrypt(m, SECRET))
+            .onEncrypt((m) => encrypt(m, SECRET))
             .onDecrypt((m, i) => decrypt(m, SECRET))
             .execute(network.client);
 
@@ -101,18 +86,19 @@ describe("HcsVcEncryptionTest", function () {
         await sleep(1000);
     });
 
-    it('Test ResolveWithValidDecrypter', async function () {
+    it("Test ResolveWithValidDecrypter", async function () {
         this.timeout(60000);
 
         const mapRef = [];
 
         // Resolve encrypted message
-        network.didNetwork.getVcStatusResolver(m => [issuersPrivateKey.publicKey])
+        network.didNetwork
+            .getVcStatusResolver((m) => [issuersPrivateKey.publicKey])
             .addCredentialHash(credentialHash)
             .setTimeout(NO_MORE_MESSAGES_TIMEOUT)
             .onError(EXPECT_NO_ERROR)
             .onDecrypt((m, i) => decrypt(m, SECRET))
-            .whenFinished(m => mapRef.push(m))
+            .whenFinished((m) => mapRef.push(m))
             .execute(network.client);
 
         // Wait until mirror node resolves the DID.
@@ -132,19 +118,20 @@ describe("HcsVcEncryptionTest", function () {
         await sleep(1000);
     });
 
-    it('Test ResolveWithInvalidDecrypter', async function () {
+    it("Test ResolveWithInvalidDecrypter", async function () {
         this.timeout(60000);
 
         const mapRef = [];
         const errorRef = [];
 
         // Try to resolve encrypted message with a wrong secret
-        network.didNetwork.getVcStatusResolver(m => [issuersPrivateKey.publicKey])
+        network.didNetwork
+            .getVcStatusResolver((m) => [issuersPrivateKey.publicKey])
             .addCredentialHash(credentialHash)
             .setTimeout(NO_MORE_MESSAGES_TIMEOUT)
-            .onError(e => errorRef.push(String(e)))
+            .onError((e) => errorRef.push(String(e)))
             .onDecrypt((m, i) => decrypt(m, INVALID_SECRET))
-            .whenFinished(m => mapRef.push(m))
+            .whenFinished((m) => mapRef.push(m))
             .execute(network.client);
 
         // Wait until mirror node resolves the DID.
@@ -159,18 +146,16 @@ describe("HcsVcEncryptionTest", function () {
         await sleep(1000);
     });
 
-    it('Test MessageEncryptionDecryption', async function () {
+    it("Test MessageEncryptionDecryption", async function () {
         this.timeout(60000);
 
         const msg = HcsVcMessage.fromCredentialHash(credentialHash, HcsVcOperation.ISSUE);
 
-        const encryptedMsg = msg
-            .encrypt(HcsVcMessage.getEncrypter(m => encrypt(m, SECRET)));
+        const encryptedMsg = msg.encrypt(HcsVcMessage.getEncrypter((m) => encrypt(m, SECRET)));
 
         assert.exists(encryptedMsg);
 
-
-        const msgJson = ArraysUtils.toString(encryptedMsg.sign(m => issuersPrivateKey.sign(m)));
+        const msgJson = ArraysUtils.toString(encryptedMsg.sign((m) => issuersPrivateKey.sign(m)));
         const encryptedSignedMsg = MessageEnvelope.fromJson(msgJson, HcsVcMessage);
 
         assert.exists(encryptedSignedMsg);
@@ -182,8 +167,7 @@ describe("HcsVcEncryptionTest", function () {
             assert.exists(error);
         }
 
-        const decryptedMsg = encryptedSignedMsg
-            .open(HcsVcMessage.getDecrypter((m, i) => decrypt(m, SECRET)));
+        const decryptedMsg = encryptedSignedMsg.open(HcsVcMessage.getDecrypter((m, i) => decrypt(m, SECRET)));
 
         assert.exists(decryptedMsg);
         assert.equal(credentialHash, decryptedMsg.getCredentialHash());

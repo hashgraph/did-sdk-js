@@ -147,7 +147,11 @@ export class HcsDidMessage extends Message {
             }
 
             // Verify that the message was sent to the right topic, if the DID contains the topic
-            if (!!didTopicId && !!hcsDid.getDidTopicId() && (didTopicId.toString() != hcsDid.getDidTopicId().toString())) {
+            if (
+                !!didTopicId &&
+                !!hcsDid.getDidTopicId() &&
+                didTopicId.toString() != hcsDid.getDidTopicId().toString()
+            ) {
                 return false;
             }
         } catch (e) {
@@ -214,7 +218,10 @@ export class HcsDidMessage extends Message {
      * @param operation       The operation on DID document.
      * @return The HCS message wrapped in an envelope for the given DID document and method operation.
      */
-    public static fromDidDocumentJson(didDocumentJson: string, operation: DidMethodOperation): MessageEnvelope<HcsDidMessage> {
+    public static fromDidDocumentJson(
+        didDocumentJson: string,
+        operation: DidMethodOperation
+    ): MessageEnvelope<HcsDidMessage> {
         const didDocumentBase: DidDocumentBase = DidDocumentBase.fromJson(didDocumentJson);
         const didDocumentBase64 = Hashing.base64.encode(didDocumentJson);
         const message: HcsDidMessage = new HcsDidMessage(operation, didDocumentBase.getId(), didDocumentBase64);

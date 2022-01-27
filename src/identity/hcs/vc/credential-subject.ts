@@ -11,7 +11,6 @@ export class CredentialSubject {
         this.id = id;
     }
 
-
     // JsonClass
 
     public toJsonTree(): any {
@@ -21,11 +20,9 @@ export class CredentialSubject {
     }
 
     public static fromJsonTree(root: any, result?: CredentialSubject): CredentialSubject {
-        if (!result)
-            result = new CredentialSubject();
+        if (!result) result = new CredentialSubject();
         result.id = root[HcsVcDocumentJsonProperties.ID];
         return result;
-
     }
 
     public toJSON(): string {
@@ -38,12 +35,10 @@ export class CredentialSubject {
         try {
             const root = JSON.parse(json);
             result = this.fromJsonTree(root);
-
         } catch (e) {
-            throw new Error('Given JSON string is not a valid CredentialSubject ' + e.message);
+            throw new Error("Given JSON string is not a valid CredentialSubject " + e.message);
         }
 
         return result;
     }
 }
-
