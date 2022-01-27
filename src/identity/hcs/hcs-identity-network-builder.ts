@@ -1,6 +1,5 @@
 import {Client, FileCreateTransaction, Hbar, PublicKey, TopicCreateTransaction, TopicId} from "@hashgraph/sdk";
 import {HcsIdentityNetwork} from "./hcs-identity-network";
-import {AddressBook} from "./address-book";
 
 export class HcsIdentityNetworkBuilder {
     private appnetName: string;
@@ -36,17 +35,7 @@ export class HcsIdentityNetworkBuilder {
         const vcTxId = await vcTopicCreateTransaction.execute(client);
         this.vcTopicId = (await vcTxId.getReceipt(client)).topicId;
 
-        const addressBook = AddressBook.create(this.appnetName, this.didTopicId.toString(), this.vcTopicId.toString(), this.didServers);
-
-        const fileCreateTx = new FileCreateTransaction().setContents(addressBook.toJSON());
-
-        const response = await fileCreateTx.execute(client);
-        const receipt = await response.getReceipt(client);
-        const fileId = receipt.fileId;
-
-        addressBook.setFileId(fileId);
-
-        return HcsIdentityNetwork.fromAddressBook(this.network, addressBook);
+        return HcsIdentityNetwork.fromHcsDid(this.network, this.didTopicId, this.vcTopicId);
     }
 
     public addAppnetDidServer(serverUrl: string): HcsIdentityNetworkBuilder {

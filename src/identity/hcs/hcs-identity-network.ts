@@ -1,6 +1,5 @@
 import { Client, FileContentsQuery, FileId, PrivateKey, PublicKey, TopicId } from "@hashgraph/sdk";
 import { DidMethodOperation } from "../did-method-operation";
-import { AddressBook } from "./address-book";
 import { HcsDid } from "./did/hcs-did";
 import { HcsDidMessage } from "./did/hcs-did-message";
 import { HcsDidResolver } from "./did/hcs-did-resolver";
@@ -17,66 +16,30 @@ import { HcsVcTransaction } from "./vc/hcs-vc-transaction";
  * Appnet's identity network based on Hedera HCS DID method specification.
  */
 export class HcsIdentityNetwork {
-    /**
-     * The address book of appnet's identity network.
-     */
-    private addressBook: AddressBook;
 
     /**
      * The Hedera network on which this identity network is created.
      */
     private network: string;
 
-    /**
-     * Instantiates existing identity network from a provided address book.
-     *
-     * @param network     The Hedera network.
-     * @param addressBook The {@link AddressBook} of the identity network.
-     * @return The identity network instance.
-     */
-    public static fromAddressBook(network: string, addressBook: AddressBook): HcsIdentityNetwork {
-        const result = new HcsIdentityNetwork();
-        result.network = network;
-        result.addressBook = addressBook;
+    private didTopicId: TopicId;
 
-        return result;
-    }
+    private vcTopicId: TopicId;
 
-    /**
-     * Instantiates existing identity network using an address book file read from Hedera File Service.
-     *
-     * @param client            The Hedera network client.
-     * @param network           The Hedera network.
-     * @param addressBookFileId The FileID of {@link AddressBook} file stored on Hedera File Service.
-     * @return The identity network instance.
-     */
-    public static async fromAddressBookFile(client: Client, network: string, addressBookFileId: FileId): Promise<HcsIdentityNetwork> {
-        const fileContentsQueryCost = (new FileContentsQuery()).setFileId(addressBookFileId).getCost(client);
-        const fileQuery = (new FileContentsQuery()).setFileId(addressBookFileId);
-
-        const contents = await fileQuery.execute(client);
-
-        const result = new HcsIdentityNetwork();
-        result.network = network;
-        result.addressBook = AddressBook.fromJson(contents.toString(), addressBookFileId);
-
-        return result;
-    }
 
     /**
      * Instantiates existing identity network using a DID generated for this network.
      *
-     * @param client The Hedera network client.
-     * @param hcsDid The Hedera HCS DID.
+     * @param network The Hedera network.
      * @return The identity network instance.
      */
-    /**
-     * TODO: inspect, should probably be removed since fid is no longer available with new format of DID
-     */
-    // public static async fromHcsDid(client: Client, hcsDid: HcsDid): Promise<HcsIdentityNetwork> {
-    //     const addressBookFileId = hcsDid.getAddressBookFileId();
-    //     return await HcsIdentityNetwork.fromAddressBookFile(client, hcsDid.getNetwork(), addressBookFileId);
-    // }
+    public static async fromHcsDid(network: string, didTopicId: TopicId, vcTopicId: TopicId): Promise<HcsIdentityNetwork> {
+        const result = new HcsIdentityNetwork();
+        result.network = network;
+        result.didTopicId = didTopicId;
+        result.vcTopicId =  vcTopicId;
+        return result;
+    }
 
     /**
      * Instantiates a {@link HcsDidTransaction} to perform the specified operation on the DID document.
@@ -100,13 +63,13 @@ export class HcsIdentityNetwork {
             (args[0] instanceof MessageEnvelope)
         ) {
             const [message] = args;
-            return new HcsDidTransaction(message, this.getDidTopicId());
+            return new HcsDidTransaction(message, this.didTopicId);
         } else if (
             (args.length === 1)
             // (args[0] instanceof DidMethodOperation)
         ) {
             const [operation] = args;
-            return new HcsDidTransaction(operation, this.getDidTopicId());
+            return new HcsDidTransaction(operation, this.didTopicId);
         } else {
             throw new Error('Invalid arguments');
         }
@@ -139,14 +102,14 @@ export class HcsIdentityNetwork {
             (args[2] instanceof PublicKey)
         ) {
             const [operation, credentialHash, signerPublicKey] = args;
-            return new HcsVcTransaction(this.getVcTopicId(), operation, credentialHash, signerPublicKey);
+            return new HcsVcTransaction(this.vcTopicId, operation, credentialHash, signerPublicKey);
         } else if (
             (args.length === 2) &&
             (args[0] instanceof MessageEnvelope) &&
             (args[1] instanceof PublicKey)
         ) {
             const [message, signerPublicKey] = args;
-            return new HcsVcTransaction(this.getVcTopicId(), message, signerPublicKey);
+            return new HcsVcTransaction(this.vcTopicId, message, signerPublicKey);
         } else {
             throw new Error('Invalid arguments');
         }
@@ -186,7 +149,7 @@ export class HcsIdentityNetwork {
         ) {
             const [withTid] = args;
             const privateKey = HcsDid.generateDidRootKey();
-            const tid = withTid ? this.getDidTopicId() : null;
+            const tid = withTid ? this.didTopicId : null;
 
             return new HcsDid(this.getNetwork(), privateKey, tid);
         } else if (
@@ -195,7 +158,7 @@ export class HcsIdentityNetwork {
             (typeof args[1] === 'boolean')
         ) {
             const [publicKey, withTid] = args;
-            const tid = withTid ? this.getDidTopicId() : null;
+            const tid = withTid ? this.didTopicId : null;
 
             return new HcsDid(this.getNetwork(), publicKey, tid);
         } else if (
@@ -204,7 +167,7 @@ export class HcsIdentityNetwork {
             (typeof args[1] === 'boolean')
         ) {
             const [privateKey, withTid] = args;
-            const tid = withTid ? this.getDidTopicId() : null;
+            const tid = withTid ? this.didTopicId : null;
 
             return new HcsDid(this.getNetwork(), privateKey, tid);
         }
@@ -216,17 +179,9 @@ export class HcsIdentityNetwork {
      * @return The DID resolver for this network.
      */
     public getDidResolver(): HcsDidResolver {
-        return new HcsDidResolver(this.getDidTopicId());
+        return new HcsDidResolver(this.didTopicId);
     }
 
-    /**
-     * Returns DID topic ID for this network.
-     *
-     * @return The DID topic ID.
-     */
-    public getDidTopicId(): TopicId {
-        return TopicId.fromString(this.addressBook.getDidTopicId());
-    }
 
     /**
      * Returns a DID topic listener for this network.
@@ -234,26 +189,9 @@ export class HcsIdentityNetwork {
      * @return The DID topic listener.
      */
     public getDidTopicListener(): HcsDidTopicListener {
-        return new HcsDidTopicListener(this.getDidTopicId());
+        return new HcsDidTopicListener(this.didTopicId);
     }
 
-    /**
-     * Returns Verifiable Credentials topic ID for this network.
-     *
-     * @return The VC topic ID.
-     */
-    public getVcTopicId(): TopicId {
-        return TopicId.fromString(this.addressBook.getVcTopicId());
-    }
-
-    /**
-     * Returns the address book of this identity network.
-     *
-     * @return The address book of this identity network.
-     */
-    public getAddressBook(): AddressBook {
-        return this.addressBook;
-    }
 
     /**
      * Returns a VC status resolver for this network.
@@ -274,10 +212,10 @@ export class HcsIdentityNetwork {
 
     public getVcStatusResolver(...args): HcsVcStatusResolver {
         if (args.length === 0) {
-            return new HcsVcStatusResolver(this.getVcTopicId());
+            return new HcsVcStatusResolver(this.vcTopicId);
         } else if (args.length === 1) {
             const [publicKeysProvider] = args;
-            return new HcsVcStatusResolver(this.getVcTopicId(), publicKeysProvider);
+            return new HcsVcStatusResolver(this.vcTopicId, publicKeysProvider);
         } else {
             throw Error('Invalid arguments');
         }
@@ -302,10 +240,10 @@ export class HcsIdentityNetwork {
 
     public getVcTopicListener(...args): HcsVcTopicListener {
         if (args.length === 0) {
-            return new HcsVcTopicListener(this.getVcTopicId());
+            return new HcsVcTopicListener(this.vcTopicId);
         } else if (args.length === 1) {
             const [publicKeysProvider] = args;
-            return new HcsVcTopicListener(this.getVcTopicId(), publicKeysProvider);
+            return new HcsVcTopicListener(this.vcTopicId, publicKeysProvider);
         } else {
             throw new Error('Invalid arguments');
         }
