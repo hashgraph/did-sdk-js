@@ -1,12 +1,12 @@
-import {MessageTransaction} from "../message-transaction";
-import {HcsVcMessage} from "./hcs-vc-message";
-import {HcsVcOperation} from "./hcs-vc-operation";
-import {PublicKey, TopicId} from "@hashgraph/sdk";
-import {MessageEnvelope} from "../message-envelope";
-import {Validator} from "../../../utils/validator";
-import {MessageListener} from "../message-listener";
-import {HcsVcTopicListener} from "./hcs-vc-topic-listener";
-import {Encrypter} from "../message";
+import { MessageTransaction } from "../message-transaction";
+import { HcsVcMessage } from "./hcs-vc-message";
+import { HcsVcOperation } from "./hcs-vc-operation";
+import { PublicKey, TopicId } from "@hashgraph/sdk";
+import { MessageEnvelope } from "../message-envelope";
+import { Validator } from "../../../utils/validator";
+import { MessageListener } from "../message-listener";
+import { HcsVcTopicListener } from "./hcs-vc-topic-listener";
+import { Encrypter } from "../message";
 
 /**
  * The DID document creation, update or deletion transaction.
@@ -37,11 +37,11 @@ export class HcsVcTransaction extends MessageTransaction<HcsVcMessage> {
     constructor(topicId: TopicId, message: MessageEnvelope<HcsVcMessage>, signerPublicKey: PublicKey);
     constructor(...args) {
         if (
-            (args.length === 4) &&
-            (args[0] instanceof TopicId) &&
+            args.length === 4 &&
+            args[0] instanceof TopicId &&
             // (args[1] instanceof HcsVcOperation) &&
-            (typeof args[2] === 'string') &&
-            (args[3] instanceof PublicKey)
+            typeof args[2] === "string" &&
+            args[3] instanceof PublicKey
         ) {
             const [topicId, operation, credentialHash, signerPublicKey] = args;
             super(topicId);
@@ -49,10 +49,10 @@ export class HcsVcTransaction extends MessageTransaction<HcsVcMessage> {
             this.credentialHash = credentialHash;
             this.signerPublicKey = signerPublicKey;
         } else if (
-            (args.length === 3) &&
-            (args[0] instanceof TopicId) &&
-            (args[1] instanceof MessageEnvelope) &&
-            (args[2] instanceof PublicKey)
+            args.length === 3 &&
+            args[0] instanceof TopicId &&
+            args[1] instanceof MessageEnvelope &&
+            args[2] instanceof PublicKey
         ) {
             const [topicId, message, signerPublicKey] = args;
             super(topicId, message);
@@ -64,8 +64,8 @@ export class HcsVcTransaction extends MessageTransaction<HcsVcMessage> {
 
     protected validate(validator: Validator): void {
         super.validate(validator);
-        validator.require(!!this.credentialHash || !!this.message, 'Verifiable credential hash is null or empty.');
-        validator.require(!!this.operation || !!this.message, 'Operation on verifiable credential is not defined.');
+        validator.require(!!this.credentialHash || !!this.message, "Verifiable credential hash is null or empty.");
+        validator.require(!!this.operation || !!this.message, "Operation on verifiable credential is not defined.");
     }
 
     protected buildMessage(): MessageEnvelope<HcsVcMessage> {
@@ -74,7 +74,7 @@ export class HcsVcTransaction extends MessageTransaction<HcsVcMessage> {
 
     protected provideTopicListener(topicIdToListen: TopicId): MessageListener<HcsVcMessage> {
         return new HcsVcTopicListener(topicIdToListen, (s) => {
-            return [this.signerPublicKey]
+            return [this.signerPublicKey];
         });
     }
 
