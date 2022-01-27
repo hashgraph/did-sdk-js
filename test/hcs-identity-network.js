@@ -1,168 +1,130 @@
-const {OPERATOR_KEY, OPERATOR_ID, NETWORK} = require("./variables");
+const { OPERATOR_KEY, OPERATOR_ID, NETWORK } = require("./variables");
 const {
-    AccountId,
-    PrivateKey,
-    Client,
-    FileCreateTransaction,
-    Hbar,
-    TopicInfoQuery
-} = require('@hashgraph/sdk');
+  AccountId,
+  PrivateKey,
+  Client,
+  Hbar,
+  TopicInfoQuery,
+  TopicId,
+} = require("@hashgraph/sdk");
 
 const {
-    AddressBook,
-    HcsDid,
-    HcsIdentityNetworkBuilder,
-    HcsIdentityNetwork
+  HcsDid,
+  HcsIdentityNetworkBuilder,
+  HcsIdentityNetwork,
 } = require("../dist");
 
-const {assert} = require('chai');
+const { assert } = require("chai");
 
 const FEE = new Hbar(2);
-const ADDRESS_BOOK_JSON = "{\"appnetName\":\"Test Identity SDK appnet\",\"didTopicId\":\"0.0.214919\",\"vcTopicId\":\"0.0.214920\",\"appnetDidServers\":[\"http://localhost:3000/api/v1\"]}";
+const DID_TOPIC_ID = TopicId.fromString("0.0.214920");
 
-let client,
-    operatorId,
-    operatorKey,
-    addressBookFileId,
-    network;
+let client, operatorId, operatorKey, network;
 
-describe('HcsIdentityNetwork', function() {
-    before(async function() {
-        this.timeout(60000);
+describe("HcsIdentityNetwork", function () {
+  before(async function () {
+    this.timeout(60000);
 
-        operatorId = AccountId.fromString(OPERATOR_ID);
-        operatorKey = PrivateKey.fromString(OPERATOR_KEY);
-        network = NETWORK;
-        client = Client.forTestnet();
-        client.setMirrorNetwork(["hcs." + network + ".mirrornode.hedera.com:5600"]);
-        client.setOperator(operatorId, operatorKey);
+    operatorId = AccountId.fromString(OPERATOR_ID);
+    operatorKey = PrivateKey.fromString(OPERATOR_KEY);
+    network = NETWORK;
+    client = Client.forTestnet();
+    client.setMirrorNetwork(["hcs." + network + ".mirrornode.hedera.com:5600"]);
+    client.setOperator(operatorId, operatorKey);
+  });
 
-        const response = await new FileCreateTransaction()
-            .setContents(ADDRESS_BOOK_JSON)
-            .setKeys([operatorKey.publicKey])
-            .setMaxTransactionFee(FEE)
-            .execute(client);
+  it("Test Create Identity Network", async function () {
+    this.timeout(60000);
+    const didTopicMemo = "Test Identity SDK appnet DID topic";
+    const vcTopicMemo = "Test Identity SDK appnet VC topic";
 
-        const receipt = await response.getReceipt(client);
-        addressBookFileId = receipt.fileId;
-    });
+    const didNetwork = await new HcsIdentityNetworkBuilder()
+      .setNetwork(network)
+      .setPublicKey(operatorKey.publicKey)
+      .setMaxTransactionFee(FEE)
+      .setDidTopicMemo(didTopicMemo)
+      .setVCTopicMemo(vcTopicMemo)
+      .execute(client);
 
-    it('Test Create Identity Network', async function() {
-        this.timeout(60000);
-        const appnetName = 'Test Identity SDK appnet';
-        const didServerUrl = 'http://localhost:3000/api/v1';
-        const didTopicMemo = 'Test Identity SDK appnet DID topic';
-        const vcTopicMemo = 'Test Identity SDK appnet VC topic';
+    assert.exists(didNetwork);
 
-        const didNetwork = await new HcsIdentityNetworkBuilder()
-            .setNetwork(network)
-            .setAppnetName(appnetName)
-            .addAppnetDidServer(didServerUrl)
-            .setPublicKey(operatorKey.publicKey)
-            .setMaxTransactionFee(FEE)
-            .setDidTopicMemo(didTopicMemo)
-            .setVCTopicMemo(vcTopicMemo)
-            .execute(client);
+    const didTopicInfo = await new TopicInfoQuery()
+      .setTopicId(didNetwork.getDidTopicId())
+      .execute(client);
 
-        assert.exists(didNetwork);
-        assert.exists(didNetwork.getAddressBook());
+    assert.exists(didTopicInfo);
+    assert.equal(didTopicInfo.topicMemo, didTopicMemo);
 
-        const addressBook = didNetwork.getAddressBook();
-        assert.exists(addressBook.getDidTopicId());
-        assert.exists(addressBook.getVcTopicId());
-        assert.exists(addressBook.getAppnetDidServers());
-        assert.exists(addressBook.getFileId());
-        assert.equal(addressBook.getAppnetName(), appnetName);
-        assert.equal(didNetwork.getNetwork(), network);
+    const vcTopicInfo = await new TopicInfoQuery()
+      .setTopicId(didNetwork.getVcTopicId())
+      .execute(client);
 
-        const didTopicInfo = await new TopicInfoQuery()
-            .setTopicId(didNetwork.getDidTopicId())
-            .execute(client);
+    assert.exists(vcTopicInfo);
+    assert.equal(vcTopicInfo.topicMemo, vcTopicMemo);
+  });
 
-        assert.exists(didTopicInfo);
-        assert.equal(didTopicInfo.topicMemo, didTopicMemo);
+  it("Test Init Network From Did topic", async function () {
+    this.timeout(60000);
+    const did = new HcsDid(
+      network,
+      HcsDid.generateDidRootKey().publicKey,
+      DID_TOPIC_ID
+    );
 
-        const vcTopicInfo = await new TopicInfoQuery()
-            .setTopicId(didNetwork.getVcTopicId())
-            .execute(client);
+    const didNetwork = await HcsIdentityNetwork.fromHcsDidTopic(
+      network,
+      did.getDidTopicId()
+    );
 
-        assert.exists(vcTopicInfo);
-        assert.equal(vcTopicInfo.topicMemo, vcTopicMemo);
+    assert.exists(didNetwork);
+    assert.equal(didNetwork.getDidTopicId(), DID_TOPIC_ID);
+    assert.equal(didNetwork.getNetwork(), network);
+  });
 
-        const createdNetwork = await HcsIdentityNetwork.fromAddressBookFile(client, network, addressBook.getFileId());
-        assert.exists(createdNetwork);
-        assert.equal(addressBook.toJSON(), createdNetwork.getAddressBook().toJSON());
-    });
+  it("Test Generate Did For Network", async function () {
+    this.timeout(60000);
 
-    it('Test Init Network From Json AddressBook', async function() {
-        this.timeout(60000);
-        const addressBook = AddressBook.fromJson(ADDRESS_BOOK_JSON, addressBookFileId);
-        const didNetwork = HcsIdentityNetwork.fromAddressBook(network, addressBook);
+    function checkTestGenerateDidForNetwork(did, publicKey, didTopicId) {
+      assert.exists(did);
+      assert.equal(HcsDid.publicKeyToIdString(publicKey), did.getIdString());
+      assert.equal(did.getNetwork(), network);
+      assert.equal(did.getDidTopicId().toString(), didTopicId);
+      assert.equal(did.getMethod(), HcsDid.DID_METHOD);
+    }
 
-        assert.exists(didNetwork);
-        assert.exists(didNetwork.getAddressBook().getFileId());
-        assert.equal(didNetwork.getNetwork(), network);
-    });
+    const didNetwork = await HcsIdentityNetwork.fromHcsDidTopic(
+      network,
+      DID_TOPIC_ID
+    );
 
-    it('Test Init Network From Did', async function() {
-        this.timeout(60000);
-        const did = new HcsDid(network, HcsDid.generateDidRootKey().publicKey, addressBookFileId);
+    let did = didNetwork.generateDid();
+    assert.exists(did.getPrivateDidRootKey());
 
-        const didNetwork = await HcsIdentityNetwork.fromHcsDid(client, did);
+    let publicKey = did.getPrivateDidRootKey().publicKey;
+    checkTestGenerateDidForNetwork(did, publicKey, didNetwork.getDidTopicId());
 
-        assert.exists(didNetwork);
-        assert.exists(didNetwork.getAddressBook().getFileId());
-        assert.equal(didNetwork.getNetwork(), network);
-        assert.equal(ADDRESS_BOOK_JSON, didNetwork.getAddressBook().toJSON());
-    });
+    did = didNetwork.generateDid();
+    assert.exists(did.getPrivateDidRootKey());
 
-    it('Test Generate Did For Network', async function() {
-        this.timeout(60000);
+    publicKey = did.getPrivateDidRootKey().publicKey;
+    checkTestGenerateDidForNetwork(did, publicKey, didNetwork.getDidTopicId());
 
-        function checkTestGenerateDidForNetwork(did, publicKey, didTopicId, withTid) {
-            assert.exists(did);
-            assert.equal(HcsDid.publicKeyToIdString(publicKey), did.getIdString());
-            assert.equal(did.getNetwork(), network);
-            assert.equal(did.getAddressBookFileId(), addressBookFileId);
-            if (withTid) {
-                assert.equal(did.getDidTopicId().toString(), didTopicId)
-            } else {
-                assert.notExists(did.getDidTopicId());
-            }
-            assert.equal(did.getMethod(), HcsDid.DID_METHOD);
-        }
+    did = didNetwork.generateDid();
+    assert.exists(did.getPrivateDidRootKey());
+    publicKey = did.getPrivateDidRootKey().publicKey;
+    checkTestGenerateDidForNetwork(did, publicKey, didNetwork.getDidTopicId());
 
-        const addressBook = AddressBook.fromJson(ADDRESS_BOOK_JSON, addressBookFileId);
-        const didNetwork = HcsIdentityNetwork.fromAddressBook(network, addressBook);
+    did = didNetwork.generateDid();
+    assert.exists(did.getPrivateDidRootKey());
+    publicKey = did.getPrivateDidRootKey().publicKey;
+    checkTestGenerateDidForNetwork(did, publicKey, didNetwork.getDidTopicId());
 
-        let did = didNetwork.generateDid(true);
-        assert.exists(did.getPrivateDidRootKey());
+    publicKey = HcsDid.generateDidRootKey().publicKey;
+    did = didNetwork.generateDid(publicKey);
+    checkTestGenerateDidForNetwork(did, publicKey, didNetwork.getDidTopicId());
 
-        let publicKey = did.getPrivateDidRootKey().publicKey;
-        checkTestGenerateDidForNetwork(did, publicKey, addressBook.getDidTopicId(), true);
-
-        did = didNetwork.generateDid(false);
-        assert.exists(did.getPrivateDidRootKey());
-
-        publicKey = did.getPrivateDidRootKey().publicKey;
-        checkTestGenerateDidForNetwork(did, publicKey, addressBook.getDidTopicId(), false);
-
-        did = didNetwork.generateDid(true);
-        assert.exists(did.getPrivateDidRootKey());
-        publicKey = did.getPrivateDidRootKey().publicKey;
-        checkTestGenerateDidForNetwork(did, publicKey, addressBook.getDidTopicId(), true);
-
-        did = didNetwork.generateDid(false);
-        assert.exists(did.getPrivateDidRootKey());
-        publicKey = did.getPrivateDidRootKey().publicKey;
-        checkTestGenerateDidForNetwork(did, publicKey, addressBook.getDidTopicId(), false);
-
-        publicKey = HcsDid.generateDidRootKey().publicKey;
-        did = didNetwork.generateDid(publicKey, true);
-        checkTestGenerateDidForNetwork(did, publicKey, addressBook.getDidTopicId(), true);
-
-        publicKey = HcsDid.generateDidRootKey().publicKey;
-        did = didNetwork.generateDid(publicKey, false);
-        checkTestGenerateDidForNetwork(did, publicKey, addressBook.getDidTopicId(), false);
-    });
+    publicKey = HcsDid.generateDidRootKey().publicKey;
+    did = didNetwork.generateDid(publicKey);
+    checkTestGenerateDidForNetwork(did, publicKey, didNetwork.getDidTopicId());
+  });
 });
