@@ -91,7 +91,6 @@ export class HcsDid implements HederaDid {
 
       this.didTopicId = didTopicId;
       this.network = network;
-      this.didRootKey = HcsDid.idStringToPublicKey(idString);
       this.idString = idString;
       this.did = this.buildDid();
 
@@ -230,17 +229,6 @@ export class HcsDid implements HederaDid {
    */
   public static publicKeyToIdString(didRootKey: PublicKey): string {
     return Hashing.base58.encode(Hashing.sha256.digest(didRootKey.toBytes()));
-  }
-
-  /**
-   * Constructs a public key from a given id-string.
-   *
-   * @param idString The id-string of a DID that is a Base58-encoded SHA-256 hash of a given public key.
-   * @return Public Key from which the DID is created.
-   */
-  public static idStringToPublicKey(idString: string): PublicKey {
-    const publicKeyBytes: Uint8Array = Hashing.base58.decode(idString);
-    return PublicKey.fromBytes(publicKeyBytes);
   }
 
   /**
