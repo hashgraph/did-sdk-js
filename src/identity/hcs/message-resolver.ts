@@ -21,7 +21,7 @@ export abstract class MessageResolver<T extends Message> {
     private errorHandler: (input: Error) => void;
     private decrypter: Decrypter<string>;
     private existingSignatures: string[];
-    private listener: MessageListener<T>
+    private listener: MessageListener<T>;
     private noMoreMessagesTimeout: Long;
 
     /**
@@ -64,7 +64,7 @@ export abstract class MessageResolver<T extends Message> {
      * @param client The mirror node client.
      */
     public execute(client: Client): void {
-        new Validator().checkValidationErrors('Resolver not executed: ', v => {
+        new Validator().checkValidationErrors("Resolver not executed: ", (v) => {
             return this.validate(v);
         });
 
@@ -72,12 +72,13 @@ export abstract class MessageResolver<T extends Message> {
 
         this.listener = this.supplyMessageListener();
 
-        this.listener.setStartTime(new Timestamp(0, 0))
+        this.listener
+            .setStartTime(new Timestamp(0, 0))
             .setEndTime(Timestamp.fromDate(new Date()))
             .setIgnoreErrors(false)
             .onError(this.errorHandler)
             .onDecrypt(this.decrypter)
-            .subscribe(client, msg => {
+            .subscribe(client, (msg) => {
                 return this.handleMessage(msg);
             });
 
@@ -178,8 +179,8 @@ export abstract class MessageResolver<T extends Message> {
      * @param validator The errors validator.
      */
     protected validate(validator: Validator): void {
-        validator.require(this.results.size > 0, 'Nothing to resolve.');
-        validator.require(!!this.topicId, 'Consensus topic ID not defined.');
-        validator.require(!!this.resultsHandler, 'Results handler \'whenFinished\' not defined.');
+        validator.require(this.results.size > 0, "Nothing to resolve.");
+        validator.require(!!this.topicId, "Consensus topic ID not defined.");
+        validator.require(!!this.resultsHandler, "Results handler 'whenFinished' not defined.");
     }
 }

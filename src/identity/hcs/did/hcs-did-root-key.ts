@@ -1,14 +1,14 @@
-import {PublicKey} from "@hashgraph/sdk";
+import { PublicKey } from "@hashgraph/sdk";
 import bs58 from "bs58";
-import {HcsDid} from "./hcs-did";
+import { HcsDid } from "./hcs-did";
 
 /**
  * Represents a root key of HCS Identity DID.
  * That is a public key of type Ed25519VerificationKey2018 compatible with a single publicKey entry of a DID Document.
  */
 export class HcsDidRootKey {
-    public static DID_ROOT_KEY_NAME = '#did-root-key';
-    public static DID_ROOT_KEY_TYPE = 'Ed25519VerificationKey2018';
+    public static DID_ROOT_KEY_NAME = "#did-root-key";
+    public static DID_ROOT_KEY_TYPE = "Ed25519VerificationKey2018";
 
     private id: string;
     private type: string;
@@ -24,13 +24,13 @@ export class HcsDidRootKey {
      */
     public static fromHcsIdentity(did: HcsDid, didRootKey: PublicKey): HcsDidRootKey {
         if (!did) {
-            throw new Error('DID cannot be ' + did);
+            throw new Error("DID cannot be " + did);
         }
         if (!didRootKey) {
-            throw new Error('DID root key cannot be ' + didRootKey);
+            throw new Error("DID root key cannot be " + didRootKey);
         }
         if (HcsDid.publicKeyToIdString(didRootKey) !== did.getIdString()) {
-            throw new Error('The specified DID does not correspond to the given DID root key');
+            throw new Error("The specified DID does not correspond to the given DID root key");
         }
         const result = new HcsDidRootKey();
         result.controller = did.toDid();
