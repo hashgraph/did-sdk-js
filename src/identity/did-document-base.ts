@@ -21,11 +21,11 @@ export class DidDocumentBase {
         try {
             const root = JSON.parse(json);
             result = new DidDocumentBase(root.id);
-            if (root.hasOwnProperty(DidDocumentJsonProperties.PUBLIC_KEY)) {
-                if (!Array.isArray(root[DidDocumentJsonProperties.PUBLIC_KEY])) {
-                    throw new Error(`${root[DidDocumentJsonProperties.PUBLIC_KEY]} is not an array`);
+            if (root.hasOwnProperty(DidDocumentJsonProperties.VERIFICATION_METHOD)) {
+                if (!Array.isArray(root[DidDocumentJsonProperties.VERIFICATION_METHOD])) {
+                    throw new Error(`${root[DidDocumentJsonProperties.VERIFICATION_METHOD]} is not an array`);
                 }
-                for (let publicKeyObj of root[DidDocumentJsonProperties.PUBLIC_KEY]) {
+                for (let publicKeyObj of root[DidDocumentJsonProperties.VERIFICATION_METHOD]) {
                     if (publicKeyObj.hasOwnProperty(DidDocumentJsonProperties.ID) && (publicKeyObj[DidDocumentJsonProperties.ID] ===
                         (result.getId() + HcsDidRootKey.DID_ROOT_KEY_NAME))) {
                         const didRootKey = HcsDidRootKey.fromJsonTree(publicKeyObj);
