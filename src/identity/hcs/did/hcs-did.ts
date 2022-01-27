@@ -33,14 +33,18 @@ export class HcsDid implements HederaDid {
      * @param privateDidRootKey The private DID root key.
      * @param didTopicId        The appnet's DID topic ID.
      */
-    constructor(network: string, privateDidRootKey: PrivateKey, didTopicId?: TopicId);
+    constructor(
+        network: string,
+        privateDidRootKey: PrivateKey,
+        didTopicId?: TopicId
+    );
     /**
      * Creates a DID instance without topic ID specification.
      *
      * @param network           The Hedera DID network.
      * @param didRootKey        The public key from which DID is derived.
      */
-    constructor(network: string, didRootKey: PublicKey)
+    constructor(network: string, didRootKey: PublicKey);
     /**
      * Creates a DID instance.
      *
@@ -51,10 +55,10 @@ export class HcsDid implements HederaDid {
     constructor(network: string, idString: string, didTopicId?: TopicId);
     constructor(...args: any[]) {
         if (
-            (typeof args[0] === 'string') &&
-            (args[1] instanceof PublicKey) &&
-            ((args[2] instanceof TopicId) || args[2] === undefined) &&
-            (args.length === 3)
+            typeof args[0] === "string" &&
+            args[1] instanceof PublicKey &&
+            (args[2] instanceof TopicId || args[2] === undefined) &&
+            args.length === 3
         ) {
             const [network, didRootKey, didTopicId] = args;
             this.didTopicId = didTopicId;
@@ -67,17 +71,19 @@ export class HcsDid implements HederaDid {
         }
 
         if (
-            (typeof args[0] === 'string') &&
-            (args[1] instanceof PrivateKey) &&
-            ((args[2] instanceof TopicId) || args[2] === undefined) &&
-            (args.length === 3)
+            typeof args[0] === "string" &&
+            args[1] instanceof PrivateKey &&
+            (args[2] instanceof TopicId || args[2] === undefined) &&
+            args.length === 3
         ) {
-            const [network, privateDidRootKey, didTopicId] = args
+            const [network, privateDidRootKey, didTopicId] = args;
 
             this.didTopicId = didTopicId;
             this.network = network;
             this.didRootKey = privateDidRootKey.publicKey;
-            this.idString = HcsDid.publicKeyToIdString(privateDidRootKey.publicKey);
+            this.idString = HcsDid.publicKeyToIdString(
+                privateDidRootKey.publicKey
+            );
             this.did = this.buildDid();
             this.privateDidRootKey = privateDidRootKey;
 
@@ -85,9 +91,9 @@ export class HcsDid implements HederaDid {
         }
 
         if (
-            (typeof args[0] === 'string') &&
-            (args[1] instanceof PublicKey) &&
-            (args.length === 2)
+            typeof args[0] === "string" &&
+            args[1] instanceof PublicKey &&
+            args.length === 2
         ) {
             const [network, didRootKey] = args;
 
@@ -100,27 +106,24 @@ export class HcsDid implements HederaDid {
             return;
         }
 
-        /**
-         * TODO: investigate. This version does not fill in didRootKey so DID is missing publicKey information
-         */
         if (
-            (typeof args[0] === 'string') &&
-            (typeof args[1] === 'string') &&
-            ((args[2] instanceof TopicId) || args[2] === undefined) &&
-            (args.length === 3)
+            typeof args[0] === "string" &&
+            typeof args[1] === "string" &&
+            (args[2] instanceof TopicId || args[2] === undefined) &&
+            args.length === 3
         ) {
             const [network, idString, didTopicId] = args;
 
             this.didTopicId = didTopicId;
             this.network = network;
-
+            this.didRootKey = HcsDid.idStringToPublicKey(idString);
             this.idString = idString;
             this.did = this.buildDid();
 
             return;
         }
 
-        throw new Error('Couldn\'t find constructor');
+        throw new Error("Couldn't find constructor");
     }
 
     /**
@@ -134,23 +137,27 @@ export class HcsDid implements HederaDid {
             throw new Error("DID string cannot be null");
         }
 
-        const [didPart, topicIdPart] = didString.split(DidSyntax.DID_TOPIC_SEPARATOR);
+        const [didPart, topicIdPart] = didString.split(
+            DidSyntax.DID_TOPIC_SEPARATOR
+        );
 
         if (!topicIdPart) {
             throw new Error("DID string is invalid: topic ID is missing");
         }
 
-        const topicId = TopicId.fromString(topicIdPart)
+        const topicId = TopicId.fromString(topicIdPart);
 
         const didParts = didPart.split(DidSyntax.DID_METHOD_SEPARATOR);
 
         if (didParts.shift() !== DidSyntax.DID_PREFIX) {
-            throw new Error('DID string is invalid: invalid prefix.');
+            throw new Error("DID string is invalid: invalid prefix.");
         }
 
         const methodName = didParts.shift();
         if (DidSyntax.Method.HEDERA_HCS !== methodName) {
-            throw new Error('DID string is invalid: invalid method name: ' + methodName);
+            throw new Error(
+                "DID string is invalid: invalid method name: " + methodName
+            );
         }
 
         try {
@@ -158,13 +165,12 @@ export class HcsDid implements HederaDid {
             const didIdString = didParts.shift();
 
             if (didIdString.length < 32 || didParts.shift()) {
-                throw new Error('DID string is invalid.')
+                throw new Error("DID string is invalid.");
             }
 
             return new HcsDid(networkName, didIdString, topicId);
-
         } catch (e) {
-            throw new Error('DID string is invalid. ' + e.message);
+            throw new Error("DID string is invalid. " + e.message);
         }
     }
 
@@ -187,13 +193,15 @@ export class HcsDid implements HederaDid {
     public generateDidDocument(): DidDocumentBase {
         const result = new DidDocumentBase(this.toDid());
         if (this.didRootKey) {
-            const rootKey = HcsDidRootKey.fromHcsIdentity(this, this.didRootKey);
+            const rootKey = HcsDidRootKey.fromHcsIdentity(
+                this,
+                this.didRootKey
+            );
             result.setDidRootKey(rootKey);
         }
 
         return result;
     }
-
 
     public getNetwork(): string {
         return this.network;
@@ -216,7 +224,7 @@ export class HcsDid implements HederaDid {
     }
 
     public toDid() {
-        return this.did
+        return this.did;
     }
 
     /**
@@ -225,17 +233,21 @@ export class HcsDid implements HederaDid {
      * @return A DID string.
      */
     private buildDid(): string {
-        const methodNetwork = [this.getMethod().toString(), this.network].join(DidSyntax.DID_METHOD_SEPARATOR);
+        const methodNetwork = [this.getMethod().toString(), this.network].join(
+            DidSyntax.DID_METHOD_SEPARATOR
+        );
 
         let ret: string;
-        ret = DidSyntax.DID_PREFIX +
+        ret =
+            DidSyntax.DID_PREFIX +
             DidSyntax.DID_METHOD_SEPARATOR +
             methodNetwork +
             DidSyntax.DID_METHOD_SEPARATOR +
             this.idString;
 
-        if(this.didTopicId) {
-            ret = ret +
+        if (this.didTopicId) {
+            ret =
+                ret +
                 DidSyntax.DID_TOPIC_SEPARATOR +
                 this.didTopicId.toString();
         }
@@ -250,7 +262,20 @@ export class HcsDid implements HederaDid {
      * @return The id-string of a DID that is a Base58-encoded SHA-256 hash of a given public key.
      */
     public static publicKeyToIdString(didRootKey: PublicKey): string {
-        return Hashing.base58.encode(Hashing.sha256.digest(didRootKey.toBytes()));
+        return Hashing.base58.encode(
+            Hashing.sha256.digest(didRootKey.toBytes())
+        );
+    }
+
+    /**
+     * Constructs a public key from a given id-string.
+     *
+     * @param idString The id-string of a DID that is a Base58-encoded SHA-256 hash of a given public key.
+     * @return Public Key from which the DID is created.
+     */
+    public static idStringToPublicKey(idString: string): PublicKey {
+        const publicKeyBytes: Uint8Array = Hashing.base58.decode(idString);
+        return PublicKey.fromBytes(publicKeyBytes);
     }
 
     /**
