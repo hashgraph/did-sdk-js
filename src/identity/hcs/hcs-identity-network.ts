@@ -46,13 +46,13 @@ export class HcsIdentityNetwork {
      * @param network The Hedera network.
      * @return The identity network instance.
      */
-         public static async fromHcsDidAndVCTopic(network: string, didTopicId: TopicId, vcTopicId: TopicId): Promise<HcsIdentityNetwork> {
-            const result = new HcsIdentityNetwork();
-            result.network = network;
-            result.didTopicId = didTopicId;
-            result.vcTopicId =  vcTopicId;
-            return result;
-        }
+    public static async fromHcsDidAndVCTopic(network: string, didTopicId: TopicId, vcTopicId: TopicId): Promise<HcsIdentityNetwork> {
+        const result = new HcsIdentityNetwork();
+        result.network = network;
+        result.didTopicId = didTopicId;
+        result.vcTopicId =  vcTopicId;
+        return result;
+    }
 
     /**
      * Instantiates a {@link HcsDidTransaction} to perform the specified operation on the DID document.
@@ -168,7 +168,6 @@ export class HcsIdentityNetwork {
      * Generates a new DID from the given public DID root key.
      *
      * @param publicKey A DID root key.
-     * @param withTid   Indicates if DID topic ID should be added to the DID as <i>tid</i> parameter.
      * @return A newly generated DID.
      */
     public generateDid(publicKey: PublicKey): HcsDid;
