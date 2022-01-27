@@ -4,7 +4,7 @@ const { DidSyntax, HcsDid } = require("../../dist");
 
 const { assert } = require("chai");
 
-const network = "network";
+const network = "testnet";
 
 describe("HcsDid", function () {
   it("Test Generate And Parse Did With Tid", async function () {
