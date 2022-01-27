@@ -25,7 +25,7 @@ export class HcsDid implements HederaDid {
      * @param didRootKey        The public key from which DID is derived.
      * @param didTopicId        The appnet's DID topic ID.
      */
-    constructor(network: string, didRootKey: PublicKey, didTopicId?: TopicId);
+    constructor(network: string, didRootKey: PublicKey, didTopicId: TopicId);
     /**
      * Creates a DID instance with private DID root key.
      *
@@ -36,7 +36,7 @@ export class HcsDid implements HederaDid {
     constructor(
         network: string,
         privateDidRootKey: PrivateKey,
-        didTopicId?: TopicId
+        didTopicId: TopicId
     );
     /**
      * Creates a DID instance without topic ID specification.
@@ -52,7 +52,7 @@ export class HcsDid implements HederaDid {
      * @param idString          The id-string of a DID.
      * @param didTopicId        The appnet's DID topic ID.
      */
-    constructor(network: string, idString: string, didTopicId?: TopicId);
+    constructor(network: string, idString: string, didTopicId: TopicId);
     constructor(...args: any[]) {
         if (
             typeof args[0] === "string" &&
@@ -243,15 +243,10 @@ export class HcsDid implements HederaDid {
             DidSyntax.DID_METHOD_SEPARATOR +
             methodNetwork +
             DidSyntax.DID_METHOD_SEPARATOR +
-            this.idString;
-
-        if (this.didTopicId) {
-            ret =
-                ret +
-                DidSyntax.DID_TOPIC_SEPARATOR +
-                this.didTopicId.toString();
-        }
-
+            this.idString +
+            DidSyntax.DID_TOPIC_SEPARATOR +
+            this.didTopicId.toString();
+        
         return ret;
     }
 
