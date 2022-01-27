@@ -25,8 +25,8 @@ describe("HcsVcDocumentBaseTest", function () {
         this.timeout(60000);
         await network.setup();
 
-        issuer = network.didNetwork.generateDid(false);
-        owner = network.didNetwork.generateDid(false);
+        issuer = network.didNetwork.generateDid();
+        owner = network.didNetwork.generateDid();
     });
 
     after(async function () {

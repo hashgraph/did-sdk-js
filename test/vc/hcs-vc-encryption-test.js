@@ -44,10 +44,10 @@ describe("HcsVcEncryptionTest", function () {
         this.timeout(120000);
         await network.setup();
 
-        issuer = network.didNetwork.generateDid(false);
+        issuer = network.didNetwork.generateDid();
         issuersPrivateKey = issuer.getPrivateDidRootKey();
 
-        owner = network.didNetwork.generateDid(false);
+        owner = network.didNetwork.generateDid();
 
         // For tests only we do not need to submit DID documents, as we will not validate them.
         // final DidMethodOperation op = DidMethodOperation.CREATE;
