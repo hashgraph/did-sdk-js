@@ -136,6 +136,14 @@ export class HcsDid implements HederaDid {
 
     try {
       const networkName = didParts.shift();
+
+      if (
+        networkName != DidSyntax.HEDERA_NETWORK_MAINNET &&
+        networkName != DidSyntax.HEDERA_NETWORK_TESTNET
+      ) {
+        throw new Error("Invalid Hedera network.");
+      }
+
       const didIdString = didParts.shift();
 
       if (didIdString.length < 32 || didParts.shift()) {
