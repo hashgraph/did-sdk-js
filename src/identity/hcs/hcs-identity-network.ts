@@ -1,4 +1,4 @@
-import { Client, FileContentsQuery, FileId, PrivateKey, PublicKey, TopicId } from "@hashgraph/sdk";
+import { PrivateKey, PublicKey, TopicId } from "@hashgraph/sdk";
 import { DidMethodOperation } from "../did-method-operation";
 import { HcsDid } from "./did/hcs-did";
 import { HcsDidMessage } from "./did/hcs-did-message";
@@ -13,7 +13,7 @@ import { HcsVcTopicListener } from "./vc/hcs-vc-topic-listener";
 import { HcsVcTransaction } from "./vc/hcs-vc-transaction";
 
 /**
- * Appnet's identity network based on Hedera HCS DID method specification.
+ * Identity network based on Hedera HCS DID method specification.
  */
 export class HcsIdentityNetwork {
 
@@ -33,13 +33,26 @@ export class HcsIdentityNetwork {
      * @param network The Hedera network.
      * @return The identity network instance.
      */
-    public static async fromHcsDid(network: string, didTopicId: TopicId, vcTopicId: TopicId): Promise<HcsIdentityNetwork> {
+    public static async fromHcsDidTopic(network: string, didTopicId: TopicId): Promise<HcsIdentityNetwork> {
         const result = new HcsIdentityNetwork();
         result.network = network;
         result.didTopicId = didTopicId;
-        result.vcTopicId =  vcTopicId;
         return result;
     }
+
+        /**
+     * Instantiates existing identity network using a DID generated for this network.
+     *
+     * @param network The Hedera network.
+     * @return The identity network instance.
+     */
+         public static async fromHcsDidAndVCTopic(network: string, didTopicId: TopicId, vcTopicId: TopicId): Promise<HcsIdentityNetwork> {
+            const result = new HcsIdentityNetwork();
+            result.network = network;
+            result.didTopicId = didTopicId;
+            result.vcTopicId =  vcTopicId;
+            return result;
+        }
 
     /**
      * Instantiates a {@link HcsDidTransaction} to perform the specified operation on the DID document.
@@ -125,14 +138,31 @@ export class HcsIdentityNetwork {
     }
 
     /**
+     * Returns the Did Topic on which this identity network sends messages to.
+     *
+     * @return The TopicId.
+     */
+    public getDidTopicId(): TopicId {
+        return this.didTopicId;
+    }
+
+    /**
+     * Returns the VC Topic on which this identity network sends messages to.
+     *
+     * @return The Hedera TopicId.
+     */
+    public getVcTopicId(): TopicId {
+        return this.vcTopicId;
+    }
+
+    /**
      * Generates a new DID and it's root key.
      *
-     * @param withTid Indicates if DID topic ID should be added to the DID as <i>tid</i> parameter.
      * @return Generated {@link HcsDid} with it's private DID root key.
      */
-    public generateDid(withTid: boolean): HcsDid;
+    public generateDid(): HcsDid;
 
-    public generateDid(privateKey: PrivateKey, withTid: boolean): HcsDid;
+    public generateDid(privateKey: PrivateKey): HcsDid;
 
     /**
      * Generates a new DID from the given public DID root key.
@@ -141,35 +171,25 @@ export class HcsIdentityNetwork {
      * @param withTid   Indicates if DID topic ID should be added to the DID as <i>tid</i> parameter.
      * @return A newly generated DID.
      */
-    public generateDid(publicKey: PublicKey, withTid: boolean): HcsDid;
+    public generateDid(publicKey: PublicKey): HcsDid;
     public generateDid(...args): HcsDid {
         if (
-            (args.length === 1) &&
-            (typeof args[0] === 'boolean')
+            (args.length === 0)
         ) {
-            const [withTid] = args;
             const privateKey = HcsDid.generateDidRootKey();
-            const tid = withTid ? this.didTopicId : null;
-
-            return new HcsDid(this.getNetwork(), privateKey, tid);
+            return new HcsDid(this.getNetwork(), privateKey, this.didTopicId);
         } else if (
-            (args.length === 2) &&
-            (args[0] instanceof PublicKey) &&
-            (typeof args[1] === 'boolean')
+            (args.length === 1) &&
+            (args[0] instanceof PublicKey) 
         ) {
-            const [publicKey, withTid] = args;
-            const tid = withTid ? this.didTopicId : null;
-
-            return new HcsDid(this.getNetwork(), publicKey, tid);
+            const [publicKey] = args;
+            return new HcsDid(this.getNetwork(), publicKey, this.didTopicId);
         } else if (
-            (args.length === 2) &&
-            (args[0] instanceof PrivateKey) &&
-            (typeof args[1] === 'boolean')
+            (args.length === 1) &&
+            (args[0] instanceof PrivateKey)
         ) {
-            const [privateKey, withTid] = args;
-            const tid = withTid ? this.didTopicId : null;
-
-            return new HcsDid(this.getNetwork(), privateKey, tid);
+            const [privateKey] = args;
+            return new HcsDid(this.getNetwork(), privateKey, this.didTopicId);
         }
     }
 
