@@ -68,6 +68,7 @@ export class DidDocumentBase {
          * TODO: investigate, should we just leave such cases crash?
          */
         if (this.didRootKey) {
+            rootObject[DidDocumentJsonProperties.ASSERTION_METHOD] = [this.didRootKey.getId()];
             rootObject[DidDocumentJsonProperties.AUTHENTICATION] = [this.didRootKey.getId()];
             rootObject[DidDocumentJsonProperties.VERIFICATION_METHOD] = [this.didRootKey.toJsonTree()];
         } else {
