@@ -106,6 +106,10 @@ describe("Hcs Did Method Operations", function () {
             rootObject[DidDocumentJsonProperties.AUTHENTICATION] = [];
         }
 
+        if (rootObject.hasOwnProperty(DidDocumentJsonProperties.ASSERTION_METHOD)) {
+            rootObject[DidDocumentJsonProperties.ASSERTION_METHOD] = [];
+        }
+
         const deletedDoc = JSON.stringify(rootObject);
 
         const operation = DidMethodOperation.DELETE;
