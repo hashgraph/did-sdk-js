@@ -4,7 +4,7 @@ export class Issuer {
     protected id: string;
     protected name: string;
 
-    constructor(id: string)
+    constructor(id: string);
     constructor(id: string, name: string);
     constructor(...args: any[]) {
         this.id = args[0];
@@ -25,7 +25,7 @@ export class Issuer {
         if (this.name) {
             const rootObject = {};
             rootObject[HcsVcDocumentJsonProperties.ID] = this.id;
-            rootObject['name'] = this.name;
+            rootObject["name"] = this.name;
             return rootObject;
         }
         return this.id;
@@ -41,7 +41,7 @@ export class Issuer {
         }
         if (result) {
             result.id = id;
-            result.name = name
+            result.name = name;
             return result;
         } else {
             return new Issuer(id, name);
@@ -58,9 +58,8 @@ export class Issuer {
         try {
             const root = JSON.parse(json);
             result = this.fromJsonTree(root);
-
         } catch (e) {
-            throw new Error('Given JSON string is not a valid Issuer ' + e.message);
+            throw new Error("Given JSON string is not a valid Issuer " + e.message);
         }
 
         return result;

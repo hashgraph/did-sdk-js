@@ -56,6 +56,5 @@ export class HcsDidTopicListener extends MessageListener<HcsDidMessage> {
             this.reportInvalidMessage(response, "Exception while validating message: " + err.message);
             return false;
         }
-
     }
 }

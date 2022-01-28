@@ -82,7 +82,7 @@ export class HcsVcDocumentBase<T extends CredentialSubject> extends HcsVcDocumen
     public setIssuer(issuer: Issuer): void;
     public setIssuer(issuerDid: HcsDid): void;
     public setIssuer(...args: any[]): void {
-        if (typeof args[0] === 'string') {
+        if (typeof args[0] === "string") {
             this.issuer = new Issuer(args[0]);
             return;
         }
@@ -99,7 +99,6 @@ export class HcsVcDocumentBase<T extends CredentialSubject> extends HcsVcDocumen
     public setIssuanceDate(issuanceDate: Timestamp): void {
         this.issuanceDate = issuanceDate;
     }
-
 
     /**
      * Adds an additional context to @context field of the VC document.
@@ -139,20 +138,20 @@ export class HcsVcDocumentBase<T extends CredentialSubject> extends HcsVcDocumen
      */
     public isComplete(): boolean {
         return (
-            (this.context != null) &&
-            (!!this.context.length) &&
-            (HcsVcDocumentJsonProperties.FIRST_CONTEXT_ENTRY == this.context[0]) &&
-            (this.type != null) &&
-            (!!this.type.length) &&
-            (this.type.indexOf(HcsVcDocumentJsonProperties.VERIFIABLE_CREDENTIAL_TYPE) > -1) &&
-            (this.issuanceDate != null) &&
-            (this.issuer != null) &&
-            (!!this.issuer.getId()) &&
-            (this.credentialSubject != null) &&
-            (!!this.credentialSubject.length)
+            this.context != null &&
+            !!this.context.length &&
+            HcsVcDocumentJsonProperties.FIRST_CONTEXT_ENTRY == this.context[0] &&
+            this.type != null &&
+            !!this.type.length &&
+            this.type.indexOf(HcsVcDocumentJsonProperties.VERIFIABLE_CREDENTIAL_TYPE) > -1 &&
+            this.issuanceDate != null &&
+            this.issuer != null &&
+            !!this.issuer.getId() &&
+            this.credentialSubject != null &&
+            !!this.credentialSubject.length
         );
     }
-    
+
     // JsonClass
 
     public toJsonTree(): any {
@@ -179,16 +178,19 @@ export class HcsVcDocumentBase<T extends CredentialSubject> extends HcsVcDocumen
         return rootObject;
     }
 
-    public static fromJsonTree<U extends CredentialSubject>(root: any, result?: HcsVcDocumentBase<U>, credentialSubjectClass?: JsonClass<U>): HcsVcDocumentBase<U> {
-        if (!result)
-            result = new HcsVcDocumentBase<U>();
+    public static fromJsonTree<U extends CredentialSubject>(
+        root: any,
+        result?: HcsVcDocumentBase<U>,
+        credentialSubjectClass?: JsonClass<U>
+    ): HcsVcDocumentBase<U> {
+        if (!result) result = new HcsVcDocumentBase<U>();
         result = HcsVcDocumentHashBase.fromJsonTree(root, result) as HcsVcDocumentBase<U>;
         const jsonCredentialSubject = root[HcsVcDocumentJsonProperties.CREDENTIAL_SUBJECT] as any[];
         const credentialSubject: U[] = [];
         for (let i = 0; i < jsonCredentialSubject.length; i++) {
             const item = jsonCredentialSubject[i];
             const subject: U = credentialSubjectClass.fromJsonTree(item);
-            credentialSubject.push(subject)
+            credentialSubject.push(subject);
         }
         result.credentialSubject = credentialSubject;
         return result;
@@ -212,14 +214,16 @@ export class HcsVcDocumentBase<T extends CredentialSubject> extends HcsVcDocumen
      * @param credentialSubjectClass The type of the credential subject inside.
      * @return The {@link HcsVcDocumentBase} object.
      */
-    public static fromJson<U extends CredentialSubject>(json: string, credentialSubjectClass?: JsonClass<U>): HcsVcDocumentBase<U> {
+    public static fromJson<U extends CredentialSubject>(
+        json: string,
+        credentialSubjectClass?: JsonClass<U>
+    ): HcsVcDocumentBase<U> {
         let result: HcsVcDocumentBase<U>;
         try {
             const root = JSON.parse(json);
             result = this.fromJsonTree(root, null, credentialSubjectClass);
-
         } catch (e) {
-            throw new Error('Given JSON string is not a valid HcsVcDocumentBase ' + e.message);
+            throw new Error("Given JSON string is not a valid HcsVcDocumentBase " + e.message);
         }
         return result;
     }
