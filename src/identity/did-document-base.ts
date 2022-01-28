@@ -1,6 +1,6 @@
-import {DidSyntax} from "./did-syntax";
-import {DidDocumentJsonProperties} from "./did-document-json-properties";
-import {HcsDidRootKey} from "./hcs/did/hcs-did-root-key";
+import { DidSyntax } from "./did-syntax";
+import { DidDocumentJsonProperties } from "./did-document-json-properties";
+import { HcsDidRootKey } from "./hcs/did/hcs-did-root-key";
 
 export class DidDocumentBase {
     private id: string;
@@ -26,8 +26,10 @@ export class DidDocumentBase {
                     throw new Error(`${root[DidDocumentJsonProperties.VERIFICATION_METHOD]} is not an array`);
                 }
                 for (let publicKeyObj of root[DidDocumentJsonProperties.VERIFICATION_METHOD]) {
-                    if (publicKeyObj.hasOwnProperty(DidDocumentJsonProperties.ID) && (publicKeyObj[DidDocumentJsonProperties.ID] ===
-                        (result.getId() + HcsDidRootKey.DID_ROOT_KEY_NAME))) {
+                    if (
+                        publicKeyObj.hasOwnProperty(DidDocumentJsonProperties.ID) &&
+                        publicKeyObj[DidDocumentJsonProperties.ID] === result.getId() + HcsDidRootKey.DID_ROOT_KEY_NAME
+                    ) {
                         const didRootKey = HcsDidRootKey.fromJsonTree(publicKeyObj);
                         result.setDidRootKey(didRootKey);
                         break;
@@ -35,7 +37,7 @@ export class DidDocumentBase {
                 }
             }
         } catch (e) {
-            throw new Error('Given JSON string is not a valid DID document ' + e.message);
+            throw new Error("Given JSON string is not a valid DID document " + e.message);
         }
 
         return result;
@@ -54,7 +56,7 @@ export class DidDocumentBase {
     }
 
     public setDidRootKey(rootKey: HcsDidRootKey): void {
-        this.didRootKey = rootKey
+        this.didRootKey = rootKey;
     }
 
     public toJsonTree(): any {
@@ -66,14 +68,10 @@ export class DidDocumentBase {
          * TODO: investigate, should we just leave such cases crash?
          */
         if (this.didRootKey) {
-            rootObject[DidDocumentJsonProperties.AUTHENTICATION] = [
-                this.didRootKey.getId()
-            ];
-            rootObject[DidDocumentJsonProperties.VERIFICATION_METHOD] = [
-                this.didRootKey.toJsonTree()
-            ];
+            rootObject[DidDocumentJsonProperties.AUTHENTICATION] = [this.didRootKey.getId()];
+            rootObject[DidDocumentJsonProperties.VERIFICATION_METHOD] = [this.didRootKey.toJsonTree()];
         } else {
-            console.warn('WARNING: didRootKey is not set for the document')
+            console.warn("WARNING: didRootKey is not set for the document");
         }
 
         return rootObject;

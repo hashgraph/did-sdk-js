@@ -20,7 +20,7 @@ export class Validator {
         const errors = this.validationErrors;
         this.validationErrors = null;
 
-        throw new Error(prologue + ':\n' + errors.join('\n'));
+        throw new Error(prologue + ":\n" + errors.join("\n"));
     }
 
     public require(condition: boolean, errorMessage: string): void {

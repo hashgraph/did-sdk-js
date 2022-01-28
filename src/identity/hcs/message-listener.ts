@@ -1,9 +1,9 @@
-import { Decrypter, Message } from "./message";
 import { Client, Timestamp, TopicId, TopicMessage, TopicMessageQuery } from "@hashgraph/sdk";
 import SubscriptionHandle from "@hashgraph/sdk/lib/topic/SubscriptionHandle";
+import Long from "long";
+import { Decrypter, Message } from "./message";
 import { MessageEnvelope } from "./message-envelope";
 import { MessageMode } from "./message-mode";
-import Long from "long";
 
 /**
  * A listener of confirmed messages from a HCS identity topic.
@@ -116,7 +116,7 @@ export abstract class MessageListener<T extends Message> {
             return;
         }
 
-        if ((MessageMode.ENCRYPTED === envelope.getMode()) && !this.decrypter) {
+        if (MessageMode.ENCRYPTED === envelope.getMode() && !this.decrypter) {
             this.reportInvalidMessage(response, "Message is encrypted and no decryption function was provided");
             return;
         }

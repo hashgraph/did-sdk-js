@@ -1,5 +1,5 @@
-import Long from "long";
 import { Timestamp } from "@hashgraph/sdk";
+import Long from "long";
 import { TimestampUtils } from "../../utils/timestamp-utils";
 
 export type Encrypter<T> = (message: T) => T;
@@ -30,8 +30,7 @@ export class Message {
     }
 
     public static fromJsonTree(tree: any, result?: Message): Message {
-        if (!result)
-            result = new Message();
+        if (!result) result = new Message();
         result.timestamp = TimestampUtils.fromJson(tree.timestamp);
         return result;
     }
