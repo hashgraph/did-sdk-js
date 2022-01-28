@@ -23,7 +23,7 @@ export class HcsVcTopicListener extends MessageListener<HcsVcMessage> {
      *
      * @param vcTopicId The VC consensus topic ID.
      */
-    constructor(vcTopicId: TopicId)
+    constructor(vcTopicId: TopicId);
     /**
      * Creates a new instance of a VC topic listener for the given consensus topic.
      * By default, invalid messages are ignored and errors are not.

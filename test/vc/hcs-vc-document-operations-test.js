@@ -1,20 +1,9 @@
+const { HcsVcDocumentBase, HcsVcOperation } = require("../../dist");
+const { Timestamp } = require("@hashgraph/sdk");
+const { DemoAccessCredential } = require("./demo-access-credential");
+const { NetworkReadyTestBase } = require("../network-ready-test-base");
 
-const {
-    HcsVcDocumentBase,
-    HcsVcOperation
-} = require("../../dist");
-const {
-    Timestamp
-} = require('@hashgraph/sdk');
-const {
-    DemoAccessCredential
-} = require("./demo-access-credential");
-const {
-    NetworkReadyTestBase
-} = require("../network-ready-test-base");
-
-const { expect, assert } = require('chai');
-
+const { expect, assert } = require("chai");
 
 /**
  * Tests operations on verifiable credentials and their status resolution.
@@ -66,7 +55,7 @@ describe("HcsVcDocumentOperationsTest", function () {
         assert.isTrue(msg.isValid());
         assert.equal(op, msg.getOperation());
         assert.equal(credentialHash, msg.getCredentialHash());
-    }
+    };
 
     const testVcStatusResolution = async function (expectedOperation) {
         const envelope = await network.resolveVcStatus(
@@ -83,33 +72,33 @@ describe("HcsVcDocumentOperationsTest", function () {
         assert.isTrue(msg.isValid());
         assert.equal(credentialHash, msg.getCredentialHash());
         assert.equal(expectedOperation, msg.getOperation());
-    }
+    };
 
-    it('Test Issue', async function () {
+    it("Test Issue", async function () {
         this.timeout(60000);
         await testVcOperation(HcsVcOperation.ISSUE);
         await testVcStatusResolution(HcsVcOperation.ISSUE);
     });
 
-    it('Test Suspend', async function () {
+    it("Test Suspend", async function () {
         this.timeout(60000);
         await testVcOperation(HcsVcOperation.SUSPEND);
         await testVcStatusResolution(HcsVcOperation.SUSPEND);
     });
 
-    it('Test Resume', async function () {
+    it("Test Resume", async function () {
         this.timeout(60000);
         await testVcOperation(HcsVcOperation.RESUME);
         await testVcStatusResolution(HcsVcOperation.RESUME);
     });
 
-    it('Test Revoke', async function () {
+    it("Test Revoke", async function () {
         this.timeout(60000);
         await testVcOperation(HcsVcOperation.REVOKE);
         await testVcStatusResolution(HcsVcOperation.REVOKE);
     });
 
-    it('Test InvalidResumeAfterRevoke', async function () {
+    it("Test InvalidResumeAfterRevoke", async function () {
         this.timeout(120000);
         await testVcOperation(HcsVcOperation.RESUME);
         // Status should still be revoked

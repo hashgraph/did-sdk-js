@@ -1,11 +1,11 @@
-import {TopicId} from "@hashgraph/sdk";
-import {TimestampUtils} from "../../../utils/timestamp-utils";
-import {MessageEnvelope} from "../message-envelope";
-import {MessageListener} from "../message-listener";
-import {MessageResolver} from "../message-resolver";
-import {HcsVcMessage} from "./hcs-vc-message";
-import {HcsVcOperation} from "./hcs-vc-operation";
-import {HcsVcTopicListener, PublicKeysProvider} from "./hcs-vc-topic-listener";
+import { TopicId } from "@hashgraph/sdk";
+import { TimestampUtils } from "../../../utils/timestamp-utils";
+import { MessageEnvelope } from "../message-envelope";
+import { MessageListener } from "../message-listener";
+import { MessageResolver } from "../message-resolver";
+import { HcsVcMessage } from "./hcs-vc-message";
+import { HcsVcOperation } from "./hcs-vc-operation";
+import { HcsVcTopicListener, PublicKeysProvider } from "./hcs-vc-topic-listener";
 
 /**
  * Resolves the DID from Hedera network.
@@ -61,7 +61,7 @@ export class HcsVcStatusResolver extends MessageResolver<HcsVcMessage> {
      */
     public addCredentialHashes(hashes: string[]): HcsVcStatusResolver {
         if (hashes != null) {
-            hashes.forEach(d => this.addCredentialHash(d));
+            hashes.forEach((d) => this.addCredentialHash(d));
         }
 
         return this;
@@ -70,7 +70,6 @@ export class HcsVcStatusResolver extends MessageResolver<HcsVcMessage> {
     protected override matchesSearchCriteria(message: HcsVcMessage): boolean {
         return this.results.has(message.getCredentialHash());
     }
-
 
     protected override supplyMessageListener(): MessageListener<HcsVcMessage> {
         return new HcsVcTopicListener(this.topicId, this.publicKeysProvider);
@@ -82,16 +81,11 @@ export class HcsVcStatusResolver extends MessageResolver<HcsVcMessage> {
         // Skip messages that are older than the once collected or if we already have a REVOKED message
         const existing: MessageEnvelope<HcsVcMessage> = this.results.get(message.getCredentialHash());
 
-        const chackOperation = (
-            (existing != null) &&
-            (
-                (TimestampUtils.lessThan(envelope.getConsensusTimestamp(), existing.getConsensusTimestamp())) ||
-                (
-                    HcsVcOperation.REVOKE == (existing.open().getOperation()) &&
-                    HcsVcOperation.REVOKE != (message.getOperation())
-                )
-            )
-        )
+        const chackOperation =
+            existing != null &&
+            (TimestampUtils.lessThan(envelope.getConsensusTimestamp(), existing.getConsensusTimestamp()) ||
+                (HcsVcOperation.REVOKE == existing.open().getOperation() &&
+                    HcsVcOperation.REVOKE != message.getOperation()));
         if (chackOperation) {
             return;
         }
