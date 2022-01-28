@@ -1,6 +1,10 @@
 {
   "name": "@hashgraph/did-sdk-js",
   "version": "0.1.1",
+  "engines": {
+    "npm": ">=8.1.2",
+    "node": ">=16.13.1"
+  },
   "description": "Support for the Hedera Hashgraph DID Method and Verifiable Credentials on the Hedera JavaScript/TypeScript SDK",
   "main": "dist/index.js",
   "module": "dist/index.js",
