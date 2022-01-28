@@ -40,8 +40,9 @@ export class HcsDid implements HederaDid {
      * @param network           The Hedera DID network.
      * @param idString          The id-string of a DID.
      * @param didTopicId        The appnet's DID topic ID.
+     * @param didRootKey        The public key from which DID is derived.
      */
-    constructor(network: string, idString: string, didTopicId: TopicId);
+    constructor(network: string, idString: string, didTopicId: TopicId, didRootKey?: PublicKey);
     constructor(...args: any[]) {
         if (
             typeof args[0] === "string" &&
@@ -81,13 +82,15 @@ export class HcsDid implements HederaDid {
             typeof args[0] === "string" &&
             typeof args[1] === "string" &&
             (args[2] instanceof TopicId || args[2] === undefined) &&
-            args.length === 3
+            (args[3] instanceof PublicKey || args[3] === undefined) &&
+            args.length === 4
         ) {
-            const [network, idString, didTopicId] = args;
+            const [network, idString, didTopicId, didRootKey] = args;
 
             this.didTopicId = didTopicId;
             this.network = network;
             this.idString = idString;
+            this.didRootKey = didRootKey;
             this.did = this.buildDid();
 
             return;
@@ -102,7 +105,7 @@ export class HcsDid implements HederaDid {
      * @param didString A Hedera DID string.
      * @return {@link HcsDid} object derived from the given Hedera DID string.
      */
-    public static fromString(didString: string): HcsDid {
+    public static fromString(didString: string, didRootKey?: PublicKey): HcsDid {
         if (!didString) {
             throw new Error("DID string cannot be null");
         }
@@ -139,10 +142,14 @@ export class HcsDid implements HederaDid {
                 throw new Error("DID string is invalid.");
             }
 
-            return new HcsDid(networkName, didIdString, topicId);
+            return new HcsDid(networkName, didIdString, topicId, didRootKey);
         } catch (e) {
             throw new Error("DID string is invalid. " + e.message);
         }
+    }
+
+    public static fromStringWithDidRootKey(didString: string, didRootKey: PublicKey): HcsDid {
+        return this.fromString(didString, didRootKey);
     }
 
     /**
