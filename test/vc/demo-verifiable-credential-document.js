@@ -1,6 +1,4 @@
-const {
-    HcsVcDocumentBase
-} = require("../../dist");
+const { HcsVcDocumentBase } = require("../../dist");
 
 /**
  * Custom VC document for tests.

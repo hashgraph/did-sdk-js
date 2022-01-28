@@ -14,8 +14,8 @@ export type SignFunction = (message: Uint8Array) => Uint8Array;
  * The envelope for Hedera identity messages sent to HCS DID or VC topics.
  */
 export class MessageEnvelope<T extends Message> {
-    private static MESSAGE_KEY = 'message';
-    private static SIGNATURE_KEY = 'signature';
+    private static MESSAGE_KEY = "message";
+    private static SIGNATURE_KEY = "signature";
 
     private static serialVersionUID = Long.fromInt(1);
 
@@ -28,7 +28,7 @@ export class MessageEnvelope<T extends Message> {
             return null;
         }
         return this.message.toJSON();
-    };
+    }
     protected decryptedMessage: T;
     protected mirrorResponse: SerializableMirrorConsensusResponse;
 
@@ -42,17 +42,15 @@ export class MessageEnvelope<T extends Message> {
     constructor(...args: any[]) {
         if (args.length === 0) {
             // do nothing
-        }
-        else if (args.length === 1) {
+        } else if (args.length === 1) {
             const [message] = args;
 
             this.message = message;
             this.mode = MessageMode.PLAIN;
         } else {
-            throw new Error('Wrong arguments passed to constructor');
+            throw new Error("Wrong arguments passed to constructor");
         }
     }
-
 
     /**
      * Signs this message envelope with the given signing function.
@@ -62,11 +60,11 @@ export class MessageEnvelope<T extends Message> {
      */
     public sign(signer: SignFunction): Uint8Array {
         if (!signer) {
-            throw new Error('Signing function is not provided.');
+            throw new Error("Signing function is not provided.");
         }
 
         if (this.signature) {
-            throw new Error('Message is already signed.');
+            throw new Error("Message is already signed.");
         }
 
         const msgBytes = ArraysUtils.fromString(this.message.toJSON());
@@ -105,14 +103,16 @@ export class MessageEnvelope<T extends Message> {
      * @param messageClass Class type of the message inside envelope.
      * @return The {@link MessageEnvelope}.
      */
-    public static fromMirrorResponse<U extends Message>(response: TopicMessage, messageClass: JsonClass<U>): MessageEnvelope<U> {
+    public static fromMirrorResponse<U extends Message>(
+        response: TopicMessage,
+        messageClass: JsonClass<U>
+    ): MessageEnvelope<U> {
         const msgJson = ArraysUtils.toString(response.contents);
         const result = MessageEnvelope.fromJson(msgJson, messageClass);
         result.mirrorResponse = new SerializableMirrorConsensusResponse(response);
 
         return result;
     }
-
 
     /**
      * Converts a VC topic message from a JSON string into object instance.
@@ -124,7 +124,7 @@ export class MessageEnvelope<T extends Message> {
      */
     public static fromJson<U extends Message>(json: string, messageClass: JsonClass<U>): MessageEnvelope<U> {
         const result = new MessageEnvelope<U>();
-        const root = JSON.parse(json)
+        const root = JSON.parse(json);
         result.mode = root.mode;
         result.signature = root[MessageEnvelope.SIGNATURE_KEY];
         if (root.hasOwnProperty(MessageEnvelope.MESSAGE_KEY)) {
@@ -135,7 +135,6 @@ export class MessageEnvelope<T extends Message> {
         return result;
     }
 
-
     /**
      * Encrypts the message in this envelope and returns its encrypted instance.
      *
@@ -144,7 +143,7 @@ export class MessageEnvelope<T extends Message> {
      */
     public encrypt(encrypter: Encrypter<T>): MessageEnvelope<T> {
         if (!encrypter) {
-            throw new Error('The encryption function is not provided.');
+            throw new Error("The encryption function is not provided.");
         }
 
         this.decryptedMessage = this.message;
@@ -185,7 +184,6 @@ export class MessageEnvelope<T extends Message> {
         return publicKey.verify(messageBytes, signatureToVerify);
     }
 
-
     /**
      * Opens a message in this envelope.
      * If the message is encrypted, the given decrypter will be used first to decrypt it.
@@ -215,7 +213,7 @@ export class MessageEnvelope<T extends Message> {
     }
 
     public getConsensusTimestamp(): Timestamp {
-        return (!this.mirrorResponse) ? null : this.mirrorResponse.consensusTimestamp;
+        return !this.mirrorResponse ? null : this.mirrorResponse.consensusTimestamp;
     }
 
     public getMode(): MessageMode {

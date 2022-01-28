@@ -45,7 +45,7 @@ export abstract class MessageTransaction<T extends Message> {
             this.message = message;
             this.executed = false;
         } else {
-            throw new Error('Invalid arguments');
+            throw new Error("Invalid arguments");
         }
     }
 
@@ -150,7 +150,9 @@ export abstract class MessageTransaction<T extends Message> {
      * @param builderFunction The transaction builder function.
      * @return This transaction instance.
      */
-    public buildAndSignTransaction(builderFunction: (input: TopicMessageSubmitTransaction) => Transaction): MessageTransaction<T> {
+    public buildAndSignTransaction(
+        builderFunction: (input: TopicMessageSubmitTransaction) => Transaction
+    ): MessageTransaction<T> {
         this.buildTransactionFunction = builderFunction;
         return this;
     }
@@ -162,7 +164,7 @@ export abstract class MessageTransaction<T extends Message> {
      * @return Transaction ID.
      */
     public async execute(client: Client): Promise<TransactionId> {
-        new Validator().checkValidationErrors('MessageTransaction execution failed: ', v => {
+        new Validator().checkValidationErrors("MessageTransaction execution failed: ", (v) => {
             return this.validate(v);
         });
 
@@ -172,16 +174,21 @@ export abstract class MessageTransaction<T extends Message> {
             envelope.encrypt(this.provideMessageEncrypter(this.encrypter));
         }
 
-        const messageContent = !envelope.getSignature() ? envelope.sign(this.signer) : ArraysUtils.fromString(envelope.toJSON());
+        const messageContent = !envelope.getSignature()
+            ? envelope.sign(this.signer)
+            : ArraysUtils.fromString(envelope.toJSON());
 
         if (this.receiver) {
             this.listener = this.provideTopicListener(this.topicId);
-            this.listener.setStartTime(Timestamp.fromDate(moment().subtract(MessageTransaction.SUBTRACT_TIME, 'seconds').toDate()))
+            this.listener
+                .setStartTime(
+                    Timestamp.fromDate(moment().subtract(MessageTransaction.SUBTRACT_TIME, "seconds").toDate())
+                )
                 .setIgnoreErrors(false)
                 .addFilter((response) => {
                     return ArraysUtils.equals(messageContent, response.contents);
                 })
-                .onError(err => {
+                .onError((err) => {
                     return this.handleError(err);
                 })
                 .onInvalidMessageReceived((response, reason) => {
@@ -189,11 +196,11 @@ export abstract class MessageTransaction<T extends Message> {
                         return;
                     }
 
-                    this.handleError(new Error(reason + ': ' + ArraysUtils.toString(response.contents)));
+                    this.handleError(new Error(reason + ": " + ArraysUtils.toString(response.contents)));
                     this.listener.unsubscribe();
                 })
                 .onDecrypt(this.decrypter)
-                .subscribe(client, msg => {
+                .subscribe(client, (msg) => {
                     this.listener.unsubscribe();
                     this.receiver(msg);
                 });
@@ -223,9 +230,15 @@ export abstract class MessageTransaction<T extends Message> {
      * @param validator The errors validator.
      */
     protected validate(validator: Validator): void {
-        validator.require(!this.executed, 'This transaction has already been executed.');
-        validator.require(!!this.signer || (!!this.message && !!this.message.getSignature()), 'Signing function is missing.');
-        validator.require(!!this.buildTransactionFunction, 'Transaction builder is missing.');
-        validator.require((!!this.encrypter && !!this.decrypter) || (!this.decrypter && !this.encrypter), 'Either both encrypter and decrypter must be specified or none.')
+        validator.require(!this.executed, "This transaction has already been executed.");
+        validator.require(
+            !!this.signer || (!!this.message && !!this.message.getSignature()),
+            "Signing function is missing."
+        );
+        validator.require(!!this.buildTransactionFunction, "Transaction builder is missing.");
+        validator.require(
+            (!!this.encrypter && !!this.decrypter) || (!this.decrypter && !this.encrypter),
+            "Either both encrypter and decrypter must be specified or none."
+        );
     }
 }

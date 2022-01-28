@@ -21,11 +21,11 @@ export class HcsDidResolver extends MessageResolver<HcsDidMessage> {
     }
 
     /**
-    * Adds a DID to resolve.
-    *
-    * @param did The DID string.
-    * @return This resolver instance.
-    */
+     * Adds a DID to resolve.
+     *
+     * @param did The DID string.
+     * @return This resolver instance.
+     */
     public addDid(did: string): HcsDidResolver {
         if (did != null) {
             this.results.set(did, null);
@@ -41,7 +41,7 @@ export class HcsDidResolver extends MessageResolver<HcsDidMessage> {
      */
     public addDids(dids: string[]): HcsDidResolver {
         if (dids) {
-            dids.forEach(d => this.addDid(d));
+            dids.forEach((d) => this.addDid(d));
         }
         return this;
     }
@@ -56,16 +56,11 @@ export class HcsDidResolver extends MessageResolver<HcsDidMessage> {
         // Also skip messages that are older than the once collected or if we already have a DELETE message
         const existing: MessageEnvelope<HcsDidMessage> = this.results.get(message.getDid());
 
-        const chackOperation = (
-            (existing != null) &&
-            (
-                (TimestampUtils.lessThan(envelope.getConsensusTimestamp(), existing.getConsensusTimestamp())) ||
-                (
-                    DidMethodOperation.DELETE == (existing.open().getOperation()) &&
-                    DidMethodOperation.DELETE != (message.getOperation())
-                )
-            )
-        )
+        const chackOperation =
+            existing != null &&
+            (TimestampUtils.lessThan(envelope.getConsensusTimestamp(), existing.getConsensusTimestamp()) ||
+                (DidMethodOperation.DELETE == existing.open().getOperation() &&
+                    DidMethodOperation.DELETE != message.getOperation()));
         if (chackOperation) {
             return;
         }
