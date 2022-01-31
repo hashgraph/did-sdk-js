@@ -1,7 +1,7 @@
 import { PublicKey } from "@hashgraph/sdk";
-import bs58 from "bs58";
+import { Hashing } from "../../..";
 import { HcsDid } from "./hcs-did";
-
+import { base58btc } from "multiformats/bases/base58";
 /**
  * Represents a root key of HCS Identity DID.
  * That is a public key of type Ed25519VerificationKey2018 compatible with a single publicKey entry of a DID Document.
@@ -13,7 +13,7 @@ export class HcsDidRootKey {
     private id: string;
     private type: string;
     private controller: string;
-    private publicKeyBase58: string;
+    private publicKeyMultibase: string;
 
     /**
      * Creates a {@link HcsDidRootKey} object from the given {@link HcsDid} DID and it's root public key.
@@ -35,7 +35,7 @@ export class HcsDidRootKey {
         const result = new HcsDidRootKey();
         result.controller = did.toDid();
         result.id = result.controller + HcsDidRootKey.DID_ROOT_KEY_NAME;
-        result.publicKeyBase58 = bs58.encode(didRootKey.toBytes());
+        result.publicKeyMultibase = Hashing.multibase.encode(didRootKey.toBytes());
         result.type = HcsDidRootKey.DID_ROOT_KEY_TYPE;
 
         return result;
@@ -54,7 +54,7 @@ export class HcsDidRootKey {
         const result = new HcsDidRootKey();
         result.controller = did.toDid();
         result.id = result.controller + this.DID_ROOT_KEY_NAME;
-        result.publicKeyBase58 = null;
+        result.publicKeyMultibase = null;
         result.type = this.DID_ROOT_KEY_TYPE;
         return result;
     }
@@ -71,8 +71,8 @@ export class HcsDidRootKey {
         return this.controller;
     }
 
-    public getPublicKeyBase58(): string {
-        return this.publicKeyBase58;
+    public getPublicKeyMultibase(): string {
+        return this.publicKeyMultibase;
     }
 
     public toJsonTree(): any {
@@ -80,7 +80,7 @@ export class HcsDidRootKey {
         result.id = this.id;
         result.type = this.type;
         result.controller = this.controller;
-        result.publicKeyBase58 = this.publicKeyBase58;
+        result.publicKeyMultibase = this.publicKeyMultibase;
         return result;
     }
 
@@ -93,7 +93,7 @@ export class HcsDidRootKey {
         result.id = json.id;
         result.type = json.type;
         result.controller = json.controller;
-        result.publicKeyBase58 = json.publicKeyBase58;
+        result.publicKeyMultibase = json.publicKeyMultibase;
         return result;
     }
 
