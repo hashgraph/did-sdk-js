@@ -1,7 +1,7 @@
 import { PublicKey } from "@hashgraph/sdk";
-import bs58 from "bs58";
+import { Hashing } from "../../..";
 import { HcsDid } from "./hcs-did";
-
+import { base58btc } from "multiformats/bases/base58";
 /**
  * Represents a root key of HCS Identity DID.
  * That is a public key of type Ed25519VerificationKey2018 compatible with a single publicKey entry of a DID Document.
@@ -35,7 +35,7 @@ export class HcsDidRootKey {
         const result = new HcsDidRootKey();
         result.controller = did.toDid();
         result.id = result.controller + HcsDidRootKey.DID_ROOT_KEY_NAME;
-        result.publicKeyBase58 = bs58.encode(didRootKey.toBytes());
+        result.publicKeyBase58 = Hashing.multibase.encode(didRootKey.toBytes());
         result.type = HcsDidRootKey.DID_ROOT_KEY_TYPE;
 
         return result;
