@@ -1,6 +1,5 @@
 const { TopicId } = require("@hashgraph/sdk");
-const bs58 = require("bs58");
-const { HcsDid, HcsDidRootKey } = require("../../dist");
+const { HcsDid, HcsDidRootKey, Hashing } = require("../../dist");
 
 const { assert } = require("chai");
 
@@ -35,6 +34,6 @@ describe("HcsDidRootKey", function () {
         assert.equal(didRootKey.getType(), "Ed25519VerificationKey2018");
         assert.equal(didRootKey.getId(), did.toDid() + HcsDidRootKey.DID_ROOT_KEY_NAME);
         assert.equal(didRootKey.getController(), did.toDid());
-        assert.equal(didRootKey.getPublicKeyBase58(), bs58.encode(privateKey.publicKey.toBytes()));
+        assert.equal(didRootKey.getPublicKeyMultibase(), Hashing.multibase.encode(privateKey.publicKey.toBytes()));
     });
 });

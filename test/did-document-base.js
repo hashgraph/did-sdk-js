@@ -1,6 +1,5 @@
-const { HcsDid, DidDocumentBase, DidDocumentJsonProperties, DidSyntax, HcsDidRootKey } = require("../dist");
+const { HcsDid, DidDocumentBase, DidDocumentJsonProperties, DidSyntax, HcsDidRootKey, Hashing } = require("../dist");
 const { TopicId } = require("@hashgraph/sdk");
-const bs58 = require("bs58");
 const { expect, assert } = require("chai");
 
 const network = "testnet";
@@ -29,7 +28,7 @@ describe("DidDocumentBase", function () {
         assert.equal(didRootKey["type"], HcsDidRootKey.DID_ROOT_KEY_TYPE);
         assert.equal(didRootKey[DidDocumentJsonProperties.ID], did.toDid() + HcsDidRootKey.DID_ROOT_KEY_NAME);
         assert.equal(didRootKey["controller"], did.toDid());
-        assert.equal(didRootKey["publicKeyBase58"], bs58.encode(privateKey.publicKey.toBytes()));
+        assert.equal(didRootKey["publicKeyMultibase"], Hashing.multibase.encode(privateKey.publicKey.toBytes()));
     });
 
     it("Test Deserialization", async function () {
@@ -44,7 +43,7 @@ describe("DidDocumentBase", function () {
 
         const didRootKey = parsedDoc.getDidRootKey();
         assert.exists(didRootKey);
-        assert.equal(didRootKey.getPublicKeyBase58(), doc.getDidRootKey().getPublicKeyBase58());
+        assert.equal(didRootKey.getPublicKeyMultibase(), doc.getDidRootKey().getPublicKeyMultibase());
         assert.equal(didRootKey.getController(), doc.getDidRootKey().getController());
         assert.equal(didRootKey.getId(), doc.getDidRootKey().getId());
         assert.equal(didRootKey.getType(), doc.getDidRootKey().getType());
@@ -94,7 +93,7 @@ describe("DidDocumentBase", function () {
             "    {" +
             ' "id": "did:hedera:mainnet:7Prd74ry1Uct87nZqL3ny7aR7Cg46JamVbJgk8azVgUm_1.5.23462345#key-1",' +
             ' "type": "Ed25519VerificationKey2018",' +
-            '      "publicKeyBase58": "H3C2AVvLMv6gmMNam3uVAjZpfkcJCwDwnZn6z3wXmqPV"' +
+            '      "publicKeyMultibase": "zH3C2AVvLMv6gmMNam3uVAjZpfkcJCwDwnZn6z3wXmqPV"' +
             "    }" +
             "  ]," +
             '  "service": [' +
@@ -116,7 +115,7 @@ describe("DidDocumentBase", function () {
             '  "publicKey": [' +
             "    {" +
             ' "type": "Ed25519VerificationKey2018",' +
-            '      "publicKeyBase58": "H3C2AVvLMv6gmMNam3uVAjZpfkcJCwDwnZn6z3wXmqPV"' +
+            '      "publicKeyMultibase": "zH3C2AVvLMv6gmMNam3uVAjZpfkcJCwDwnZn6z3wXmqPV"' +
             "    }" +
             "  ]," +
             '  "service": [' +

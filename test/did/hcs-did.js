@@ -1,6 +1,5 @@
-const { FileId, TopicId } = require("@hashgraph/sdk");
-const bs58 = require("bs58");
-const { DidSyntax, HcsDid } = require("../../dist");
+const { TopicId } = require("@hashgraph/sdk");
+const { DidSyntax, HcsDid, Hashing } = require("../../dist");
 
 const { assert } = require("chai");
 
@@ -43,7 +42,10 @@ describe("HcsDid", function () {
         assert.equal(document.getId(), parsedDid.toString());
         assert.equal(document.getContext(), DidSyntax.DID_DOCUMENT_CONTEXT);
         assert.exists(document.getDidRootKey());
-        assert.equal(document.getDidRootKey().getPublicKeyBase58(), bs58.encode(privateKey.publicKey.toBytes()));
+        assert.equal(
+            document.getDidRootKey().getPublicKeyMultibase(),
+            Hashing.multibase.encode(privateKey.publicKey.toBytes())
+        );
     });
 
     it("Test Parse Predefined Dids", async function () {
