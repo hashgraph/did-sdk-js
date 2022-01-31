@@ -31,7 +31,11 @@ export class HcsDidTopicListener extends MessageListener<HcsDidMessage> {
 
     protected override isMessageValid(envelope: MessageEnvelope<HcsDidMessage>, response: TopicMessage): boolean {
         try {
-            const msgDecrypter = !!this.decrypter ? HcsDidMessage.getDecrypter(this.decrypter) : null;
+            // const msgDecrypter = !!this.decrypter ? HcsDidMessage.getDecrypter(this.decrypter) : null;
+            /**
+             * TODO: Looks like we no longer encrypt messages
+             */
+            const msgDecrypter = null;
 
             const message: HcsDidMessage = envelope.open(msgDecrypter);
             if (!message) {
@@ -39,11 +43,15 @@ export class HcsDidTopicListener extends MessageListener<HcsDidMessage> {
                 return false;
             }
 
-            const key = message.extractDidRootKey();
-            if (!envelope.isSignatureValid(key)) {
-                this.reportInvalidMessage(response, "Signature validation failed");
-                return false;
-            }
+            /**
+             * TODO: message no longer contains the whole DID document
+             */
+
+            // const key = message.extractDidRootKey();
+            // if (!envelope.isSignatureValid(key)) {
+            //     this.reportInvalidMessage(response, "Signature validation failed");
+            //     return false;
+            // }
 
             if (!message.isValid(this.topicId)) {
                 this.reportInvalidMessage(response, "Message content validation failed.");

@@ -3,6 +3,13 @@ import { Hashing } from "../../../..";
 import { HcsDidEvent } from "./hcs-did-event";
 import { HcsDidEventName } from "./hcs-did-event-name";
 
+export type VerificationRelationshipType =
+    | "authentication"
+    | "assertionMethod"
+    | "keyAgreement"
+    | "capabilityInvocation"
+    | "capabilityDelegation";
+
 export class HcsDidVerificationRelationshipEvent extends HcsDidEvent {
     public static KEY_TYPE = "Ed25519VerificationKey2018";
 
@@ -10,17 +17,14 @@ export class HcsDidVerificationRelationshipEvent extends HcsDidEvent {
 
     protected id: string;
     protected type = HcsDidVerificationRelationshipEvent.KEY_TYPE;
-    /**
-     * What are the values of relationshipType ?
-     */
-    protected relationshipType: string;
+    protected relationshipType: VerificationRelationshipType;
     protected controller: string;
     protected publicKey: PublicKey;
 
     /**
      * TODO: I guess controller param is not necessary and can be derived from the publicKey, right?
      */
-    constructor(id: string, relationshipType: string, controller: string, publicKey: PublicKey) {
+    constructor(id: string, relationshipType: VerificationRelationshipType, controller: string, publicKey: PublicKey) {
         super();
 
         this.id = id;

@@ -1,5 +1,4 @@
 import { PrivateKey, PublicKey, TopicId } from "@hashgraph/sdk";
-import { DidMethodOperation } from "../did-method-operation";
 import { HcsDid } from "./did/hcs-did";
 import { HcsDidMessage } from "./did/hcs-did-message";
 import { HcsDidResolver } from "./did/hcs-did-resolver";
@@ -62,7 +61,7 @@ export class HcsIdentityNetwork {
      * @param operation The operation to be performed on a DID document.
      * @return The {@link HcsDidTransaction} instance.
      */
-    public createDidTransaction(operation: DidMethodOperation): HcsDidTransaction;
+    // public createDidTransaction(operation: DidMethodOperation): HcsDidTransaction;
 
     /**
      * Instantiates a {@link HcsDidTransaction} to perform the specified operation on the DID document.
@@ -76,13 +75,14 @@ export class HcsIdentityNetwork {
         if (args.length === 1 && args[0] instanceof MessageEnvelope) {
             const [message] = args;
             return new HcsDidTransaction(message, this.didTopicId);
-        } else if (
-            args.length === 1
-            // (args[0] instanceof DidMethodOperation)
-        ) {
-            const [operation] = args;
-            return new HcsDidTransaction(operation, this.didTopicId);
-        } else {
+        } // else if (
+        //     args.length === 1
+        //     // (args[0] instanceof DidMethodOperation)
+        // ) {
+        //     const [operation] = args;
+        //     return new HcsDidTransaction(operation, this.didTopicId);
+        // }
+        else {
             throw new Error("Invalid arguments");
         }
     }
