@@ -1,12 +1,12 @@
+import { TopicId } from "@hashgraph/sdk";
+import { Validator } from "../../../utils/validator";
+import { DidMethodOperation } from "../../did-method-operation";
+import { Encrypter } from "../message";
+import { MessageEnvelope } from "../message-envelope";
+import { MessageListener } from "../message-listener";
 import { MessageTransaction } from "../message-transaction";
 import { HcsDidMessage } from "./hcs-did-message";
-import { DidMethodOperation } from "../../did-method-operation";
-import { PublicKey, TopicId } from "@hashgraph/sdk";
-import { MessageEnvelope } from "../message-envelope";
-import { Validator } from "../../../utils/validator";
-import { MessageListener } from "../message-listener";
 import { HcsDidTopicListener } from "./hcs-did-topic-listener";
-import { Encrypter } from "../message";
 
 /**
  * The DID document creation, update or deletion transaction.
@@ -36,11 +36,12 @@ export class HcsDidTransaction extends MessageTransaction<HcsDidMessage> {
             const [message, topicId] = args;
             super(topicId, message);
             this.operation = null;
-        } else if (args.length === 2) {
-            const [operation, topicId] = args;
-            super(topicId);
-            this.operation = operation;
-        } else {
+        } // else if (args.length === 2) {
+        // const [operation, topicId] = args;
+        // super(topicId);
+        // this.operation = operation;
+        // }
+        else {
             throw new Error("Invalid arguments");
         }
     }
@@ -63,7 +64,8 @@ export class HcsDidTransaction extends MessageTransaction<HcsDidMessage> {
     }
 
     protected buildMessage(): MessageEnvelope<HcsDidMessage> {
-        return HcsDidMessage.fromDidDocumentJson(this.didDocument, this.operation);
+        throw new Error("we no longer submit the whole DID document");
+        // return HcsDidMessage.fromDidDocumentJson(this.didDocument, this.operation);
     }
 
     protected provideTopicListener(topicIdToListen: TopicId): MessageListener<HcsDidMessage> {
@@ -71,6 +73,7 @@ export class HcsDidTransaction extends MessageTransaction<HcsDidMessage> {
     }
 
     protected provideMessageEncrypter(encryptionFunction: Encrypter<string>): (input: HcsDidMessage) => HcsDidMessage {
-        return HcsDidMessage.getEncrypter(encryptionFunction);
+        throw new Error("we no longer encrypt messages");
+        // return HcsDidMessage.getEncrypter(encryptionFunction);
     }
 }
