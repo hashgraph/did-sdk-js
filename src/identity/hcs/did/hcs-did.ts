@@ -230,7 +230,7 @@ export class HcsDid implements HederaDid {
      * @return The id-string of a DID that is a Base58-encoded SHA-256 hash of a given public key.
      */
     public static publicKeyToIdString(didRootKey: PublicKey): string {
-        return Hashing.base58.encode(Hashing.sha256.digest(didRootKey.toBytes()));
+        return Hashing.multibase.encode(Hashing.sha256.digest(didRootKey.toBytes()));
     }
 
     /**

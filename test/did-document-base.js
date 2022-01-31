@@ -1,6 +1,5 @@
-const { HcsDid, DidDocumentBase, DidDocumentJsonProperties, DidSyntax, HcsDidRootKey } = require("../dist");
+const { HcsDid, DidDocumentBase, DidDocumentJsonProperties, DidSyntax, HcsDidRootKey, Hashing } = require("../dist");
 const { TopicId } = require("@hashgraph/sdk");
-const bs58 = require("bs58");
 const { expect, assert } = require("chai");
 
 const network = "testnet";
@@ -29,7 +28,7 @@ describe("DidDocumentBase", function () {
         assert.equal(didRootKey["type"], HcsDidRootKey.DID_ROOT_KEY_TYPE);
         assert.equal(didRootKey[DidDocumentJsonProperties.ID], did.toDid() + HcsDidRootKey.DID_ROOT_KEY_NAME);
         assert.equal(didRootKey["controller"], did.toDid());
-        assert.equal(didRootKey["publicKeyBase58"], bs58.encode(privateKey.publicKey.toBytes()));
+        assert.equal(didRootKey["publicKeyBase58"], Hashing.multibase.encode(privateKey.publicKey.toBytes()));
     });
 
     it("Test Deserialization", async function () {

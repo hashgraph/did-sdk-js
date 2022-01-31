@@ -139,7 +139,7 @@ export class HcsDidMessage extends Message {
             const hcsDid: HcsDid = HcsDid.fromString(this.did);
 
             // Extract public key from the DID document
-            const publicKeyBytes: Uint8Array = Hashing.base58.decode(doc.getDidRootKey().getPublicKeyBase58());
+            const publicKeyBytes: Uint8Array = Hashing.multibase.decode(doc.getDidRootKey().getPublicKeyBase58());
             const publicKey: PublicKey = PublicKey.fromBytes(publicKeyBytes);
 
             if (HcsDid.publicKeyToIdString(publicKey) != hcsDid.getIdString()) {
@@ -172,7 +172,7 @@ export class HcsDidMessage extends Message {
             const doc: DidDocumentBase = DidDocumentBase.fromJson(this.getDidDocument());
             // Make sure that DID root key is present in the document
             if (doc.getDidRootKey() != null && doc.getDidRootKey().getPublicKeyBase58() != null) {
-                const publicKeyBytes: Uint8Array = Hashing.base58.decode(doc.getDidRootKey().getPublicKeyBase58());
+                const publicKeyBytes: Uint8Array = Hashing.multibase.decode(doc.getDidRootKey().getPublicKeyBase58());
                 result = PublicKey.fromBytes(publicKeyBytes);
             }
             // ArrayIndexOutOfBoundsException is thrown in case public key is invalid in PublicKey.fromBytes
