@@ -43,7 +43,7 @@ describe("HcsDid", function () {
         assert.equal(document.getContext(), DidSyntax.DID_DOCUMENT_CONTEXT);
         assert.exists(document.getDidRootKey());
         assert.equal(
-            document.getDidRootKey().getPublicKeyBase58(),
+            document.getDidRootKey().getPublicKeyMultibase(),
             Hashing.multibase.encode(privateKey.publicKey.toBytes())
         );
     });
