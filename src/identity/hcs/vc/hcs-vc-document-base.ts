@@ -47,7 +47,7 @@ export class HcsVcDocumentBase<T extends CredentialSubject> extends HcsVcDocumen
         map[HcsVcDocumentJsonProperties.ISSUANCE_DATE] = TimestampUtils.toJSON(this.issuanceDate);
         const json: string = JSON.stringify(map);
         const hash: Uint8Array = Hashing.sha256.digest(json);
-        return Hashing.base58.encode(hash);
+        return Hashing.multibase.encode(hash);
     }
 
     public getContext(): string[] {
