@@ -1,16 +1,9 @@
 import * as crypto from "crypto";
-import bs58 from "bs58";
+import { base58btc } from "multiformats/bases/base58";
 import { Base64 } from "js-base64";
+import { MultibaseEncoder, MultibaseDecoder } from "multiformats/bases/interface";
 
 export class Hashing {
-    public static readonly base58 = {
-        encode: function (data: Uint8Array): string {
-            return bs58.encode(data);
-        },
-        decode: function (data: string): Uint8Array {
-            return bs58.decode(data);
-        },
-    };
     public static readonly sha256 = {
         digest: function (data: Uint8Array | string): Uint8Array {
             const sha256 = crypto
@@ -27,6 +20,20 @@ export class Hashing {
         },
         encode: function (decodedBytes: string): string {
             return Base64.toBase64(decodedBytes);
+        },
+    };
+
+    /**
+     * @returns Multibase [MULTIBASE] base58-btc encoded value for the public key type and the raw bytes associated with the public key format.
+     * https://github.com/multiformats/multibase
+     * https://www.w3.org/TR/did-core/#dfn-publickeymultibase
+     */
+    public static readonly multibase = {
+        encode: function (data: Uint8Array, base: MultibaseEncoder<string> = base58btc): string {
+            return base.encode(data);
+        },
+        decode: function (data: string, base: MultibaseDecoder<string> = base58btc): Uint8Array {
+            return base.decode(data);
         },
     };
 }
