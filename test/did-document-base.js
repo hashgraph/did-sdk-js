@@ -93,7 +93,7 @@ describe("DidDocumentBase", function () {
             "    {" +
             ' "id": "did:hedera:mainnet:7Prd74ry1Uct87nZqL3ny7aR7Cg46JamVbJgk8azVgUm_1.5.23462345#key-1",' +
             ' "type": "Ed25519VerificationKey2018",' +
-            '      "publicKeyMultibase": "H3C2AVvLMv6gmMNam3uVAjZpfkcJCwDwnZn6z3wXmqPV"' +
+            '      "publicKeyMultibase": "zH3C2AVvLMv6gmMNam3uVAjZpfkcJCwDwnZn6z3wXmqPV"' +
             "    }" +
             "  ]," +
             '  "service": [' +
@@ -115,7 +115,7 @@ describe("DidDocumentBase", function () {
             '  "publicKey": [' +
             "    {" +
             ' "type": "Ed25519VerificationKey2018",' +
-            '      "publicKeyMultibase": "H3C2AVvLMv6gmMNam3uVAjZpfkcJCwDwnZn6z3wXmqPV"' +
+            '      "publicKeyMultibase": "zH3C2AVvLMv6gmMNam3uVAjZpfkcJCwDwnZn6z3wXmqPV"' +
             "    }" +
             "  ]," +
             '  "service": [' +
