@@ -53,14 +53,14 @@ describe("DidDocumentBase", function () {
         const didJson =
             "{" +
             '  "@context": "https://www.w3.org/ns/did/v1",' +
-            '  "id": "did:hedera:mainnet:7Prd74ry1Uct87nZqL3ny7aR7Cg46JamVbJgk8azVgUm_1.5.23462345",' +
+            '  "id": "did:hedera:mainnet:z6Mk7Prd74ry1Uct87nZqL3ny7aR7Cg46JamVbJgk8azVgUm_1.5.23462345",' +
             '  "authentication": [' +
-            ' "did:hedera:mainnet:7Prd74ry1Uct87nZqL3ny7aR7Cg46JamVbJgk8azVgUm_1.5.23462345#did-root-key"' +
+            ' "did:hedera:mainnet:z6Mk7Prd74ry1Uct87nZqL3ny7aR7Cg46JamVbJgk8azVgUm_1.5.23462345#did-root-key"' +
             "  ]," +
             '  "verificationMethod":"invalidPublicKey",' +
             '  "service": [' +
             "    {" +
-            '    "id":"did:hedera:mainnet:7Prd74ry1Uct87nZqL3ny7aR7Cg46JamVbJgk8azVgUm_1.5.23462345#vcs",' +
+            '    "id":"did:hedera:mainnet:z6Mk7Prd74ry1Uct87nZqL3ny7aR7Cg46JamVbJgk8azVgUm_1.5.23462345#vcs",' +
             '    "type": "VerifiableCredentialService",' +
             '    "serviceEndpoint": "https://example.com/vc/"' +
             "    }" +
@@ -76,29 +76,29 @@ describe("DidDocumentBase", function () {
         const didJsonMissingPublicKeys =
             "{" +
             '  "@context": "https://www.w3.org/ns/did/v1",' +
-            '  "id": "did:hedera:mainnet:7Prd74ry1Uct87nZqL3ny7aR7Cg46JamVbJgk8azVgUm_1.5.23462345",' +
+            '  "id": "did:hedera:mainnet:z6Mk7Prd74ry1Uct87nZqL3ny7aR7Cg46JamVbJgk8azVgUm_1.5.23462345",' +
             '  "authentication": [' +
-            ' "did:hedera:mainnet:7Prd74ry1Uct87nZqL3ny7aR7Cg46JamVbJgk8azVgUm_1.5.23462345#did-root-key"' +
+            ' "did:hedera:mainnet:z6Mk7Prd74ry1Uct87nZqL3ny7aR7Cg46JamVbJgk8azVgUm_1.5.23462345#did-root-key"' +
             "  ]" +
             "}";
 
         const didJsonMissingRootKey =
             "{" +
             '  "@context": "https://www.w3.org/ns/did/v1",' +
-            '  "id": "did:hedera:mainnet:7Prd74ry1Uct87nZqL3ny7aR7Cg46JamVbJgk8azVgUm_1.5.23462345",' +
+            '  "id": "did:hedera:mainnet:z6Mk7Prd74ry1Uct87nZqL3ny7aR7Cg46JamVbJgk8azVgUm_1.5.23462345",' +
             '  "authentication": [' +
-            '  "did:hedera:mainnet:7Prd74ry1Uct87nZqL3ny7aR7Cg46JamVbJgk8azVgUm_1.5.23462345#did-root-key"' +
+            '  "did:hedera:mainnet:z6Mk7Prd74ry1Uct87nZqL3ny7aR7Cg46JamVbJgk8azVgUm_1.5.23462345#did-root-key"' +
             "  ]," +
             '  "publicKey": [' +
             "    {" +
-            ' "id": "did:hedera:mainnet:7Prd74ry1Uct87nZqL3ny7aR7Cg46JamVbJgk8azVgUm_1.5.23462345#key-1",' +
+            ' "id": "did:hedera:mainnet:z6Mk7Prd74ry1Uct87nZqL3ny7aR7Cg46JamVbJgk8azVgUm_1.5.23462345#key-1",' +
             ' "type": "Ed25519VerificationKey2018",' +
-            '      "publicKeyMultibase": "zH3C2AVvLMv6gmMNam3uVAjZpfkcJCwDwnZn6z3wXmqPV"' +
+            '      "publicKeyMultibase": "z6MkH3C2AVvLMv6gmMNam3uVAjZpfkcJCwDwnZn6z3wXmqPV"' +
             "    }" +
             "  ]," +
             '  "service": [' +
             "    {" +
-            ' "id": "did:hedera:mainnet:7Prd74ry1Uct87nZqL3ny7aR7Cg46JamVbJgk8azVgUm_1.5.23462345#vcs",' +
+            ' "id": "did:hedera:mainnet:z6Mk7Prd74ry1Uct87nZqL3ny7aR7Cg46JamVbJgk8azVgUm_1.5.23462345#vcs",' +
             '      "type": "VerifiableCredentialService",' +
             '      "serviceEndpoint": "https://example.com/vc/"' +
             "    }" +
@@ -108,19 +108,19 @@ describe("DidDocumentBase", function () {
         const didJsonMissingPublicKeyId =
             "{" +
             '  "@context": "https://www.w3.org/ns/did/v1",' +
-            '  "id": "did:hedera:mainnet:7Prd74ry1Uct87nZqL3ny7aR7Cg46JamVbJgk8azVgUm_1.5.23462345",' +
+            '  "id": "did:hedera:mainnet:z6Mk7Prd74ry1Uct87nZqL3ny7aR7Cg46JamVbJgk8azVgUm_1.5.23462345",' +
             '  "authentication": [' +
-            '  "did:hedera:mainnet:7Prd74ry1Uct87nZqL3ny7aR7Cg46JamVbJgk8azVgUm_1.5.23462345#did-root-key"' +
+            '  "did:hedera:mainnet:z6Mk7Prd74ry1Uct87nZqL3ny7aR7Cg46JamVbJgk8azVgUm_1.5.23462345#did-root-key"' +
             "  ]," +
             '  "publicKey": [' +
             "    {" +
             ' "type": "Ed25519VerificationKey2018",' +
-            '      "publicKeyMultibase": "zH3C2AVvLMv6gmMNam3uVAjZpfkcJCwDwnZn6z3wXmqPV"' +
+            '      "publicKeyMultibase": "z6MkH3C2AVvLMv6gmMNam3uVAjZpfkcJCwDwnZn6z3wXmqPV"' +
             "    }" +
             "  ]," +
             '  "service": [' +
             "    {" +
-            ' "id": "did:hedera:mainnet:7Prd74ry1Uct87nZqL3ny7aR7Cg46JamVbJgk8azVgUm_1.5.23462345#vcs",' +
+            ' "id": "did:hedera:mainnet:z6Mk7Prd74ry1Uct87nZqL3ny7aR7Cg46JamVbJgk8azVgUm_1.5.23462345#vcs",' +
             '      "type": "VerifiableCredentialService",' +
             '      "serviceEndpoint": "https://example.com/vc/"' +
             "    }" +
