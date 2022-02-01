@@ -52,7 +52,7 @@ describe("HcsDid", function () {
         const didTopicId = "1.5.23462345";
 
         const validDidWithSwitchedParamsOrder =
-            "did:hedera:testnet:8LjUL78kFVnWV9rFnNCTE5bZdRmjm2obqJwS892jVLak" + "_" + didTopicId;
+            "did:hedera:testnet:z6Mk8LjUL78kFVnWV9rFnNCTE5bZdRmjm2obqJwS892jVLak" + "_" + didTopicId;
 
         const invalidDids = [
             null,
@@ -62,11 +62,11 @@ describe("HcsDid", function () {
             "did:hedera:invalidNetwork:8LjUL78kFVnWV9rFnNCTE5bZdRmjm2obqJwS892jVLak_0.0.24352",
             "did:hedera:testnet:invalidAddress_0.0.24352_1.5.23462345",
             "did:hedera:testnet_1.5.23462345",
-            "did:hedera:testnet:8LjUL78kFVnWV9rFnNCTE5bZdRmjm2obqJwS892jVLak:unknown:parameter=1_missing",
-            "did:hedera:testnet:8LjUL78kFVnWV9rFnNCTE5bZdRmjm2obqJwS892jVLak_0.0.1=1",
-            "did:hedera:testnet:8LjUL78kFVnWV9rFnNCTE5bZdRmjm2obqJwS892jVLak:hedera:testnet:fid",
-            "did:hedera:testnet:8LjUL78kFVnWV9rFnNCTE5bZdRmjm2obqJwS892jVLak:unknownPart_0.0.1",
-            "did:notHedera:testnet:8LjUL78kFVnWV9rFnNCTE5bZdRmjm2obqJwS892jVLak_0.0.1",
+            "did:hedera:testnet:z6Mk8LjUL78kFVnWV9rFnNCTE5bZdRmjm2obqJwS892jVLak:unknown:parameter=1_missing",
+            "did:hedera:testnet:z6Mk8LjUL78kFVnWV9rFnNCTE5bZdRmjm2obqJwS892jVLak_0.0.1=1",
+            "did:hedera:testnet:z6Mk8LjUL78kFVnWV9rFnNCTE5bZdRmjm2obqJwS892jVLak:hedera:testnet:fid",
+            "did:hedera:testnet:z6Mk8LjUL78kFVnWV9rFnNCTE5bZdRmjm2obqJwS892jVLak:unknownPart_0.0.1",
+            "did:notHedera:testnet:z6Mk8LjUL78kFVnWV9rFnNCTE5bZdRmjm2obqJwS892jVLak_0.0.1",
         ];
 
         for (let did of invalidDids) {
