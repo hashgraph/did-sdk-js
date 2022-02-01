@@ -2,6 +2,7 @@ import { Timestamp, TopicId } from "@hashgraph/sdk";
 import { DidMethodOperation } from "../../did-method-operation";
 import { Message } from "../message";
 import { HcsDidEvent } from "./event/hcs-did-event";
+import { HcsDidEventParser } from "./event/hcs-did-event-parser";
 import { HcsDid } from "./hcs-did";
 
 /**
@@ -34,6 +35,7 @@ export class HcsDidMessage extends Message {
      */
     constructor(operation: DidMethodOperation, did: string, event: HcsDidEvent) {
         super();
+
         this.operation = operation;
         this.did = did;
         this.event = event;
@@ -109,6 +111,7 @@ export class HcsDidMessage extends Message {
             // }
 
             // // Verify that DID was derived from this DID root key
+
             const hcsDid: HcsDid = HcsDid.fromString(this.did);
 
             // // Extract public key from the DID document
@@ -170,12 +173,14 @@ export class HcsDidMessage extends Message {
     }
 
     public static fromJsonTree(tree: any, result?: HcsDidMessage): HcsDidMessage {
+        const event = HcsDidEventParser.fromBase64(tree.event);
+
         if (!result) {
-            result = new HcsDidMessage(tree.operation, tree.did, tree.didDocumentBase64);
+            result = new HcsDidMessage(tree.operation, tree.did, event);
         } else {
             result.operation = tree.operation;
             result.did = tree.did;
-            // result.didDocumentBase64 = tree.didDocumentBase64;
+            result.event = event;
         }
         result = super.fromJsonTree(tree, result) as HcsDidMessage;
         return result;

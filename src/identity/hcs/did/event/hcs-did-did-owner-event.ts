@@ -49,7 +49,7 @@ export class HcsDidDidOwnerEvent extends HcsDidEvent {
             [this.name]: {
                 id: this.getId(),
                 type: this.getType(),
-                contoller: this.getController(),
+                controller: this.getController(),
                 publicKeyMultibase: this.getPublicKeyMultibase(),
             },
         };
@@ -57,5 +57,10 @@ export class HcsDidDidOwnerEvent extends HcsDidEvent {
 
     public toJSON() {
         return JSON.stringify(this.toJsonTree());
+    }
+
+    static fromJsonTree(tree: any): HcsDidDidOwnerEvent {
+        const publicKey = PublicKey.fromBytes(Hashing.multibase.decode(tree.publicKeyMultibase));
+        return new HcsDidDidOwnerEvent(tree.id, tree.controller, publicKey);
     }
 }
