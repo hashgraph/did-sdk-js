@@ -33,6 +33,7 @@ import { SerializableMirrorConsensusResponse } from "./identity/hcs/serializable
 import { TimestampUtils } from "./utils/timestamp-utils";
 import { Validator } from "./utils/validator";
 import { Issuer } from "./identity/hcs/vc/issuer";
+import { Ed25519PubCodec } from "./utils/ed25519PubCodec";
 
 export {
     ArraysUtils,
@@ -70,4 +71,5 @@ export {
     TimestampUtils,
     Validator,
     Issuer,
+    Ed25519PubCodec,
 };
