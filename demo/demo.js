@@ -15,7 +15,7 @@ console.log(`did: ${didString}`);
 // console.log(did);
 console.log(`did-document: ${did.generateDidDocument().toJSON()}`);
 
-const didFromString = HcsDid.fromStringWithDidRootKey(didString, privateKey.publicKey);
+const didFromString = HcsDid.fromString(didString);
 
 // console.log(did);
 console.log(`did-document: ${didFromString.generateDidDocument().toJSON()}`);

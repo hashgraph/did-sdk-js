@@ -3,6 +3,7 @@ import { Hashing } from "../../../utils/hashing";
 import { DidDocumentBase } from "../../did-document-base";
 import { DidSyntax } from "../../did-syntax";
 import { HederaDid } from "../../hedera-did";
+import { HcsDidMessage } from "./hcs-did-message";
 import { HcsDidRootKey } from "./hcs-did-root-key";
 
 /**
@@ -17,6 +18,7 @@ export class HcsDid implements HederaDid {
     private did: string;
     private didRootKey: PublicKey;
     private privateDidRootKey: PrivateKey;
+    private messages: HcsDidMessage[] = [];
 
     /**
      * Creates a DID instance.
@@ -42,7 +44,7 @@ export class HcsDid implements HederaDid {
      * @param didTopicId        The appnet's DID topic ID.
      * @param didRootKey        The public key from which DID is derived.
      */
-    constructor(network: string, idString: string, didTopicId: TopicId, didRootKey?: PublicKey);
+    constructor(network: string, idString: string, didTopicId: TopicId);
     constructor(...args: any[]) {
         if (
             typeof args[0] === "string" &&
@@ -82,15 +84,14 @@ export class HcsDid implements HederaDid {
             typeof args[0] === "string" &&
             typeof args[1] === "string" &&
             (args[2] instanceof TopicId || args[2] === undefined) &&
-            (args[3] instanceof PublicKey || args[3] === undefined) &&
-            args.length === 4
+            args.length === 3
         ) {
-            const [network, idString, didTopicId, didRootKey] = args;
+            const [network, idString, didTopicId] = args;
 
             this.didTopicId = didTopicId;
             this.network = network;
             this.idString = idString;
-            this.didRootKey = didRootKey;
+            this.didRootKey = HcsDid.idStringToPublicKey(idString);
             this.did = this.buildDid();
 
             return;
@@ -105,7 +106,7 @@ export class HcsDid implements HederaDid {
      * @param didString A Hedera DID string.
      * @return {@link HcsDid} object derived from the given Hedera DID string.
      */
-    public static fromString(didString: string, didRootKey?: PublicKey): HcsDid {
+    public static fromString(didString: string): HcsDid {
         if (!didString) {
             throw new Error("DID string cannot be null");
         }
@@ -142,14 +143,10 @@ export class HcsDid implements HederaDid {
                 throw new Error("DID string is invalid.");
             }
 
-            return new HcsDid(networkName, didIdString, topicId, didRootKey);
+            return new HcsDid(networkName, didIdString, topicId);
         } catch (e) {
             throw new Error("DID string is invalid. " + e.message);
         }
-    }
-
-    public static fromStringWithDidRootKey(didString: string, didRootKey: PublicKey): HcsDid {
-        return this.fromString(didString, didRootKey);
     }
 
     /**
@@ -202,6 +199,14 @@ export class HcsDid implements HederaDid {
         return this.did;
     }
 
+    public getMessages() {
+        return this.messages;
+    }
+
+    public addMessage(message: HcsDidMessage) {
+        this.messages.push(message);
+    }
+
     /**
      * Constructs DID string from the instance of DID object.
      *
@@ -231,6 +236,10 @@ export class HcsDid implements HederaDid {
      */
     public static publicKeyToIdString(didRootKey: PublicKey): string {
         return Hashing.multibase.encode(Hashing.sha256.digest(didRootKey.toBytes()));
+    }
+
+    public static idStringToPublicKey(idString: string): PublicKey {
+        return PublicKey.fromBytes(Hashing.multibase.decode(idString));
     }
 
     /**

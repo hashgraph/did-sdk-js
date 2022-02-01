@@ -44,4 +44,8 @@ export class HcsDidServiceEvent extends HcsDidEvent {
     public toJSON() {
         return JSON.stringify(this.toJsonTree());
     }
+
+    static fromJsonTree(tree: any): HcsDidServiceEvent {
+        return new HcsDidServiceEvent(tree.id, tree.type, tree.serviceEndpoint);
+    }
 }
