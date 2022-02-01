@@ -43,6 +43,7 @@
     "@hashgraph/sdk": "^2.0.20",
     "js-base64": "^3.6.1",
     "moment": "^2.29.1",
-    "multiformats": "^9.6.2"
+    "multiformats": "^9.6.2",
+    "varint": "^6.0.0"
   }
 }
