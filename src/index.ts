@@ -34,6 +34,7 @@ import { HcsVcTopicListener } from "./identity/hcs/vc/hcs-vc-topic-listener";
 import { Issuer } from "./identity/hcs/vc/issuer";
 import { HederaDid } from "./identity/hedera-did";
 import { ArraysUtils } from "./utils/arrays-utils";
+import { Ed25519PubCodec } from "./utils/ed25519PubCodec";
 import { Hashing } from "./utils/hashing";
 import { TimestampUtils } from "./utils/timestamp-utils";
 import { Validator } from "./utils/validator";
@@ -78,4 +79,5 @@ export {
     TimestampUtils,
     Validator,
     Issuer,
+    Ed25519PubCodec,
 };
