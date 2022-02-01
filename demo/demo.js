@@ -1,4 +1,4 @@
-const { PublicKey, TopicId } = require("@hashgraph/sdk");
+const { TopicId } = require("@hashgraph/sdk");
 const { HcsDid } = require("../dist");
 
 const didTopicId = "0.0.12345";

@@ -63,7 +63,7 @@ describe("Hcs Did Method Operations", function () {
                     '"id": "did:example:123456789abcdefghi#keys-2",' +
                     '"type": "Ed25519VerificationKey2018",' +
                     '"controller": "did:example:pqrstuvwxyz0987654321",' +
-                    '"publicKeyMultibase": "zH3C2AVvLMv6gmMNam3uVAjZpfkcJCwDwnZn6z3wXmqPV"' +
+                    '"publicKeyMultibase": "z6MkH3C2AVvLMv6gmMNam3uVAjZpfkcJCwDwnZn6z3wXmqPV"' +
                     "}"
             )
         );
