@@ -72,4 +72,9 @@ export class HcsDidVerificationRelationshipEvent extends HcsDidEvent {
     public toJSON() {
         return JSON.stringify(this.toJsonTree());
     }
+
+    static fromJsonTree(tree: any): HcsDidVerificationRelationshipEvent {
+        const publicKey = PublicKey.fromBytes(Hashing.multibase.decode(tree.publicKeyMultibase));
+        return new HcsDidVerificationRelationshipEvent(tree.id, tree.relationshipType, tree.controller, publicKey);
+    }
 }

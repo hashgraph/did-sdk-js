@@ -1,5 +1,5 @@
-import { DidSyntax } from "./did-syntax";
 import { DidDocumentJsonProperties } from "./did-document-json-properties";
+import { DidSyntax } from "./did-syntax";
 import { HcsDidRootKey } from "./hcs/did/hcs-did-root-key";
 
 export class DidDocumentBase {
@@ -64,16 +64,9 @@ export class DidDocumentBase {
         rootObject[DidDocumentJsonProperties.CONTEXT] = this.context;
         rootObject[DidDocumentJsonProperties.ID] = this.id;
 
-        /**
-         * TODO: investigate, should we just leave such cases crash?
-         */
-        if (this.didRootKey) {
-            rootObject[DidDocumentJsonProperties.ASSERTION_METHOD] = [this.didRootKey.getId()];
-            rootObject[DidDocumentJsonProperties.AUTHENTICATION] = [this.didRootKey.getId()];
-            rootObject[DidDocumentJsonProperties.VERIFICATION_METHOD] = [this.didRootKey.toJsonTree()];
-        } else {
-            console.warn("WARNING: didRootKey is not set for the document");
-        }
+        rootObject[DidDocumentJsonProperties.ASSERTION_METHOD] = [this.didRootKey.getId()];
+        rootObject[DidDocumentJsonProperties.AUTHENTICATION] = [this.didRootKey.getId()];
+        rootObject[DidDocumentJsonProperties.VERIFICATION_METHOD] = [this.didRootKey.toJsonTree()];
 
         return rootObject;
     }
