@@ -1,5 +1,5 @@
 import { PublicKey } from "@hashgraph/sdk";
-import { Hashing } from "../../../..";
+import { DidDocumentBase, Hashing } from "../../../..";
 import { HcsDidEvent } from "./hcs-did-event";
 import { HcsDidEventName } from "./hcs-did-event-name";
 
@@ -76,5 +76,10 @@ export class HcsDidVerificationRelationshipEvent extends HcsDidEvent {
     static fromJsonTree(tree: any): HcsDidVerificationRelationshipEvent {
         const publicKey = PublicKey.fromBytes(Hashing.multibase.decode(tree.publicKeyMultibase));
         return new HcsDidVerificationRelationshipEvent(tree.id, tree.relationshipType, tree.controller, publicKey);
+    }
+
+    // TODO: apply verification method event
+    process(didDoc: DidDocumentBase): DidDocumentBase {
+        throw new Error("Method not implemented.");
     }
 }
