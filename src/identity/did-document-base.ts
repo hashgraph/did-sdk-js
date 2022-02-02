@@ -1,3 +1,4 @@
+import { HcsDidServiceEvent } from "..";
 import { DidDocumentJsonProperties } from "./did-document-json-properties";
 import { DidSyntax } from "./did-syntax";
 import { HcsDidRootKey } from "./hcs/did/hcs-did-root-key";
@@ -6,6 +7,7 @@ export class DidDocumentBase {
     private id: string;
     private context: string;
     private didRootKey: HcsDidRootKey;
+    private service: HcsDidServiceEvent;
 
     constructor(did: string) {
         this.id = did;
@@ -51,6 +53,14 @@ export class DidDocumentBase {
         return this.id;
     }
 
+    public getService(): HcsDidServiceEvent {
+        return this.service;
+    }
+
+    public setService(service: HcsDidServiceEvent): void {
+        this.service = service;
+    }
+
     public getDidRootKey(): HcsDidRootKey {
         return this.didRootKey;
     }
@@ -60,13 +70,17 @@ export class DidDocumentBase {
     }
 
     public toJsonTree(): any {
-        const rootObject = {};
+        let rootObject = {};
         rootObject[DidDocumentJsonProperties.CONTEXT] = this.context;
         rootObject[DidDocumentJsonProperties.ID] = this.id;
 
         rootObject[DidDocumentJsonProperties.ASSERTION_METHOD] = [this.didRootKey.getId()];
         rootObject[DidDocumentJsonProperties.AUTHENTICATION] = [this.didRootKey.getId()];
         rootObject[DidDocumentJsonProperties.VERIFICATION_METHOD] = [this.didRootKey.toJsonTree()];
+
+        if (this.service) {
+            rootObject = { ...rootObject, ...this.service.toJsonTree() };
+        }
 
         return rootObject;
     }
