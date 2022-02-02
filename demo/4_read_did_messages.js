@@ -31,6 +31,11 @@ async function main() {
             console.log("Event:");
             console.log(msg.event.toJsonTree());
         });
+        console.log("\n");
+        console.log("===================================================");
+        console.log("DragaonGlass Explorer:");
+        console.log(`https://testnet.dragonglass.me/hedera/topics/${did.didTopicId}`);
+        console.log("\n");
     });
 
     /**
