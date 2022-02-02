@@ -53,7 +53,9 @@ export class HcsDidServiceEvent extends HcsDidEvent {
     // TODO: apply service event
     process(didDoc: DidDocumentBase): DidDocumentBase {
         // add relevent service json properties to didDoc
-        didDoc.setService(this);
+        if (didDoc.getServices().find((service) => service.getId() === this.getId())) return didDoc;
+
+        didDoc.addService(this);
         return didDoc;
     }
 }
