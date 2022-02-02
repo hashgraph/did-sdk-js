@@ -7,11 +7,12 @@ export class DidDocumentBase {
     private id: string;
     private context: string;
     private didRootKey: HcsDidRootKey;
-    private service: HcsDidServiceEvent;
+    private services: HcsDidServiceEvent[];
 
     constructor(did: string) {
         this.id = did;
         this.context = DidSyntax.DID_DOCUMENT_CONTEXT;
+        this.services = [];
     }
 
     /**
@@ -53,12 +54,12 @@ export class DidDocumentBase {
         return this.id;
     }
 
-    public getService(): HcsDidServiceEvent {
-        return this.service;
+    public getServices(): HcsDidServiceEvent[] {
+        return this.services;
     }
 
-    public setService(service: HcsDidServiceEvent): void {
-        this.service = service;
+    public addService(service: HcsDidServiceEvent): void {
+        this.services.push(service);
     }
 
     public getDidRootKey(): HcsDidRootKey {
@@ -78,8 +79,11 @@ export class DidDocumentBase {
         rootObject[DidDocumentJsonProperties.AUTHENTICATION] = [this.didRootKey.getId()];
         rootObject[DidDocumentJsonProperties.VERIFICATION_METHOD] = [this.didRootKey.toJsonTree()];
 
-        if (this.service) {
-            rootObject = { ...rootObject, ...this.service.toJsonTree() };
+        if (this.getServices().length > 0) {
+            rootObject[DidDocumentJsonProperties.SERVICE] = [];
+            this.getServices().forEach((service) => {
+                rootObject[DidDocumentJsonProperties.SERVICE].push(service.toJsonTree().Service);
+            });
         }
 
         return rootObject;
