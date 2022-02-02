@@ -166,11 +166,16 @@ export class HcsDid implements HederaDid {
      * @throws IllegalArgumentException In case given DID root key does not match this DID.
      */
     public generateDidDocument(): DidDocumentBase {
-        const result = new DidDocumentBase(this.toDid());
+        let result = new DidDocumentBase(this.toDid());
         if (this.didRootKey) {
             const rootKey = HcsDidRootKey.fromHcsIdentity(this, this.didRootKey);
             result.setDidRootKey(rootKey);
         }
+
+        // proccess events to get uptodate did document
+        this.getMessages().forEach((msg) => {
+            result = msg.getEvent().process(result);
+        });
 
         return result;
     }
@@ -235,7 +240,7 @@ export class HcsDid implements HederaDid {
      * @return The id-string of a DID that is a Base58-encoded SHA-256 hash of a given public key.
      */
     public static publicKeyToIdString(didRootKey: PublicKey): string {
-        return Hashing.multibase.encode(Hashing.sha256.digest(didRootKey.toBytes()));
+        return Hashing.multibase.encode(didRootKey.toBytes());
     }
 
     public static idStringToPublicKey(idString: string): PublicKey {

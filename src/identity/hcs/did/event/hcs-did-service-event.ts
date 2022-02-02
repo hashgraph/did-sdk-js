@@ -1,3 +1,4 @@
+import { DidDocumentBase } from "../../../did-document-base";
 import { HcsDidEvent } from "./hcs-did-event";
 import { HcsDidEventName } from "./hcs-did-event-name";
 
@@ -47,5 +48,12 @@ export class HcsDidServiceEvent extends HcsDidEvent {
 
     static fromJsonTree(tree: any): HcsDidServiceEvent {
         return new HcsDidServiceEvent(tree.id, tree.type, tree.serviceEndpoint);
+    }
+
+    // TODO: apply service event
+    process(didDoc: DidDocumentBase): DidDocumentBase {
+        // add relevent service json properties to didDoc
+        didDoc.setService(this);
+        return didDoc;
     }
 }

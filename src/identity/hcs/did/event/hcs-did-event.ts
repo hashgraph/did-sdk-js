@@ -1,4 +1,4 @@
-import { Hashing } from "../../../..";
+import { DidDocumentBase, Hashing } from "../../../..";
 import { HcsDidEventName } from "./hcs-did-event-name";
 
 export abstract class HcsDidEvent {
@@ -9,6 +9,8 @@ export abstract class HcsDidEvent {
     abstract toJsonTree(): any;
 
     abstract toJSON(): string;
+
+    abstract process(didDoc: DidDocumentBase): DidDocumentBase;
 
     public getBase64() {
         return Hashing.base64.encode(this.toJSON());
