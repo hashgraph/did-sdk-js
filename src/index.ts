@@ -23,15 +23,6 @@ import { MessageMode } from "./identity/hcs/message-mode";
 import { MessageResolver } from "./identity/hcs/message-resolver";
 import { MessageTransaction } from "./identity/hcs/message-transaction";
 import { SerializableMirrorConsensusResponse } from "./identity/hcs/serializable-mirror-consensus-response";
-import { CredentialSubject } from "./identity/hcs/vc/credential-subject";
-import { HcsVcDocumentBase } from "./identity/hcs/vc/hcs-vc-document-base";
-import { HcsVcDocumentHashBase } from "./identity/hcs/vc/hcs-vc-document-hash-base";
-import { HcsVcDocumentJsonProperties } from "./identity/hcs/vc/hcs-vc-document-json-properties";
-import { HcsVcMessage } from "./identity/hcs/vc/hcs-vc-message";
-import { HcsVcOperation } from "./identity/hcs/vc/hcs-vc-operation";
-import { HcsVcStatusResolver } from "./identity/hcs/vc/hcs-vc-status-resolver";
-import { HcsVcTopicListener } from "./identity/hcs/vc/hcs-vc-topic-listener";
-import { Issuer } from "./identity/hcs/vc/issuer";
 import { HederaDid } from "./identity/hedera-did";
 import { ArraysUtils } from "./utils/arrays-utils";
 import { Ed25519PubCodec } from "./utils/ed25519PubCodec";
@@ -41,7 +32,6 @@ import { Validator } from "./utils/validator";
 
 export {
     ArraysUtils,
-    CredentialSubject,
     DidDocumentBase,
     DidDocumentJsonProperties,
     DidMethodOperation,
@@ -56,13 +46,6 @@ export {
     HcsDidTransaction,
     HcsIdentityNetwork,
     HcsIdentityNetworkBuilder,
-    HcsVcDocumentBase,
-    HcsVcDocumentHashBase,
-    HcsVcDocumentJsonProperties,
-    HcsVcMessage,
-    HcsVcOperation,
-    HcsVcStatusResolver,
-    HcsVcTopicListener,
     HcsDidDidOwnerEvent,
     HcsDidServiceEvent,
     HcsDidVerificationMethodEvent,
@@ -78,6 +61,5 @@ export {
     SerializableMirrorConsensusResponse,
     TimestampUtils,
     Validator,
-    Issuer,
     Ed25519PubCodec,
 };
