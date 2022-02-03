@@ -12,8 +12,6 @@ export abstract class MessageTransaction<T extends Message> {
     protected topicId: TopicId;
     protected message: MessageEnvelope<T>;
 
-    private encrypter: Encrypter<string>;
-    private decrypter: Decrypter<string>;
     private buildTransactionFunction: (input: TopicMessageSubmitTransaction) => Transaction;
     private receiver: (input: MessageEnvelope<T>) => void;
     private errorHandler: (input: Error) => void;
@@ -88,17 +86,6 @@ export abstract class MessageTransaction<T extends Message> {
     }
 
     /**
-     * Defines encryption function that encrypts the message attributes before submission.
-     *
-     * @param encrypter The encrypter to use.
-     * @return This transaction instance.
-     */
-    public onEncrypt(encrypter: Encrypter<string>): MessageTransaction<T> {
-        this.encrypter = encrypter;
-        return this;
-    }
-
-    /**
      * Handles event from a mirror node when a message was consensus was reached and message received.
      *
      * @param receiver The receiver handling incoming message.
@@ -117,18 +104,6 @@ export abstract class MessageTransaction<T extends Message> {
      */
     public onError(handler: (input: Error) => void): MessageTransaction<T> {
         this.errorHandler = handler;
-        return this;
-    }
-
-    /**
-     * Defines decryption function that decrypts message attributes after consensus is reached.
-     * Decryption function must accept a byte array of encrypted message and an Timestamp that is its consensus timestamp,
-     *
-     * @param decrypter The decrypter to use.
-     * @return This transaction instance.
-     */
-    public onDecrypt(decrypter: Decrypter<string>): MessageTransaction<T> {
-        this.decrypter = decrypter;
         return this;
     }
 
@@ -170,10 +145,6 @@ export abstract class MessageTransaction<T extends Message> {
 
         const envelope = !this.message ? this.buildMessage() : this.message;
 
-        if (this.encrypter) {
-            envelope.encrypt(this.provideMessageEncrypter(this.encrypter));
-        }
-
         const messageContent = !envelope.getSignature()
             ? envelope.sign(this.signer)
             : ArraysUtils.fromString(envelope.toJSON());
@@ -199,7 +170,6 @@ export abstract class MessageTransaction<T extends Message> {
                     this.handleError(new Error(reason + ": " + ArraysUtils.toString(response.contents)));
                     this.listener.unsubscribe();
                 })
-                .onDecrypt(this.decrypter)
                 .subscribe(client, (msg) => {
                     this.listener.unsubscribe();
                     this.receiver(msg);
@@ -236,9 +206,5 @@ export abstract class MessageTransaction<T extends Message> {
             "Signing function is missing."
         );
         validator.require(!!this.buildTransactionFunction, "Transaction builder is missing.");
-        validator.require(
-            (!!this.encrypter && !!this.decrypter) || (!this.decrypter && !this.encrypter),
-            "Either both encrypter and decrypter must be specified or none."
-        );
     }
 }
