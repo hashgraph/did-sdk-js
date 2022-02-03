@@ -4,7 +4,6 @@ import { DidDocumentBase } from "../../did-document-base";
 import { DidSyntax } from "../../did-syntax";
 import { HederaDid } from "../../hedera-did";
 import { HcsDidMessage } from "./hcs-did-message";
-import { HcsDidRootKey } from "./hcs-did-root-key";
 
 /**
  * Hedera Decentralized Identifier for Hedera DID Method specification based on HCS.
@@ -167,10 +166,6 @@ export class HcsDid implements HederaDid {
      */
     public generateDidDocument(): DidDocumentBase {
         let result = new DidDocumentBase(this.toDid());
-        if (this.didRootKey) {
-            const rootKey = HcsDidRootKey.fromHcsIdentity(this, this.didRootKey);
-            result.setDidRootKey(rootKey);
-        }
 
         // proccess events to get uptodate did document
         this.getMessages().forEach((msg) => {
