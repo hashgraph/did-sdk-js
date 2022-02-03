@@ -140,4 +140,63 @@ describe("HcsDidV2", function () {
             assert.equal(messages.length, 1);
         }).timeout(60000);
     });
+
+    describe("#resolve", () => {
+        let client;
+
+        before(async () => {
+            const operatorId = AccountId.fromString(OPERATOR_ID);
+            const operatorKey = PrivateKey.fromString(OPERATOR_KEY);
+            client = Client.forTestnet();
+            client.setMirrorNetwork(["hcs." + NETWORK + ".mirrornode.hedera.com:5600"]);
+            client.setOperator(operatorId, operatorKey);
+        });
+
+        it("throws error about unregistered DID", async () => {
+            const privateKey = PrivateKey.generate();
+            const did = new HcsDidV2({ privateKey, client });
+
+            try {
+                await did.resolve();
+            } catch (err) {
+                assert.instanceOf(err, Error);
+                assert.equal(err.message, "DID is not registered");
+            }
+        });
+
+        it("throws error about missing Client parameter", async () => {
+            const identifier = "did:hedera:testnet:z6MkgUv5CvjRP6AsvEYqSRN7djB6p4zK9bcMQ93g5yK6Td7N_0.0.29613327";
+            const did = new HcsDidV2({ identifier });
+
+            try {
+                await did.resolve();
+            } catch (err) {
+                assert.instanceOf(err, Error);
+                assert.equal(err.message, "Client configuration is missing");
+            }
+        });
+
+        it("successfuly resolves just registered DID", async () => {
+            const privateKey = PrivateKey.fromString(OPERATOR_KEY);
+            const did = new HcsDidV2({ privateKey, client });
+
+            await did.register();
+
+            const didDocument = (await did.resolve()).toJsonTree();
+
+            assert.equal(didDocument["@context"], "https://www.w3.org/ns/did/v1");
+            assert.equal(didDocument["id"], did.getIdentifier());
+            assert.equal(didDocument["assertionMethod"].length, 1);
+            assert.equal(didDocument["assertionMethod"][0], `${did.getIdentifier()}#did-root-key`);
+            assert.equal(didDocument["authentication"].length, 1);
+            assert.equal(didDocument["authentication"][0], `${did.getIdentifier()}#did-root-key`);
+            assert.equal(didDocument["verificationMethod"].length, 1);
+            assert.deepEqual(didDocument["verificationMethod"][0], {
+                id: `${did.getIdentifier()}#did-root-key`,
+                type: "Ed25519VerificationKey2018",
+                controller: did.getIdentifier(),
+                publicKeyMultibase: Hashing.multibase.encode(privateKey.publicKey.toBytes()),
+            });
+        }).timeout(60000);
+    });
 });
