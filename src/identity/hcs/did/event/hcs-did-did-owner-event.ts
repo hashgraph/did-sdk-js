@@ -1,5 +1,5 @@
 import { PublicKey } from "@hashgraph/sdk";
-import { Hashing, HcsDidRootKey } from "../../../..";
+import { Hashing } from "../../../..";
 import { DidDocumentBase } from "../../../did-document-base";
 import { HcsDidEvent } from "./hcs-did-event";
 import { HcsDidEventName } from "./hcs-did-event-name";
@@ -65,14 +65,14 @@ export class HcsDidDidOwnerEvent extends HcsDidEvent {
         return new HcsDidDidOwnerEvent(tree.id, tree.controller, publicKey);
     }
 
-    // TODO: apply owner event
     process(didDoc: DidDocumentBase): DidDocumentBase {
-        // verify DID owner
-        if (this.controller + HcsDidRootKey.DID_ROOT_KEY_NAME !== didDoc.getDidRootKey().getId()) {
-            throw new Error("DID Owner varification failed.");
-        }
+        didDoc.addOwner({
+            id: this.getId() + "#did-root-key",
+            type: this.getType(),
+            controller: this.getController(),
+            publicKeyMultibase: this.getPublicKeyMultibase(),
+        });
 
-        // TODO: how to identify and change didDoc if transfer of ownership event
         return didDoc;
     }
 }
