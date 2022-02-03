@@ -1,10 +1,10 @@
-import { Decrypter, Encrypter, Message, Signer } from "./message";
 import { Client, Timestamp, TopicId, TopicMessageSubmitTransaction, Transaction, TransactionId } from "@hashgraph/sdk";
-import { MessageEnvelope } from "./message-envelope";
-import { MessageListener } from "./message-listener";
-import { Validator } from "../../utils/validator";
 import moment from "moment";
 import { ArraysUtils } from "../../utils/arrays-utils";
+import { Validator } from "../../utils/validator";
+import { Encrypter, Message, Signer } from "./message";
+import { MessageEnvelope } from "./message-envelope";
+import { MessageListener } from "./message-listener";
 
 export abstract class MessageTransaction<T extends Message> {
     private static SUBTRACT_TIME = 1; // seconds
