@@ -1,5 +1,6 @@
 import { Client, Hbar, PrivateKey, PublicKey, Timestamp, TopicCreateTransaction, TopicId } from "@hashgraph/sdk";
 import {
+    DidDocumentBase,
     DidMethodOperation,
     Hashing,
     HcsDidDidOwnerEvent,
@@ -8,6 +9,7 @@ import {
     MessageEnvelope,
 } from "../../..";
 import { DidSyntax } from "../../did-syntax";
+import { HcsDidResolver } from "./hcs-did-resolver";
 
 export class HcsDidV2 {
     public static DID_METHOD = DidSyntax.Method.HEDERA_HCS;
@@ -18,7 +20,8 @@ export class HcsDidV2 {
     protected network: string;
     protected topicId: TopicId;
 
-    private updatedAt: Timestamp;
+    protected messages: HcsDidMessage[];
+    protected resolvedAt: Timestamp;
 
     constructor(args: { identifier?: string; privateKey?: PrivateKey; client?: Client }) {
         this.identifier = args.identifier;
@@ -96,7 +99,41 @@ export class HcsDidV2 {
         return this;
     }
 
-    async resolve() {}
+    async resolve() {
+        if (!this.identifier) {
+            throw new Error("DID is not registered");
+        }
+
+        if (!this.client) {
+            throw new Error("Client configuration is missing");
+        }
+
+        return await new Promise((resolve, reject) => {
+            /**
+             * This API will have to change...
+             */
+            const resolver = new HcsDidResolver(this.topicId)
+                .setTimeout(3000)
+                .whenFinished((result) => {
+                    this.messages = result.get(this.identifier);
+
+                    let document = new DidDocumentBase(this.identifier);
+
+                    this.messages.forEach((msg) => {
+                        document = msg.getEvent().process(document);
+                    });
+
+                    resolve(document);
+                })
+                .onError((err) => {
+                    console.log(err);
+                    reject(err);
+                });
+
+            resolver.addDid(this.identifier);
+            resolver.execute(this.client);
+        });
+    }
 
     /**
      * Attribute getters

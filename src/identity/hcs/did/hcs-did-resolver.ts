@@ -5,7 +5,6 @@ import { Sleep } from "../../../utils/sleep";
 import { MessageEnvelope } from "../message-envelope";
 import { MessageListener } from "../message-listener";
 import { MessageResolver } from "../message-resolver";
-import { HcsDid } from "./hcs-did";
 import { HcsDidMessage } from "./hcs-did-message";
 import { HcsDidTopicListener } from "./hcs-did-topic-listener";
 
@@ -19,10 +18,10 @@ export class HcsDidResolver {
     public static DEFAULT_TIMEOUT: Long = Long.fromInt(30000);
 
     protected topicId: TopicId;
-    protected results: Map<string, HcsDid>;
+    protected results: Map<string, HcsDidMessage[]>;
 
     private lastMessageArrivalTime: Long;
-    private resultsHandler: (input: Map<string, HcsDid>) => void;
+    private resultsHandler: (input: Map<string, HcsDidMessage[]>) => void;
     private errorHandler: (input: Error) => void;
     private existingSignatures: string[];
     private listener: MessageListener<HcsDidMessage>;
@@ -49,7 +48,7 @@ export class HcsDidResolver {
      */
     public addDid(did: string): HcsDidResolver {
         if (did != null) {
-            this.results.set(did, HcsDid.fromString(did));
+            this.results.set(did, []);
         }
         return this;
     }
@@ -135,7 +134,7 @@ export class HcsDidResolver {
      * @param handler The results handler.
      * @return This resolver instance.
      */
-    public whenFinished(handler: (input: Map<string, HcsDid>) => void): HcsDidResolver {
+    public whenFinished(handler: (input: Map<string, HcsDidMessage[]>) => void): HcsDidResolver {
         this.resultsHandler = handler;
         return this;
     }
@@ -202,7 +201,7 @@ export class HcsDidResolver {
         // }
 
         // Add valid message to the results
-        this.results.get(message.getDid()).addMessage(message);
+        this.results.get(message.getDid()).push(message);
     }
 
     protected supplyMessageListener(): MessageListener<HcsDidMessage> {
