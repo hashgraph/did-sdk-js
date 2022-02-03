@@ -13,6 +13,7 @@ import { HcsDidResolver } from "./identity/hcs/did/hcs-did-resolver";
 import { HcsDidRootKey } from "./identity/hcs/did/hcs-did-root-key";
 import { HcsDidTopicListener } from "./identity/hcs/did/hcs-did-topic-listener";
 import { HcsDidTransaction } from "./identity/hcs/did/hcs-did-transaction";
+import { HcsDidV2 } from "./identity/hcs/did/hcs-did-v2";
 import { HcsIdentityNetwork } from "./identity/hcs/hcs-identity-network";
 import { HcsIdentityNetworkBuilder } from "./identity/hcs/hcs-identity-network-builder";
 import { JsonClass } from "./identity/hcs/json-class";
@@ -39,6 +40,7 @@ export {
     DidSyntax,
     Hashing,
     HcsDid,
+    HcsDidV2,
     HcsDidMessage,
     HcsDidResolver,
     HcsDidRootKey,
