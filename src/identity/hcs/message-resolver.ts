@@ -77,7 +77,6 @@ export abstract class MessageResolver<T extends Message> {
             .setEndTime(Timestamp.fromDate(new Date()))
             .setIgnoreErrors(false)
             .onError(this.errorHandler)
-            .onDecrypt(this.decrypter)
             .subscribe(client, (msg) => {
                 return this.handleMessage(msg);
             });
