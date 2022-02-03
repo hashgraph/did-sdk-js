@@ -14,7 +14,6 @@ export abstract class MessageListener<T extends Message> {
     protected query: TopicMessageQuery;
     protected errorHandler: (input: Error) => void;
     protected ignoreErrors: boolean;
-    protected decrypter: Decrypter<string>;
     protected subscriptionHandle: SubscriptionHandle;
     protected filters: ((input: TopicMessage) => boolean)[];
     protected invalidMessageHandler: (t: TopicMessage, u: string) => void;
@@ -116,11 +115,6 @@ export abstract class MessageListener<T extends Message> {
             return;
         }
 
-        if (MessageMode.ENCRYPTED === envelope.getMode() && !this.decrypter) {
-            this.reportInvalidMessage(response, "Message is encrypted and no decryption function was provided");
-            return;
-        }
-
         if (this.isMessageValid(envelope, response)) {
             receiver(envelope);
         }
@@ -176,19 +170,6 @@ export abstract class MessageListener<T extends Message> {
      */
     public onInvalidMessageReceived(handler: (t: TopicMessage, u: string) => void): MessageListener<T> {
         this.invalidMessageHandler = handler;
-        return this;
-    }
-
-    /**
-     * Defines decryption function that decrypts submitted message attributes after consensus is reached.
-     * Decryption function must accept a byte array of encrypted message and an Timestamp that is its consensus timestamp,
-     * If decrypter is not specified, encrypted messages will be ignored.
-     *
-     * @param decrypter The decryption function to use.
-     * @return This transaction instance.
-     */
-    public onDecrypt(decrypter: Decrypter<string>): MessageListener<T> {
-        this.decrypter = decrypter;
         return this;
     }
 

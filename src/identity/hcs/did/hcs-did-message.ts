@@ -31,7 +31,7 @@ export class HcsDidMessage extends Message {
      *
      * @param operation         The operation on DID document.
      * @param did               The DID string.
-     * @param didDocumentBase64 The Base64-encoded DID document.
+     * @param event The DID Event.
      */
     constructor(operation: DidMethodOperation, did: string, event: HcsDidEvent) {
         super();
@@ -137,33 +137,6 @@ export class HcsDidMessage extends Message {
         return true;
     }
 
-    /**
-     * Extracts #did-root-key from the DID document.
-     *
-     * @return Public key of the DID subject.
-     */
-    /**
-     * TODO: message no longer contains the whole DID document
-     */
-    // public extractDidRootKey(): PublicKey {
-    //     let result: PublicKey = null;
-    //     try {
-    //         const doc: DidDocumentBase = DidDocumentBase.fromJson(this.getDidDocument());
-    //         // Make sure that DID root key is present in the document
-    //         if (doc.getDidRootKey() != null && doc.getDidRootKey().getPublicKeyMultibase() != null) {
-    //             const publicKeyBytes: Uint8Array = Hashing.multibase.decode(
-    //                 doc.getDidRootKey().getPublicKeyMultibase()
-    //             );
-    //             result = PublicKey.fromBytes(publicKeyBytes);
-    //         }
-    //         // ArrayIndexOutOfBoundsException is thrown in case public key is invalid in PublicKey.fromBytes
-    //     } catch (e) {
-    //         return null;
-    //     }
-
-    //     return result;
-    // }
-
     public toJsonTree(): any {
         const result: any = super.toJsonTree();
         result.operation = this.operation;
@@ -193,74 +166,4 @@ export class HcsDidMessage extends Message {
     public static fromJson(json: string): Message {
         return Message.fromJsonTree(JSON.parse(json));
     }
-
-    /**
-     * Creates a new DID message for submission to HCS topic.
-     *
-     * @param didDocumentJson DID document as JSON string.
-     * @param operation       The operation on DID document.
-     * @return The HCS message wrapped in an envelope for the given DID document and method operation.
-     */
-    /**
-     * TODO: we no longer submit the whole DID document
-     */
-    // public static fromDidDocumentJson(
-    //     didDocumentJson: string,
-    //     operation: DidMethodOperation
-    // ): MessageEnvelope<HcsDidMessage> {
-    //     const didDocumentBase: DidDocumentBase = DidDocumentBase.fromJson(didDocumentJson);
-    //     const didDocumentBase64 = Hashing.base64.encode(didDocumentJson);
-    //     const message: HcsDidMessage = new HcsDidMessage(operation, didDocumentBase.getId(), didDocumentBase64);
-    //     return new MessageEnvelope<HcsDidMessage>(message);
-    // }
-
-    /**
-     * Provides an encryption operator that converts an {@link HcsDidMessage} into encrypted one.
-     *
-     * @param encryptionFunction The encryption function to use for encryption of single attributes.
-     * @return The encryption operator instance.
-     */
-    // public static getEncrypter(encryptionFunction: Encrypter<string>): Encrypter<HcsDidMessage> {
-    //     if (encryptionFunction == null) {
-    //         throw "Encryption function is missing or null.";
-    //     }
-    //     return function (message: HcsDidMessage): HcsDidMessage {
-    //         const operation: DidMethodOperation = message.getOperation();
-    //         // Encrypt the DID
-    //         const encryptedDid: string = encryptionFunction(message.getDid());
-    //         const did: string = Hashing.base64.encode(encryptedDid);
-    //         // Encrypt the DID document
-    //         const encryptedDoc: string = encryptionFunction(message.getDidDocumentBase64());
-    //         const didDocumentBase64: string = Hashing.base64.encode(encryptedDoc);
-    //         return new HcsDidMessage(operation, did, didDocumentBase64);
-    //     };
-    // }
-
-    /**
-     * Provides a decryption function that converts {@link HcsDidMessage} in encrypted for into a plain form.
-     *
-     * @param decryptionFunction The decryption function to use for decryption of single attributes.
-     * @return The Decryption function for the {@link HcsDidMessage}
-     */
-    // public static getDecrypter(decryptionFunction: Decrypter<string>): Decrypter<HcsDidMessage> {
-    //     if (decryptionFunction == null) {
-    //         throw "Decryption function is missing or null.";
-    //     }
-    //     return function (encryptedMsg: HcsDidMessage, consensusTimestamp: Timestamp): HcsDidMessage {
-    //         const operation: DidMethodOperation = encryptedMsg.getOperation();
-    //         // Decrypt DID string
-    //         let decryptedDid: string = encryptedMsg.getDid();
-    //         if (decryptedDid != null) {
-    //             const did: string = Hashing.base64.decode(decryptedDid);
-    //             decryptedDid = decryptionFunction(did, consensusTimestamp);
-    //         }
-    //         // Decrypt DID document
-    //         let decryptedDocBase64 = encryptedMsg.getDidDocumentBase64();
-    //         if (decryptedDocBase64 != null) {
-    //             const doc: string = Hashing.base64.decode(decryptedDocBase64);
-    //             decryptedDocBase64 = decryptionFunction(doc, consensusTimestamp);
-    //         }
-    //         return new HcsDidMessage(operation, decryptedDid, decryptedDocBase64);
-    //     };
-    // }
 }
