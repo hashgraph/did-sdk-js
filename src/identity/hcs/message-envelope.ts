@@ -137,24 +137,6 @@ export class MessageEnvelope<T extends Message> {
     }
 
     /**
-     * Encrypts the message in this envelope and returns its encrypted instance.
-     *
-     * @param encrypter The function used to encrypt the message.
-     * @return This envelope instance.
-     */
-    public encrypt(encrypter: Encrypter<T>): MessageEnvelope<T> {
-        if (!encrypter) {
-            throw new Error("The encryption function is not provided.");
-        }
-
-        this.decryptedMessage = this.message;
-        this.message = encrypter(this.message);
-        this.mode = MessageMode.ENCRYPTED;
-
-        return this;
-    }
-
-    /**
      * Verifies the signature of the envelope against the public key of it's signer.
      *
      * @param publicKeyProvider Provider of a public key of this envelope signer.
@@ -193,18 +175,12 @@ export class MessageEnvelope<T extends Message> {
      * @param decrypter The function used to decrypt the message.
      * @return The message object in a plain mode.
      */
-    public open(decrypter: Decrypter<T> = null): T {
+    public open(): T {
         if (this.decryptedMessage != null) {
             return this.decryptedMessage;
         }
 
-        if (MessageMode.ENCRYPTED !== this.mode) {
-            this.decryptedMessage = this.message;
-        } else if (!decrypter) {
-            throw new Error("The message is encrypted, provide decryption function.");
-        } else if (!this.decryptedMessage) {
-            this.decryptedMessage = decrypter(this.message, this.getConsensusTimestamp());
-        }
+        this.decryptedMessage = this.message;
 
         return this.decryptedMessage;
     }
