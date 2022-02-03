@@ -1,10 +1,9 @@
-import { Client, FileCreateTransaction, Hbar, PublicKey, TopicCreateTransaction, TopicId } from "@hashgraph/sdk";
+import { Client, Hbar, PublicKey, TopicCreateTransaction, TopicId } from "@hashgraph/sdk";
 import { HcsIdentityNetwork } from "./hcs-identity-network";
 
 export class HcsIdentityNetworkBuilder {
-    private appnetName: string;
     private didTopicId: TopicId;
-    private vcTopicId: TopicId;
+
     private network: string;
     private didServers: string[];
     private publicKey: PublicKey;
@@ -24,18 +23,7 @@ export class HcsIdentityNetworkBuilder {
         const didTxId = await didTopicCreateTransaction.execute(client);
         this.didTopicId = (await didTxId.getReceipt(client)).topicId;
 
-        const vcTopicCreateTransaction = new TopicCreateTransaction()
-            .setMaxTransactionFee(this.maxTransactionFee)
-            .setTopicMemo(this.vcTopicMemo);
-
-        if (this.publicKey) {
-            vcTopicCreateTransaction.setAdminKey(this.publicKey);
-        }
-
-        const vcTxId = await vcTopicCreateTransaction.execute(client);
-        this.vcTopicId = (await vcTxId.getReceipt(client)).topicId;
-
-        return HcsIdentityNetwork.fromHcsDidAndVCTopic(this.network, this.didTopicId, this.vcTopicId);
+        return HcsIdentityNetwork.fromHcsDidAndVCTopic(this.network, this.didTopicId);
     }
 
     public addAppnetDidServer(serverUrl: string): HcsIdentityNetworkBuilder {
@@ -47,11 +35,6 @@ export class HcsIdentityNetworkBuilder {
             this.didServers.push(serverUrl);
         }
 
-        return this;
-    }
-
-    public setAppnetName(appnetName: string): HcsIdentityNetworkBuilder {
-        this.appnetName = appnetName;
         return this;
     }
 
@@ -67,11 +50,6 @@ export class HcsIdentityNetworkBuilder {
 
     public setDidTopicId(didTopicId: TopicId): HcsIdentityNetworkBuilder {
         this.didTopicId = didTopicId;
-        return this;
-    }
-
-    public setVCTopicId(vcTopicId: TopicId): HcsIdentityNetworkBuilder {
-        this.vcTopicId = vcTopicId;
         return this;
     }
 
