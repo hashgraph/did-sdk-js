@@ -16,31 +16,26 @@ async function main() {
     /**
      * Read DID resolver setup
      */
-    const resolver = new HcsDidResolver(did.getTopicId()).setTimeout(3000).whenFinished((result) => {
-        const didResult = result.get(did.getIdentifier());
-
-        didResult.forEach((msg) => {
+    new HcsDidResolver(did.getTopicId())
+        .setTimeout(3000)
+        .whenFinished((messages) => {
+            messages.forEach((msg) => {
+                console.log("\n");
+                console.log("===================================================");
+                console.log("\n");
+                console.log("Message:");
+                console.log(msg.toJsonTree());
+                console.log("\n");
+                console.log("Event:");
+                console.log(msg.event.toJsonTree());
+            });
             console.log("\n");
             console.log("===================================================");
+            console.log("DragaonGlass Explorer:");
+            console.log(`https://testnet.dragonglass.me/hedera/topics/${did.getTopicId().toString()}`);
             console.log("\n");
-            console.log("Message:");
-            console.log(msg.toJsonTree());
-            console.log("\n");
-            console.log("Event:");
-            console.log(msg.event.toJsonTree());
-        });
-        console.log("\n");
-        console.log("===================================================");
-        console.log("DragaonGlass Explorer:");
-        console.log(`https://testnet.dragonglass.me/hedera/topics/${did.getTopicId().toString()}`);
-        console.log("\n");
-    });
-
-    /**
-     * Read DID information
-     */
-    resolver.addDid(did.getIdentifier());
-    resolver.execute(client);
+        })
+        .execute(client);
 }
 
 main();
