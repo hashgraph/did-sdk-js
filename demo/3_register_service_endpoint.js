@@ -20,19 +20,23 @@ async function main() {
     /**
      * Build DID instance
      */
-    const did = HcsDid.fromString(TEST_DID_STR);
+    const did = new HcsDid({ identifier: TEST_DID_STR, privateKey: privateKey });
 
     /**
      * Build create Service message
      */
-    const event = new HcsDidServiceEvent(did.did, "VerifiableCredentialService", "https://test.meeco.me/vcs");
-    const message = new HcsDidMessage(DidMethodOperation.CREATE, did.did, event);
+    const event = new HcsDidServiceEvent(
+        did.getIdentifier(),
+        "VerifiableCredentialService",
+        "https://test.meeco.me/vcs"
+    );
+    const message = new HcsDidMessage(DidMethodOperation.CREATE, did.getIdentifier(), event);
     const envelope = new MessageEnvelope(message);
 
     /**
      * Send DIDOwner message to Hashgraph
      */
-    const transaction = new HcsDidTransaction(envelope, did.didTopicId);
+    const transaction = new HcsDidTransaction(envelope, did.getTopicId());
 
     transaction
         .signMessage((msg) => privateKey.sign(msg))

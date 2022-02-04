@@ -11,29 +11,21 @@ async function main() {
     /**
      * Build DID instance
      */
-    const did = HcsDid.fromString(TEST_DID_STR);
+    const did = new HcsDid({ identifier: TEST_DID_STR, client: client });
 
     /**
-     * Read DID resolver setup
+     * Resolve DID
      */
-    const resolver = new HcsDidResolver(did.didTopicId).setTimeout(3000).whenFinished((result) => {
-        const didResult = result.get(did.did);
 
-        console.log("generating did doc");
-        console.log(didResult.generateDidDocument().toJsonTree());
+    console.log("generating did doc");
+    const didDoc = await did.resolve();
+    console.log(didDoc.toJsonTree());
 
-        console.log("\n");
-        console.log("===================================================");
-        console.log("DragaonGlass Explorer:");
-        console.log(`https://testnet.dragonglass.me/hedera/topics/${did.didTopicId}`);
-        console.log("\n");
-    });
-
-    /**
-     * Read DID information
-     */
-    resolver.addDid(did.did);
-    resolver.execute(client);
+    console.log("\n");
+    console.log("===================================================");
+    console.log("DragaonGlass Explorer:");
+    console.log(`https://testnet.dragonglass.me/hedera/topics/${did.getTopicId().toString()}`);
+    console.log("\n");
 }
 
 main();
