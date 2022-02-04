@@ -1,9 +1,10 @@
-const { HcsDid, Hashing } = require("../../dist");
+const { Hashing } = require("../../dist");
 const { expect } = require("chai");
+const { PrivateKey } = require("@hashgraph/sdk");
 
 describe("Util Multibase & Multicodec", function () {
     it("Test Valid Multibase base58btc with ed25519 pub key encode", async function () {
-        const privateKey = HcsDid.generateDidRootKey();
+        const privateKey = PrivateKey.generate();
 
         const publickeybytes = privateKey.publicKey.toBytes();
         const base58btcEncodedString = Hashing.multibase.encode(publickeybytes);
