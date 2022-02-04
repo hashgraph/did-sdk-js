@@ -1,11 +1,11 @@
-import { Decrypter, Encrypter, Message } from "./message";
+import { PublicKey, Timestamp, TopicMessage } from "@hashgraph/sdk";
+import { Base64 } from "js-base64";
 import Long from "long";
+import { ArraysUtils } from "../../utils/arrays-utils";
+import { JsonClass } from "./json-class";
+import { Decrypter, Encrypter, Message } from "./message";
 import { MessageMode } from "./message-mode";
 import { SerializableMirrorConsensusResponse } from "./serializable-mirror-consensus-response";
-import { PublicKey, Timestamp, TopicMessage } from "@hashgraph/sdk";
-import { JsonClass } from "./json-class";
-import { Base64 } from "js-base64";
-import { ArraysUtils } from "../../utils/arrays-utils";
 
 export type PublicKeyProvider<T extends Message> = (evn: MessageEnvelope<T>) => PublicKey;
 export type SignFunction = (message: Uint8Array) => Uint8Array;
@@ -109,6 +109,7 @@ export class MessageEnvelope<T extends Message> {
     ): MessageEnvelope<U> {
         const msgJson = ArraysUtils.toString(response.contents);
         const result = MessageEnvelope.fromJson(msgJson, messageClass);
+        // console.log(result);
         result.mirrorResponse = new SerializableMirrorConsensusResponse(response);
 
         return result;
@@ -133,24 +134,6 @@ export class MessageEnvelope<T extends Message> {
             result.message = null;
         }
         return result;
-    }
-
-    /**
-     * Encrypts the message in this envelope and returns its encrypted instance.
-     *
-     * @param encrypter The function used to encrypt the message.
-     * @return This envelope instance.
-     */
-    public encrypt(encrypter: Encrypter<T>): MessageEnvelope<T> {
-        if (!encrypter) {
-            throw new Error("The encryption function is not provided.");
-        }
-
-        this.decryptedMessage = this.message;
-        this.message = encrypter(this.message);
-        this.mode = MessageMode.ENCRYPTED;
-
-        return this;
     }
 
     /**
@@ -192,18 +175,12 @@ export class MessageEnvelope<T extends Message> {
      * @param decrypter The function used to decrypt the message.
      * @return The message object in a plain mode.
      */
-    public open(decrypter: Decrypter<T> = null): T {
+    public open(): T {
         if (this.decryptedMessage != null) {
             return this.decryptedMessage;
         }
 
-        if (MessageMode.ENCRYPTED !== this.mode) {
-            this.decryptedMessage = this.message;
-        } else if (!decrypter) {
-            throw new Error("The message is encrypted, provide decryption function.");
-        } else if (!this.decryptedMessage) {
-            this.decryptedMessage = decrypter(this.message, this.getConsensusTimestamp());
-        }
+        this.decryptedMessage = this.message;
 
         return this.decryptedMessage;
     }

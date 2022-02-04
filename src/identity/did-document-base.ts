@@ -1,46 +1,18 @@
-import { DidSyntax } from "./did-syntax";
+import { HcsDidServiceEvent } from "..";
 import { DidDocumentJsonProperties } from "./did-document-json-properties";
-import { HcsDidRootKey } from "./hcs/did/hcs-did-root-key";
+import { DidSyntax } from "./did-syntax";
 
 export class DidDocumentBase {
     private id: string;
     private context: string;
-    private didRootKey: HcsDidRootKey;
+    private services: HcsDidServiceEvent[];
+    private owners: any[];
 
     constructor(did: string) {
         this.id = did;
         this.context = DidSyntax.DID_DOCUMENT_CONTEXT;
-    }
-
-    /**
-     * TODO: inverstigate, how fexible this method should be? Should it still support old format?
-     */
-    public static fromJson(json: string): DidDocumentBase {
-        let result: DidDocumentBase;
-
-        try {
-            const root = JSON.parse(json);
-            result = new DidDocumentBase(root.id);
-            if (root.hasOwnProperty(DidDocumentJsonProperties.VERIFICATION_METHOD)) {
-                if (!Array.isArray(root[DidDocumentJsonProperties.VERIFICATION_METHOD])) {
-                    throw new Error(`${root[DidDocumentJsonProperties.VERIFICATION_METHOD]} is not an array`);
-                }
-                for (let publicKeyObj of root[DidDocumentJsonProperties.VERIFICATION_METHOD]) {
-                    if (
-                        publicKeyObj.hasOwnProperty(DidDocumentJsonProperties.ID) &&
-                        publicKeyObj[DidDocumentJsonProperties.ID] === result.getId() + HcsDidRootKey.DID_ROOT_KEY_NAME
-                    ) {
-                        const didRootKey = HcsDidRootKey.fromJsonTree(publicKeyObj);
-                        result.setDidRootKey(didRootKey);
-                        break;
-                    }
-                }
-            }
-        } catch (e) {
-            throw new Error("Given JSON string is not a valid DID document " + e.message);
-        }
-
-        return result;
+        this.services = [];
+        this.owners = [];
     }
 
     public getContext(): string {
@@ -51,28 +23,41 @@ export class DidDocumentBase {
         return this.id;
     }
 
-    public getDidRootKey(): HcsDidRootKey {
-        return this.didRootKey;
+    public getServices(): HcsDidServiceEvent[] {
+        return this.services;
     }
 
-    public setDidRootKey(rootKey: HcsDidRootKey): void {
-        this.didRootKey = rootKey;
+    public addService(service: HcsDidServiceEvent): void {
+        this.services.push(service);
+    }
+
+    public addOwner(owner): void {
+        if (this.owners.includes((o) => o.id === owner.id)) {
+            return;
+        }
+
+        this.owners.push(owner);
+    }
+
+    public getOwners(): any[] {
+        return this.owners;
     }
 
     public toJsonTree(): any {
-        const rootObject = {};
+        let rootObject = {};
+
         rootObject[DidDocumentJsonProperties.CONTEXT] = this.context;
         rootObject[DidDocumentJsonProperties.ID] = this.id;
 
-        /**
-         * TODO: investigate, should we just leave such cases crash?
-         */
-        if (this.didRootKey) {
-            rootObject[DidDocumentJsonProperties.ASSERTION_METHOD] = [this.didRootKey.getId()];
-            rootObject[DidDocumentJsonProperties.AUTHENTICATION] = [this.didRootKey.getId()];
-            rootObject[DidDocumentJsonProperties.VERIFICATION_METHOD] = [this.didRootKey.toJsonTree()];
-        } else {
-            console.warn("WARNING: didRootKey is not set for the document");
+        rootObject[DidDocumentJsonProperties.ASSERTION_METHOD] = this.owners.map((owner) => owner.id);
+        rootObject[DidDocumentJsonProperties.AUTHENTICATION] = this.owners.map((owner) => owner.id);
+        rootObject[DidDocumentJsonProperties.VERIFICATION_METHOD] = this.owners;
+
+        if (this.getServices().length > 0) {
+            rootObject[DidDocumentJsonProperties.SERVICE] = [];
+            this.getServices().forEach((service) => {
+                rootObject[DidDocumentJsonProperties.SERVICE].push(service.toJsonTree().Service);
+            });
         }
 
         return rootObject;

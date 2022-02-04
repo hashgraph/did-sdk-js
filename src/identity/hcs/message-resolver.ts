@@ -1,11 +1,10 @@
-import { Decrypter, Message } from "./message";
-import Long from "long";
 import { Client, Timestamp, TopicId } from "@hashgraph/sdk";
+import Long from "long";
+import { Sleep } from "../../utils/sleep";
+import { Validator } from "../../utils/validator";
+import { Decrypter, Message } from "./message";
 import { MessageEnvelope } from "./message-envelope";
 import { MessageListener } from "./message-listener";
-import { Validator } from "../../utils/validator";
-import { TimestampUtils } from "../../utils/timestamp-utils";
-import { Sleep } from "../../utils/sleep";
 
 export abstract class MessageResolver<T extends Message> {
     /**
@@ -32,6 +31,7 @@ export abstract class MessageResolver<T extends Message> {
     constructor(topicId: TopicId) {
         this.topicId = topicId;
         this.results = new Map();
+
         this.noMoreMessagesTimeout = MessageResolver.DEFAULT_TIMEOUT;
         this.lastMessageArrivalTime = Long.fromInt(Date.now());
     }
@@ -77,7 +77,6 @@ export abstract class MessageResolver<T extends Message> {
             .setEndTime(Timestamp.fromDate(new Date()))
             .setIgnoreErrors(false)
             .onError(this.errorHandler)
-            .onDecrypt(this.decrypter)
             .subscribe(client, (msg) => {
                 return this.handleMessage(msg);
             });
