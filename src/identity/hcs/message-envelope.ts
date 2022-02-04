@@ -3,7 +3,7 @@ import { Base64 } from "js-base64";
 import Long from "long";
 import { ArraysUtils } from "../../utils/arrays-utils";
 import { JsonClass } from "./json-class";
-import { Decrypter, Encrypter, Message } from "./message";
+import { Message } from "./message";
 import { MessageMode } from "./message-mode";
 import { SerializableMirrorConsensusResponse } from "./serializable-mirror-consensus-response";
 

@@ -4,7 +4,6 @@ import { Validator } from "../../..";
 import { Sleep } from "../../../utils/sleep";
 import { MessageEnvelope } from "../message-envelope";
 import { MessageListener } from "../message-listener";
-import { MessageResolver } from "../message-resolver";
 import { HcsDidMessage } from "./hcs-did-message";
 import { HcsDidTopicListener } from "./hcs-did-topic-listener";
 
@@ -18,10 +17,10 @@ export class HcsDidResolver {
     public static DEFAULT_TIMEOUT: Long = Long.fromInt(30000);
 
     protected topicId: TopicId;
-    protected results: Map<string, HcsDidMessage[]>;
+    protected messages: HcsDidMessage[] = [];
 
     private lastMessageArrivalTime: Long;
-    private resultsHandler: (input: Map<string, HcsDidMessage[]>) => void;
+    private resultsHandler: (input: HcsDidMessage[]) => void;
     private errorHandler: (input: Error) => void;
     private existingSignatures: string[];
     private listener: MessageListener<HcsDidMessage>;
@@ -34,36 +33,9 @@ export class HcsDidResolver {
      */
     constructor(topicId: TopicId) {
         this.topicId = topicId;
-        this.results = new Map();
 
-        this.noMoreMessagesTimeout = MessageResolver.DEFAULT_TIMEOUT;
+        this.noMoreMessagesTimeout = HcsDidResolver.DEFAULT_TIMEOUT;
         this.lastMessageArrivalTime = Long.fromInt(Date.now());
-    }
-
-    /**
-     * Adds a DID to resolve.
-     *
-     * @param did The DID string.
-     * @return This resolver instance.
-     */
-    public addDid(did: string): HcsDidResolver {
-        if (did != null) {
-            this.results.set(did, []);
-        }
-        return this;
-    }
-
-    /**
-     * Adds multiple DIDs to resolve.
-     *
-     * @param dids The set of DID strings.
-     * @return This resolver instance.
-     */
-    public addDids(dids: string[]): HcsDidResolver {
-        if (dids) {
-            dids.forEach((d) => this.addDid(d));
-        }
-        return this;
     }
 
     public execute(client: Client): void {
@@ -120,7 +92,7 @@ export class HcsDidResolver {
             return;
         }
 
-        this.resultsHandler(this.results);
+        this.resultsHandler(this.messages);
 
         if (this.listener) {
             this.listener.unsubscribe();
@@ -134,7 +106,7 @@ export class HcsDidResolver {
      * @param handler The results handler.
      * @return This resolver instance.
      */
-    public whenFinished(handler: (input: Map<string, HcsDidMessage[]>) => void): HcsDidResolver {
+    public whenFinished(handler: (input: HcsDidMessage[]) => void): HcsDidResolver {
         this.resultsHandler = handler;
         return this;
     }
@@ -168,29 +140,16 @@ export class HcsDidResolver {
      * @param validator The errors validator.
      */
     protected validate(validator: Validator): void {
-        validator.require(this.results.size > 0, "Nothing to resolve.");
         validator.require(!!this.topicId, "Consensus topic ID not defined.");
         validator.require(!!this.resultsHandler, "Results handler 'whenFinished' not defined.");
     }
 
     protected matchesSearchCriteria(message: HcsDidMessage): boolean {
-        return this.results.has(message.getDid());
+        return true;
     }
 
     protected processMessage(envelope: MessageEnvelope<HcsDidMessage>): void {
         const message: HcsDidMessage = envelope.open();
-
-        // // Also skip messages that are older than the once collected or if we already have a DELETE message
-        // const existing: MessageEnvelope<HcsDidMessage> = this.results.get(message.getDid());
-
-        // const chackOperation =
-        //     existing != null &&
-        //     (TimestampUtils.lessThan(envelope.getConsensusTimestamp(), existing.getConsensusTimestamp()) ||
-        //         (DidMethodOperation.DELETE == existing.open().getOperation() &&
-        //             DidMethodOperation.DELETE != message.getOperation()));
-        // if (chackOperation) {
-        //     return;
-        // }
 
         // // Preserve created and updated timestamps
         // message.setUpdated(envelope.getConsensusTimestamp());
@@ -201,7 +160,7 @@ export class HcsDidResolver {
         // }
 
         // Add valid message to the results
-        this.results.get(message.getDid()).push(message);
+        this.messages.push(message);
     }
 
     protected supplyMessageListener(): MessageListener<HcsDidMessage> {
