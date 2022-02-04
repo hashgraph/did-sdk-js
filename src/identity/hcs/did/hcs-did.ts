@@ -62,7 +62,7 @@ export class HcsDid {
         }
 
         if (!this.privateKey) {
-            throw new Error("privateKey is missingi i");
+            throw new Error("privateKey is missing");
         }
 
         if (!this.client) {
@@ -101,30 +101,23 @@ export class HcsDid {
             throw new Error("Client configuration is missing");
         }
 
-        return await new Promise((resolve, reject) => {
-            /**
-             * This API will have to change...
-             */
-            const resolver = new HcsDidResolver(this.topicId)
+        return new Promise((resolve, reject) => {
+            new HcsDidResolver(this.topicId)
                 .setTimeout(3000)
-                .whenFinished((result) => {
-                    this.messages = result.get(this.identifier);
-
-                    let document = new DidDocumentBase(this.identifier);
-
-                    this.messages.forEach((msg) => {
-                        document = msg.getEvent().process(document);
-                    });
-
-                    resolve(document);
+                .whenFinished((messages) => {
+                    this.messages = messages;
+                    resolve(
+                        this.messages.reduce(
+                            (doc, msg) => msg.getEvent().process(doc),
+                            new DidDocumentBase(this.identifier)
+                        )
+                    );
                 })
                 .onError((err) => {
                     console.log(err);
                     reject(err);
-                });
-
-            resolver.addDid(this.identifier);
-            resolver.execute(this.client);
+                })
+                .execute(this.client);
         });
     }
 
@@ -146,11 +139,7 @@ export class HcsDid {
             throw new Error("Client configuration is missing");
         }
 
-        if (!args) {
-            throw new Error("Service args are missing");
-        }
-
-        if (!args.id || !args.type || !args.serviceEndpoint) {
+        if (!args || !args.id || !args.type || !args.serviceEndpoint) {
             throw new Error("Service args are missing");
         }
 
@@ -182,11 +171,7 @@ export class HcsDid {
             throw new Error("Client configuration is missing");
         }
 
-        if (!args) {
-            throw new Error("Verification Method args are missing");
-        }
-
-        if (!args.id || !args.type || !args.controller || !args.publicKey) {
+        if (!args || !args.id || !args.type || !args.controller || !args.publicKey) {
             throw new Error("Verification Method args are missing");
         }
 
@@ -219,11 +204,7 @@ export class HcsDid {
             throw new Error("Client configuration is missing");
         }
 
-        if (!args) {
-            throw new Error("Verification Relationship args are missing");
-        }
-
-        if (!args.id || !args.relationshipType || !args.type || !args.controller || !args.publicKey) {
+        if (!args || !args.id || !args.relationshipType || !args.type || !args.controller || !args.publicKey) {
             throw new Error("Verification Relationship args are missing");
         }
 
