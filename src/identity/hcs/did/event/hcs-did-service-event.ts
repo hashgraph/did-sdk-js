@@ -2,17 +2,19 @@ import { DidDocumentBase } from "../../../did-document-base";
 import { HcsDidEvent } from "./hcs-did-event";
 import { HcsDidEventName } from "./hcs-did-event-name";
 
+export type ServiceTypes = "LinkedDomains" | "DIDCommMessaging";
+
 export class HcsDidServiceEvent extends HcsDidEvent {
     protected readonly name = HcsDidEventName.SERVICE;
 
     protected id: string;
-    protected type: string;
+    protected type: ServiceTypes;
     protected serviceEndpoint: string;
 
     /**
      * TODO: are there any restrictions on type?
      */
-    constructor(id: string, type: string, serviceEndpoint: string) {
+    constructor(id: string, type: ServiceTypes, serviceEndpoint: string) {
         super();
 
         this.id = id;
