@@ -11,15 +11,15 @@ async function main() {
     /**
      * Build DID instance
      */
-    const did = HcsDid.fromString(TEST_DID_STR);
+    const did = new HcsDid({ identifier: TEST_DID_STR });
 
     /**
      * Read DID resolver setup
      */
-    const resolver = new HcsDidResolver(did.didTopicId).setTimeout(3000).whenFinished((result) => {
-        const didResult = result.get(did.did);
+    const resolver = new HcsDidResolver(did.getTopicId()).setTimeout(3000).whenFinished((result) => {
+        const didResult = result.get(did.getIdentifier());
 
-        didResult.getMessages().forEach((msg) => {
+        didResult.forEach((msg) => {
             console.log("\n");
             console.log("===================================================");
             console.log("\n");
@@ -32,14 +32,14 @@ async function main() {
         console.log("\n");
         console.log("===================================================");
         console.log("DragaonGlass Explorer:");
-        console.log(`https://testnet.dragonglass.me/hedera/topics/${did.didTopicId}`);
+        console.log(`https://testnet.dragonglass.me/hedera/topics/${did.getTopicId().toString()}`);
         console.log("\n");
     });
 
     /**
      * Read DID information
      */
-    resolver.addDid(did.did);
+    resolver.addDid(did.getIdentifier());
     resolver.execute(client);
 }
 
