@@ -17,7 +17,6 @@ import { Message } from "./identity/hcs/message";
 import { MessageEnvelope } from "./identity/hcs/message-envelope";
 import { MessageListener } from "./identity/hcs/message-listener";
 import { MessageMode } from "./identity/hcs/message-mode";
-import { MessageResolver } from "./identity/hcs/message-resolver";
 import { MessageTransaction } from "./identity/hcs/message-transaction";
 import { SerializableMirrorConsensusResponse } from "./identity/hcs/serializable-mirror-consensus-response";
 import { HederaDid } from "./identity/hedera-did";
@@ -50,7 +49,6 @@ export {
     MessageEnvelope,
     MessageListener,
     MessageMode,
-    MessageResolver,
     MessageTransaction,
     SerializableMirrorConsensusResponse,
     TimestampUtils,
