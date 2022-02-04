@@ -1,16 +1,16 @@
-import { DidDocumentBase, Hashing } from "../../../..";
+import { Hashing } from "../../../..";
 import { HcsDidEventName } from "./hcs-did-event-name";
 
 export abstract class HcsDidEvent {
-    protected abstract readonly name: HcsDidEventName;
+    public abstract readonly name: HcsDidEventName;
 
     constructor() {}
+
+    abstract getId(): string;
 
     abstract toJsonTree(): any;
 
     abstract toJSON(): string;
-
-    abstract process(didDoc: DidDocumentBase): DidDocumentBase;
 
     public getBase64() {
         return Hashing.base64.encode(this.toJSON());
