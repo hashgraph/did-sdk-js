@@ -5,6 +5,8 @@ const { HcsDid, Hashing } = require("../../dist");
 const { assert } = require("chai");
 
 const TOPIC_REGEXP = /^0\.0\.[0-9]{8,}/;
+const MINUTE_TIMEOUT_LIMIT = 60000;
+const READ_MESSAGES_TIMEOUT = 30000;
 
 describe("HcsDid", function () {
     describe("#constructor", () => {
@@ -122,23 +124,10 @@ describe("HcsDid", function () {
             assert.equal(did.getClient(), client);
             assert.equal(did.getNetwork(), "testnet");
 
-            const messages = [];
-
-            new TopicMessageQuery()
-                .setTopicId(did.getTopicId())
-                .setStartTime(new Timestamp(0, 0))
-                .setEndTime(Timestamp.fromDate(new Date()))
-                .subscribe(client, (msg) => {
-                    messages.push(msg);
-                });
-
-            /**
-             * Will have to change, let's just wait for 3s and assume all messages were read
-             */
-            await new Promise((resolve) => setTimeout(resolve, 3000));
+            const messages = await readtTopicMessages(did.getTopicId(), client);
 
             assert.equal(messages.length, 1);
-        }).timeout(60000);
+        }).timeout(MINUTE_TIMEOUT_LIMIT);
     });
 
     describe("#resolve", () => {
@@ -197,7 +186,7 @@ describe("HcsDid", function () {
                 controller: did.getIdentifier(),
                 publicKeyMultibase: Hashing.multibase.encode(privateKey.publicKey.toBytes()),
             });
-        }).timeout(60000);
+        }).timeout(MINUTE_TIMEOUT_LIMIT);
     });
 
     describe("Add Service meta-information", async () => {
@@ -265,24 +254,11 @@ describe("HcsDid", function () {
 
             console.log(`https://testnet.dragonglass.me/hedera/topics/${did.getTopicId().toString()}`);
 
-            const messages = [];
-
-            new TopicMessageQuery()
-                .setTopicId(did.getTopicId())
-                .setStartTime(new Timestamp(0, 0))
-                .setEndTime(Timestamp.fromDate(new Date()))
-                .subscribe(client, (msg) => {
-                    messages.push(msg);
-                });
-
-            /**
-             * wait for 3s and assume all messages were read
-             */
-            await new Promise((resolve) => setTimeout(resolve, 3000));
+            const messages = await readtTopicMessages(did.getTopicId(), client);
 
             // DIDOwner and Service event
             assert.equal(messages.length, 2);
-        }).timeout(60000);
+        }).timeout(MINUTE_TIMEOUT_LIMIT);
     });
 
     describe("Add VerificationMethod meta-information", async () => {
@@ -301,7 +277,7 @@ describe("HcsDid", function () {
             const did = new HcsDid({ identifier });
 
             try {
-                await did.verificationMethod({});
+                await did.addVerificaitonMethod({});
             } catch (err) {
                 assert.instanceOf(err, Error);
                 assert.equal(err.message, "privateKey is missing");
@@ -358,24 +334,11 @@ describe("HcsDid", function () {
             console.log(`${did.getIdentifier()}`);
             console.log(`https://testnet.dragonglass.me/hedera/topics/${did.getTopicId().toString()}`);
 
-            const messages = [];
-
-            new TopicMessageQuery()
-                .setTopicId(did.getTopicId())
-                .setStartTime(new Timestamp(0, 0))
-                .setEndTime(Timestamp.fromDate(new Date()))
-                .subscribe(client, (msg) => {
-                    messages.push(msg);
-                });
-
-            /**
-             * wait for 3s and assume all messages were read
-             */
-            await new Promise((resolve) => setTimeout(resolve, 3000));
+            const messages = await readtTopicMessages(did.getTopicId(), client);
 
             // DIDOwner and VerificationMethod event
             assert.equal(messages.length, 2);
-        }).timeout(60000);
+        }).timeout(MINUTE_TIMEOUT_LIMIT);
     });
 
     describe("Add VerificationMethod Relationship meta-information", async () => {
@@ -394,7 +357,7 @@ describe("HcsDid", function () {
             const did = new HcsDid({ identifier });
 
             try {
-                await did.verificationMethod({});
+                await did.addVerificaitonMethod({});
             } catch (err) {
                 assert.instanceOf(err, Error);
                 assert.equal(err.message, "privateKey is missing");
@@ -452,23 +415,33 @@ describe("HcsDid", function () {
             console.log(`${did.getIdentifier()}`);
             console.log(`https://testnet.dragonglass.me/hedera/topics/${did.getTopicId().toString()}`);
 
-            const messages = [];
-
-            new TopicMessageQuery()
-                .setTopicId(did.getTopicId())
-                .setStartTime(new Timestamp(0, 0))
-                .setEndTime(Timestamp.fromDate(new Date()))
-                .subscribe(client, (msg) => {
-                    messages.push(msg);
-                });
-
-            /**
-             * wait for 3s and assume all messages were read
-             */
-            await new Promise((resolve) => setTimeout(resolve, 3000));
+            const messages = await readtTopicMessages(did.getTopicId(), client);
 
             // DIDOwner and VerificationMethod event
             assert.equal(messages.length, 2);
-        }).timeout(60000);
+        }).timeout(MINUTE_TIMEOUT_LIMIT);
     });
 });
+
+/**
+ * Test Helpers
+ */
+
+async function readtTopicMessages(topicId, client) {
+    const messages = [];
+
+    new TopicMessageQuery()
+        .setTopicId(topicId)
+        .setStartTime(new Timestamp(0, 0))
+        .setEndTime(Timestamp.fromDate(new Date()))
+        .subscribe(client, (msg) => {
+            messages.push(msg);
+        });
+
+    /**
+     * wait for 3s and assume all messages were read
+     */
+    await new Promise((resolve) => setTimeout(resolve, READ_MESSAGES_TIMEOUT));
+
+    return messages;
+}
