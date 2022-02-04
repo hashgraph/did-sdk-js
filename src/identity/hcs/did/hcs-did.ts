@@ -348,12 +348,12 @@ export class HcsDid {
         didMethodOperation: DidMethodOperation,
         event: HcsDidEvent,
         privateKey: PrivateKey
-    ) {
+    ): Promise<MessageEnvelope<HcsDidMessage>> {
         const message = new HcsDidMessage(didMethodOperation, this.getIdentifier(), event);
         const envelope = new MessageEnvelope(message);
         const transaction = new HcsDidTransaction(envelope, this.getTopicId());
 
-        new Promise((resolve, reject) => {
+        return new Promise((resolve, reject) => {
             transaction
                 .signMessage((msg) => privateKey.sign(msg))
                 .buildAndSignTransaction((tx) => tx.setMaxTransactionFee(HcsDid.TRANSACTION_FEE))
