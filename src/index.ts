@@ -14,8 +14,6 @@ import { HcsDidRootKey } from "./identity/hcs/did/hcs-did-root-key";
 import { HcsDidTopicListener } from "./identity/hcs/did/hcs-did-topic-listener";
 import { HcsDidTransaction } from "./identity/hcs/did/hcs-did-transaction";
 import { HcsDidV2 } from "./identity/hcs/did/hcs-did-v2";
-import { HcsIdentityNetwork } from "./identity/hcs/hcs-identity-network";
-import { HcsIdentityNetworkBuilder } from "./identity/hcs/hcs-identity-network-builder";
 import { JsonClass } from "./identity/hcs/json-class";
 import { Message } from "./identity/hcs/message";
 import { MessageEnvelope } from "./identity/hcs/message-envelope";
@@ -46,8 +44,6 @@ export {
     HcsDidRootKey,
     HcsDidTopicListener,
     HcsDidTransaction,
-    HcsIdentityNetwork,
-    HcsIdentityNetworkBuilder,
     HcsDidDidOwnerEvent,
     HcsDidServiceEvent,
     HcsDidVerificationMethodEvent,
