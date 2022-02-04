@@ -12,6 +12,10 @@ import {
 import { DidSyntax } from "../../did-syntax";
 import { HcsDidEvent } from "./event/hcs-did-event";
 import { ServiceTypes } from "./event/hcs-did-service-event";
+import {
+    HcsDidVerificationMethodEvent,
+    VerificationMethodSupportedKeyType,
+} from "./event/hcs-did-verification-method-event";
 import { HcsDidResolver } from "./hcs-did-resolver";
 
 export class HcsDid {
@@ -78,7 +82,7 @@ export class HcsDid {
          * Set ownership
          */
         const event = new HcsDidDidOwnerEvent(this.identifier, this.identifier, this.privateKey.publicKey);
-        await this.submitTransaciton(DidMethodOperation.CREATE, event);
+        await this.submitTransaciton(DidMethodOperation.CREATE, event, this.privateKey);
 
         return this;
     }
@@ -160,7 +164,7 @@ export class HcsDid {
             DidSyntax.DID_METHOD_SEPARATOR +
             methodNetwork +
             DidSyntax.DID_METHOD_SEPARATOR +
-            this.publicKeyToIdString(publicKey) +
+            HcsDid.publicKeyToIdString(publicKey) +
             DidSyntax.DID_TOPIC_SEPARATOR +
             this.topicId.toString();
 
@@ -206,8 +210,12 @@ export class HcsDid {
         }
     }
 
-    private publicKeyToIdString(publicKey: PublicKey): string {
+    public static publicKeyToIdString(publicKey: PublicKey): string {
         return Hashing.multibase.encode(publicKey.toBytes());
+    }
+
+    public static stringToPublicKey(idString: string): PublicKey {
+        return PublicKey.fromBytes(Hashing.multibase.decode(idString));
     }
 
     /**
@@ -240,7 +248,43 @@ export class HcsDid {
          * Build create Service message
          */
         const event = new HcsDidServiceEvent(args.id, args.type, args.serviceEndpoint);
-        await this.submitTransaciton(DidMethodOperation.CREATE, event);
+        await this.submitTransaciton(DidMethodOperation.CREATE, event, this.privateKey);
+
+        return this;
+    }
+
+    /**
+     * Add a Verification Method meta-information to DID
+     * @param args
+     * @returns this
+     */
+    async addVerificaitonMethod(args: {
+        id: string;
+        type: VerificationMethodSupportedKeyType;
+        controller: string;
+        publicKey: PublicKey;
+    }) {
+        if (!this.privateKey) {
+            throw new Error("privateKey is missing");
+        }
+
+        if (!this.client) {
+            throw new Error("Client configuration is missing");
+        }
+
+        if (!args) {
+            throw new Error("Verification Method args are missing");
+        }
+
+        if (!args.id || !args.type || !args.controller || !args.publicKey) {
+            throw new Error("Verification Method args are missing");
+        }
+
+        /**
+         * Build create Service message
+         */
+        const event = new HcsDidVerificationMethodEvent(args.id, args.type, args.controller, args.publicKey);
+        await this.submitTransaciton(DidMethodOperation.CREATE, event, this.privateKey);
 
         return this;
     }
@@ -248,14 +292,18 @@ export class HcsDid {
     /**
      * Submit Message Transaciton to Hashgraph
      */
-    private async submitTransaciton(didMethodOperation: DidMethodOperation, event: HcsDidEvent) {
+    private async submitTransaciton(
+        didMethodOperation: DidMethodOperation,
+        event: HcsDidEvent,
+        privateKey: PrivateKey
+    ) {
         const message = new HcsDidMessage(didMethodOperation, this.getIdentifier(), event);
         const envelope = new MessageEnvelope(message);
 
         const transaction = new HcsDidTransaction(envelope, this.getTopicId());
         new Promise((resolve, reject) => {
             transaction
-                .signMessage((msg) => this.privateKey.sign(msg))
+                .signMessage((msg) => privateKey.sign(msg))
                 .buildAndSignTransaction((tx) => tx.setMaxTransactionFee(HcsDid.TRANSACTION_FEE))
                 .onMessageConfirmed((msg) => {
                     console.log("Message Published");
