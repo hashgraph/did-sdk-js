@@ -31,17 +31,9 @@ export class HcsDidTopicListener extends MessageListener<HcsDidMessage> {
 
     protected override isMessageValid(envelope: MessageEnvelope<HcsDidMessage>, response: TopicMessage): boolean {
         try {
-            const msgDecrypter = !!this.decrypter ? HcsDidMessage.getDecrypter(this.decrypter) : null;
-
-            const message: HcsDidMessage = envelope.open(msgDecrypter);
+            const message: HcsDidMessage = envelope.open();
             if (!message) {
                 this.reportInvalidMessage(response, "Empty message received when opening envelope");
-                return false;
-            }
-
-            const key = message.extractDidRootKey();
-            if (!envelope.isSignatureValid(key)) {
-                this.reportInvalidMessage(response, "Signature validation failed");
                 return false;
             }
 
