@@ -5,14 +5,18 @@ import {
     Hashing,
     HcsDidDidOwnerEvent,
     HcsDidMessage,
+    HcsDidServiceEvent,
     HcsDidTransaction,
     MessageEnvelope,
 } from "../../..";
 import { DidSyntax } from "../../did-syntax";
+import { HcsDidEvent } from "./event/hcs-did-event";
+import { ServiceTypes } from "./event/hcs-did-service-event";
 import { HcsDidResolver } from "./hcs-did-resolver";
 
 export class HcsDid {
     public static DID_METHOD = DidSyntax.Method.HEDERA_HCS;
+    public static TRANSACTION_FEE = new Hbar(2);
 
     protected client: Client;
     protected privateKey: PrivateKey;
@@ -60,7 +64,7 @@ export class HcsDid {
          * Create topic
          */
         const topicCreateTransaction = new TopicCreateTransaction()
-            .setMaxTransactionFee(new Hbar(2))
+            .setMaxTransactionFee(HcsDid.TRANSACTION_FEE)
             .setAdminKey(this.privateKey.publicKey);
 
         const txId = await topicCreateTransaction.execute(this.client);
@@ -74,27 +78,7 @@ export class HcsDid {
          * Set ownership
          */
         const event = new HcsDidDidOwnerEvent(this.identifier, this.identifier, this.privateKey.publicKey);
-        const message = new HcsDidMessage(DidMethodOperation.CREATE, this.identifier, event);
-        const envelope = new MessageEnvelope(message);
-
-        const transaction = new HcsDidTransaction(envelope, this.topicId);
-
-        // Expect some subscribtion errors because it takes time for Topic to be accessible
-
-        await new Promise((resolve, reject) => {
-            transaction
-                .signMessage((msg) => this.privateKey.sign(msg))
-                .buildAndSignTransaction((tx) => tx.setMaxTransactionFee(new Hbar(2)))
-                .onMessageConfirmed((msg) => {
-                    console.log("Submitted");
-                    resolve(msg);
-                })
-                .onError((err) => {
-                    console.log(err);
-                    reject(err);
-                })
-                .execute(this.client);
-        });
+        await this.submitTransaciton(DidMethodOperation.CREATE, event);
 
         return this;
     }
@@ -224,5 +208,63 @@ export class HcsDid {
 
     private publicKeyToIdString(publicKey: PublicKey): string {
         return Hashing.multibase.encode(publicKey.toBytes());
+    }
+
+    /**
+     *  Meta-information about DID
+     */
+
+    /**
+     * Add a Service meta-information to DID
+     * @param args
+     * @returns this
+     */
+    async addService(args: { id: string; type: ServiceTypes; serviceEndpoint: string }) {
+        if (!this.privateKey) {
+            throw new Error("privateKey is missing");
+        }
+
+        if (!this.client) {
+            throw new Error("Client configuration is missing");
+        }
+
+        if (!args) {
+            throw new Error("Service args are missing");
+        }
+
+        if (!args.id || !args.type || !args.serviceEndpoint) {
+            throw new Error("Service args are missing");
+        }
+
+        /**
+         * Build create Service message
+         */
+        const event = new HcsDidServiceEvent(args.id, args.type, args.serviceEndpoint);
+        await this.submitTransaciton(DidMethodOperation.CREATE, event);
+
+        return this;
+    }
+
+    /**
+     * Submit Message Transaciton to Hashgraph
+     */
+    private async submitTransaciton(didMethodOperation: DidMethodOperation, event: HcsDidEvent) {
+        const message = new HcsDidMessage(didMethodOperation, this.getIdentifier(), event);
+        const envelope = new MessageEnvelope(message);
+
+        const transaction = new HcsDidTransaction(envelope, this.getTopicId());
+        new Promise((resolve, reject) => {
+            transaction
+                .signMessage((msg) => this.privateKey.sign(msg))
+                .buildAndSignTransaction((tx) => tx.setMaxTransactionFee(HcsDid.TRANSACTION_FEE))
+                .onMessageConfirmed((msg) => {
+                    console.log("Message Published");
+                    console.log(
+                        `Explor on dragonglass: https://testnet.dragonglass.me/hedera/topics/${this.getTopicId()}`
+                    );
+                    resolve(msg);
+                })
+                .execute(this.client);
+        });
     }
 }
