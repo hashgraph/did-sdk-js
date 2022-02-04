@@ -1,5 +1,6 @@
 import { Timestamp, TopicId } from "@hashgraph/sdk";
 import { DidMethodOperation } from "../../did-method-operation";
+import { DidParser } from "../../did-parser";
 import { Message } from "../message";
 import { HcsDidEvent } from "./event/hcs-did-event";
 import { HcsDidEventParser } from "./event/hcs-did-event-parser";
@@ -112,7 +113,7 @@ export class HcsDidMessage extends Message {
 
             // // Verify that DID was derived from this DID root key
 
-            const hcsDid: HcsDid = HcsDid.fromString(this.did);
+            const hcsDid: HcsDid = DidParser.parse(this.did);
 
             // // Extract public key from the DID document
             // const publicKeyBytes: Uint8Array = Hashing.multibase.decode(doc.getDidRootKey().getPublicKeyMultibase());
@@ -123,11 +124,7 @@ export class HcsDidMessage extends Message {
             // }
 
             // Verify that the message was sent to the right topic, if the DID contains the topic
-            if (
-                !!didTopicId &&
-                !!hcsDid.getDidTopicId() &&
-                didTopicId.toString() != hcsDid.getDidTopicId().toString()
-            ) {
+            if (!!didTopicId && !!hcsDid.getTopicId() && didTopicId.toString() != hcsDid.getTopicId().toString()) {
                 return false;
             }
         } catch (e) {
