@@ -42,7 +42,7 @@ export class HcsDid {
         this.client = args.client;
 
         if (!this.identifier && !this.privateKey) {
-            throw new Error("identifier and privateKey cannot be empty");
+            throw new Error("identifier and privateKey cannot both be empty");
         }
 
         if (this.identifier) {
@@ -56,7 +56,7 @@ export class HcsDid {
      * Public API
      */
 
-    async register() {
+    public async register() {
         if (this.identifier) {
             throw new Error("DID is already registered");
         }
@@ -92,7 +92,7 @@ export class HcsDid {
         return this;
     }
 
-    async resolve() {
+    public async resolve() {
         if (!this.identifier) {
             throw new Error("DID is not registered");
         }
@@ -129,6 +129,120 @@ export class HcsDid {
     }
 
     /**
+     *  Meta-information about DID
+     */
+
+    /**
+     * Add a Service meta-information to DID
+     * @param args
+     * @returns this
+     */
+    public async addService(args: { id: string; type: ServiceTypes; serviceEndpoint: string }) {
+        if (!this.privateKey) {
+            throw new Error("privateKey is missing");
+        }
+
+        if (!this.client) {
+            throw new Error("Client configuration is missing");
+        }
+
+        if (!args) {
+            throw new Error("Service args are missing");
+        }
+
+        if (!args.id || !args.type || !args.serviceEndpoint) {
+            throw new Error("Service args are missing");
+        }
+
+        /**
+         * Build create Service message
+         */
+        const event = new HcsDidServiceEvent(args.id, args.type, args.serviceEndpoint);
+        await this.submitTransaciton(DidMethodOperation.CREATE, event, this.privateKey);
+
+        return this;
+    }
+
+    /**
+     * Add a Verification Method meta-information to DID
+     * @param args
+     * @returns this
+     */
+    public async addVerificaitonMethod(args: {
+        id: string;
+        type: VerificationMethodSupportedKeyType;
+        controller: string;
+        publicKey: PublicKey;
+    }) {
+        if (!this.privateKey) {
+            throw new Error("privateKey is missing");
+        }
+
+        if (!this.client) {
+            throw new Error("Client configuration is missing");
+        }
+
+        if (!args) {
+            throw new Error("Verification Method args are missing");
+        }
+
+        if (!args.id || !args.type || !args.controller || !args.publicKey) {
+            throw new Error("Verification Method args are missing");
+        }
+
+        /**
+         * Build create Service message
+         */
+        const event = new HcsDidVerificationMethodEvent(args.id, args.type, args.controller, args.publicKey);
+        await this.submitTransaciton(DidMethodOperation.CREATE, event, this.privateKey);
+
+        return this;
+    }
+
+    /**
+     * Add a Verification Relationship to DID
+     * @param args
+     * @returns this
+     */
+    public async addVerificaitonRelationship(args: {
+        id: string;
+        relationshipType: VerificationRelationshipType;
+        type: VerificationRelationshipSupportedKeyType;
+        controller: string;
+        publicKey: PublicKey;
+    }) {
+        if (!this.privateKey) {
+            throw new Error("privateKey is missing");
+        }
+
+        if (!this.client) {
+            throw new Error("Client configuration is missing");
+        }
+
+        if (!args) {
+            throw new Error("Verification Relationship args are missing");
+        }
+
+        if (!args.id || !args.relationshipType || !args.type || !args.controller || !args.publicKey) {
+            throw new Error("Verification Relationship args are missing");
+        }
+
+        /**
+         * Build create Service message
+         */
+        const event = new HcsDidVerificationRelationshipEvent(
+            args.id,
+            args.relationshipType,
+            args.type,
+            args.controller,
+            args.publicKey
+        );
+        await this.submitTransaciton(DidMethodOperation.CREATE, event, this.privateKey);
+
+        return this;
+    }
+
+    /**
      * Attribute getters
      */
 
@@ -154,6 +268,18 @@ export class HcsDid {
 
     public getMethod() {
         return HcsDid.DID_METHOD;
+    }
+
+    /**
+     * Static methods
+     */
+
+    public static publicKeyToIdString(publicKey: PublicKey): string {
+        return Hashing.multibase.encode(publicKey.toBytes());
+    }
+
+    public static stringToPublicKey(idString: string): PublicKey {
+        return PublicKey.fromBytes(Hashing.multibase.decode(idString));
     }
 
     /**
@@ -215,128 +341,6 @@ export class HcsDid {
         }
     }
 
-    public static publicKeyToIdString(publicKey: PublicKey): string {
-        return Hashing.multibase.encode(publicKey.toBytes());
-    }
-
-    public static stringToPublicKey(idString: string): PublicKey {
-        return PublicKey.fromBytes(Hashing.multibase.decode(idString));
-    }
-
-    /**
-     *  Meta-information about DID
-     */
-
-    /**
-     * Add a Service meta-information to DID
-     * @param args
-     * @returns this
-     */
-    async addService(args: { id: string; type: ServiceTypes; serviceEndpoint: string }) {
-        if (!this.privateKey) {
-            throw new Error("privateKey is missing");
-        }
-
-        if (!this.client) {
-            throw new Error("Client configuration is missing");
-        }
-
-        if (!args) {
-            throw new Error("Service args are missing");
-        }
-
-        if (!args.id || !args.type || !args.serviceEndpoint) {
-            throw new Error("Service args are missing");
-        }
-
-        /**
-         * Build create Service message
-         */
-        const event = new HcsDidServiceEvent(args.id, args.type, args.serviceEndpoint);
-        await this.submitTransaciton(DidMethodOperation.CREATE, event, this.privateKey);
-
-        return this;
-    }
-
-    /**
-     * Add a Verification Method meta-information to DID
-     * @param args
-     * @returns this
-     */
-    async addVerificaitonMethod(args: {
-        id: string;
-        type: VerificationMethodSupportedKeyType;
-        controller: string;
-        publicKey: PublicKey;
-    }) {
-        if (!this.privateKey) {
-            throw new Error("privateKey is missing");
-        }
-
-        if (!this.client) {
-            throw new Error("Client configuration is missing");
-        }
-
-        if (!args) {
-            throw new Error("Verification Method args are missing");
-        }
-
-        if (!args.id || !args.type || !args.controller || !args.publicKey) {
-            throw new Error("Verification Method args are missing");
-        }
-
-        /**
-         * Build create Service message
-         */
-        const event = new HcsDidVerificationMethodEvent(args.id, args.type, args.controller, args.publicKey);
-        await this.submitTransaciton(DidMethodOperation.CREATE, event, this.privateKey);
-
-        return this;
-    }
-
-    /**
-     * Add a Verification Relationship to DID
-     * @param args
-     * @returns this
-     */
-    async addVerificaitonRelationship(args: {
-        id: string;
-        relationshipType: VerificationRelationshipType;
-        type: VerificationRelationshipSupportedKeyType;
-        controller: string;
-        publicKey: PublicKey;
-    }) {
-        if (!this.privateKey) {
-            throw new Error("privateKey is missing");
-        }
-
-        if (!this.client) {
-            throw new Error("Client configuration is missing");
-        }
-
-        if (!args) {
-            throw new Error("Verification Relationship args are missing");
-        }
-
-        if (!args.id || !args.relationshipType || !args.type || !args.controller || !args.publicKey) {
-            throw new Error("Verification Relationship args are missing");
-        }
-
-        /**
-         * Build create Service message
-         */
-        const event = new HcsDidVerificationRelationshipEvent(
-            args.id,
-            args.relationshipType,
-            args.type,
-            args.controller,
-            args.publicKey
-        );
-        await this.submitTransaciton(DidMethodOperation.CREATE, event, this.privateKey);
-
-        return this;
-    }
-
     /**
      * Submit Message Transaciton to Hashgraph
      */
@@ -347,12 +351,16 @@ export class HcsDid {
     ) {
         const message = new HcsDidMessage(didMethodOperation, this.getIdentifier(), event);
         const envelope = new MessageEnvelope(message);
-
         const transaction = new HcsDidTransaction(envelope, this.getTopicId());
+
         new Promise((resolve, reject) => {
             transaction
                 .signMessage((msg) => privateKey.sign(msg))
                 .buildAndSignTransaction((tx) => tx.setMaxTransactionFee(HcsDid.TRANSACTION_FEE))
+                .onError((err) => {
+                    console.error(err);
+                    reject(err);
+                })
                 .onMessageConfirmed((msg) => {
                     console.log("Message Published");
                     console.log(
