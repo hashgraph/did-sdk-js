@@ -16,6 +16,11 @@ import {
     HcsDidVerificationMethodEvent,
     VerificationMethodSupportedKeyType,
 } from "./event/hcs-did-verification-method-event";
+import {
+    HcsDidVerificationRelationshipEvent,
+    VerificationRelationshipSupportedKeyType,
+    VerificationRelationshipType,
+} from "./event/hcs-did-verification-relationship-event";
 import { HcsDidResolver } from "./hcs-did-resolver";
 
 export class HcsDid {
@@ -284,6 +289,49 @@ export class HcsDid {
          * Build create Service message
          */
         const event = new HcsDidVerificationMethodEvent(args.id, args.type, args.controller, args.publicKey);
+        await this.submitTransaciton(DidMethodOperation.CREATE, event, this.privateKey);
+
+        return this;
+    }
+
+    /**
+     * Add a Verification Relationship to DID
+     * @param args
+     * @returns this
+     */
+    async addVerificaitonRelationship(args: {
+        id: string;
+        relationshipType: VerificationRelationshipType;
+        type: VerificationRelationshipSupportedKeyType;
+        controller: string;
+        publicKey: PublicKey;
+    }) {
+        if (!this.privateKey) {
+            throw new Error("privateKey is missing");
+        }
+
+        if (!this.client) {
+            throw new Error("Client configuration is missing");
+        }
+
+        if (!args) {
+            throw new Error("Verification Relationship args are missing");
+        }
+
+        if (!args.id || !args.relationshipType || !args.type || !args.controller || !args.publicKey) {
+            throw new Error("Verification Relationship args are missing");
+        }
+
+        /**
+         * Build create Service message
+         */
+        const event = new HcsDidVerificationRelationshipEvent(
+            args.id,
+            args.relationshipType,
+            args.type,
+            args.controller,
+            args.publicKey
+        );
         await this.submitTransaciton(DidMethodOperation.CREATE, event, this.privateKey);
 
         return this;
