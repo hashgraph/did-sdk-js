@@ -6,7 +6,7 @@ const { assert } = require("chai");
 
 const TOPIC_REGEXP = /^0\.0\.[0-9]{8,}/;
 const MINUTE_TIMEOUT_LIMIT = 60000;
-const READ_MESSAGES_TIMEOUT = 30000;
+const READ_MESSAGES_TIMEOUT = 5000;
 
 describe("HcsDid", function () {
     describe("#constructor", () => {
@@ -439,7 +439,7 @@ async function readtTopicMessages(topicId, client) {
         });
 
     /**
-     * wait for 3s and assume all messages were read
+     * wait for READ_MESSAGES_TIMEOUT seconds and assume all messages were read
      */
     await new Promise((resolve) => setTimeout(resolve, READ_MESSAGES_TIMEOUT));
 
