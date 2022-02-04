@@ -1,116 +1,183 @@
-import { PrivateKey, PublicKey, TopicId } from "@hashgraph/sdk";
-import { Hashing } from "../../../utils/hashing";
-import { DidDocumentBase } from "../../did-document-base";
+import { Client, Hbar, PrivateKey, PublicKey, Timestamp, TopicCreateTransaction, TopicId } from "@hashgraph/sdk";
+import {
+    DidDocumentBase,
+    DidMethodOperation,
+    Hashing,
+    HcsDidDidOwnerEvent,
+    HcsDidMessage,
+    HcsDidServiceEvent,
+    HcsDidTransaction,
+    MessageEnvelope,
+} from "../../..";
 import { DidSyntax } from "../../did-syntax";
-import { HederaDid } from "../../hedera-did";
-import { HcsDidRootKey } from "./hcs-did-root-key";
+import { HcsDidEvent } from "./event/hcs-did-event";
+import { ServiceTypes } from "./event/hcs-did-service-event";
+import {
+    HcsDidVerificationMethodEvent,
+    VerificationMethodSupportedKeyType,
+} from "./event/hcs-did-verification-method-event";
+import {
+    HcsDidVerificationRelationshipEvent,
+    VerificationRelationshipSupportedKeyType,
+    VerificationRelationshipType,
+} from "./event/hcs-did-verification-relationship-event";
+import { HcsDidResolver } from "./hcs-did-resolver";
 
-/**
- * Hedera Decentralized Identifier for Hedera DID Method specification based on HCS.
- */
-export class HcsDid implements HederaDid {
+export class HcsDid {
     public static DID_METHOD = DidSyntax.Method.HEDERA_HCS;
+    public static TRANSACTION_FEE = new Hbar(2);
 
-    private didTopicId: TopicId;
-    private network: string;
-    private idString: string;
-    private did: string;
-    private didRootKey: PublicKey;
-    private privateDidRootKey: PrivateKey;
+    protected client: Client;
+    protected privateKey: PrivateKey;
+    protected identifier: string;
+    protected network: string;
+    protected topicId: TopicId;
 
-    /**
-     * Creates a DID instance.
-     *
-     * @param network           The Hedera DID network.
-     * @param didRootKey        The public key from which DID is derived.
-     * @param didTopicId        The appnet's DID topic ID.
-     */
-    constructor(network: string, didRootKey: PublicKey, didTopicId: TopicId);
-    /**
-     * Creates a DID instance with private DID root key.
-     *
-     * @param network           The Hedera DID network.
-     * @param privateDidRootKey The private DID root key.
-     * @param didTopicId        The appnet's DID topic ID.
-     */
-    constructor(network: string, privateDidRootKey: PrivateKey, didTopicId: TopicId);
-    /**
-     * Creates a DID instance.
-     *
-     * @param network           The Hedera DID network.
-     * @param idString          The id-string of a DID.
-     * @param didTopicId        The appnet's DID topic ID.
-     * @param didRootKey        The public key from which DID is derived.
-     */
-    constructor(network: string, idString: string, didTopicId: TopicId, didRootKey?: PublicKey);
-    constructor(...args: any[]) {
-        if (
-            typeof args[0] === "string" &&
-            args[1] instanceof PublicKey &&
-            (args[2] instanceof TopicId || args[2] === undefined) &&
-            args.length === 3
-        ) {
-            const [network, didRootKey, didTopicId] = args;
-            this.didTopicId = didTopicId;
-            this.network = network;
-            this.didRootKey = didRootKey;
-            this.idString = HcsDid.publicKeyToIdString(didRootKey);
-            this.did = this.buildDid();
+    protected messages: HcsDidMessage[];
+    protected resolvedAt: Timestamp;
 
-            return;
+    constructor(args: { identifier?: string; privateKey?: PrivateKey; client?: Client }) {
+        this.identifier = args.identifier;
+        this.privateKey = args.privateKey;
+        this.client = args.client;
+
+        if (!this.identifier && !this.privateKey) {
+            throw new Error("identifier and privateKey cannot be empty");
         }
 
-        if (
-            typeof args[0] === "string" &&
-            args[1] instanceof PrivateKey &&
-            (args[2] instanceof TopicId || args[2] === undefined) &&
-            args.length === 3
-        ) {
-            const [network, privateDidRootKey, didTopicId] = args;
-
-            this.didTopicId = didTopicId;
-            this.network = network;
-            this.didRootKey = privateDidRootKey.publicKey;
-            this.idString = HcsDid.publicKeyToIdString(privateDidRootKey.publicKey);
-            this.did = this.buildDid();
-            this.privateDidRootKey = privateDidRootKey;
-
-            return;
+        if (this.identifier) {
+            const [networkName, topicId] = this.parseIdentifier(this.identifier);
+            this.network = networkName;
+            this.topicId = topicId;
         }
-
-        if (
-            typeof args[0] === "string" &&
-            typeof args[1] === "string" &&
-            (args[2] instanceof TopicId || args[2] === undefined) &&
-            (args[3] instanceof PublicKey || args[3] === undefined) &&
-            args.length === 4
-        ) {
-            const [network, idString, didTopicId, didRootKey] = args;
-
-            this.didTopicId = didTopicId;
-            this.network = network;
-            this.idString = idString;
-            this.didRootKey = didRootKey;
-            this.did = this.buildDid();
-
-            return;
-        }
-
-        throw new Error("Couldn't find constructor");
     }
 
     /**
-     * Converts a Hedera DID string into {@link HcsDid} object.
-     *
-     * @param didString A Hedera DID string.
-     * @return {@link HcsDid} object derived from the given Hedera DID string.
+     * Public API
      */
-    public static fromString(didString: string, didRootKey?: PublicKey): HcsDid {
-        if (!didString) {
-            throw new Error("DID string cannot be null");
+
+    async register() {
+        if (this.identifier) {
+            throw new Error("DID is already registered");
         }
 
-        const [didPart, topicIdPart] = didString.split(DidSyntax.DID_TOPIC_SEPARATOR);
+        if (!this.privateKey) {
+            throw new Error("privateKey is missingi i");
+        }
+
+        if (!this.client) {
+            throw new Error("Client configuration is missing");
+        }
+
+        /**
+         * Create topic
+         */
+        const topicCreateTransaction = new TopicCreateTransaction()
+            .setMaxTransactionFee(HcsDid.TRANSACTION_FEE)
+            .setAdminKey(this.privateKey.publicKey);
+
+        const txId = await topicCreateTransaction.execute(this.client);
+        const topicId = (await txId.getReceipt(this.client)).topicId;
+
+        this.topicId = topicId;
+        this.network = this.client.networkName;
+        this.identifier = this.buildIdentifier(this.privateKey.publicKey);
+
+        /**
+         * Set ownership
+         */
+        const event = new HcsDidDidOwnerEvent(this.identifier, this.identifier, this.privateKey.publicKey);
+        await this.submitTransaciton(DidMethodOperation.CREATE, event, this.privateKey);
+
+        return this;
+    }
+
+    async resolve() {
+        if (!this.identifier) {
+            throw new Error("DID is not registered");
+        }
+
+        if (!this.client) {
+            throw new Error("Client configuration is missing");
+        }
+
+        return await new Promise((resolve, reject) => {
+            /**
+             * This API will have to change...
+             */
+            const resolver = new HcsDidResolver(this.topicId)
+                .setTimeout(3000)
+                .whenFinished((result) => {
+                    this.messages = result.get(this.identifier);
+
+                    let document = new DidDocumentBase(this.identifier);
+
+                    this.messages.forEach((msg) => {
+                        document = msg.getEvent().process(document);
+                    });
+
+                    resolve(document);
+                })
+                .onError((err) => {
+                    console.log(err);
+                    reject(err);
+                });
+
+            resolver.addDid(this.identifier);
+            resolver.execute(this.client);
+        });
+    }
+
+    /**
+     * Attribute getters
+     */
+
+    public getIdentifier() {
+        return this.identifier;
+    }
+
+    public getClient() {
+        return this.client;
+    }
+
+    public getPrivateKey() {
+        return this.privateKey;
+    }
+
+    public getTopicId() {
+        return this.topicId;
+    }
+
+    public getNetwork() {
+        return this.network;
+    }
+
+    public getMethod() {
+        return HcsDid.DID_METHOD;
+    }
+
+    /**
+     * Private
+     */
+
+    private buildIdentifier(publicKey: PublicKey): string {
+        const methodNetwork = [this.getMethod().toString(), this.network].join(DidSyntax.DID_METHOD_SEPARATOR);
+
+        let ret: string;
+        ret =
+            DidSyntax.DID_PREFIX +
+            DidSyntax.DID_METHOD_SEPARATOR +
+            methodNetwork +
+            DidSyntax.DID_METHOD_SEPARATOR +
+            HcsDid.publicKeyToIdString(publicKey) +
+            DidSyntax.DID_TOPIC_SEPARATOR +
+            this.topicId.toString();
+
+        return ret;
+    }
+
+    private parseIdentifier(identifier: string): [string, TopicId] {
+        const [didPart, topicIdPart] = identifier.split(DidSyntax.DID_TOPIC_SEPARATOR);
 
         if (!topicIdPart) {
             throw new Error("DID string is invalid: topic ID is missing");
@@ -142,114 +209,158 @@ export class HcsDid implements HederaDid {
                 throw new Error("DID string is invalid.");
             }
 
-            return new HcsDid(networkName, didIdString, topicId, didRootKey);
+            return [networkName, topicId];
         } catch (e) {
             throw new Error("DID string is invalid. " + e.message);
         }
     }
 
-    public static fromStringWithDidRootKey(didString: string, didRootKey: PublicKey): HcsDid {
-        return this.fromString(didString, didRootKey);
+    public static publicKeyToIdString(publicKey: PublicKey): string {
+        return Hashing.multibase.encode(publicKey.toBytes());
+    }
+
+    public static stringToPublicKey(idString: string): PublicKey {
+        return PublicKey.fromBytes(Hashing.multibase.decode(idString));
     }
 
     /**
-     * Generates a random DID root key.
-     *
-     * @return A private key of generated public DID root key.
+     *  Meta-information about DID
      */
-    public static generateDidRootKey(): PrivateKey {
-        return PrivateKey.generate();
-    }
 
     /**
-     * Generates DID document base from the given DID and its root key.
-     *
-     * @param didRootKey Public key used to build this DID.
-     * @return The DID document base.
-     * @throws IllegalArgumentException In case given DID root key does not match this DID.
+     * Add a Service meta-information to DID
+     * @param args
+     * @returns this
      */
-    public generateDidDocument(): DidDocumentBase {
-        const result = new DidDocumentBase(this.toDid());
-        if (this.didRootKey) {
-            const rootKey = HcsDidRootKey.fromHcsIdentity(this, this.didRootKey);
-            result.setDidRootKey(rootKey);
+    async addService(args: { id: string; type: ServiceTypes; serviceEndpoint: string }) {
+        if (!this.privateKey) {
+            throw new Error("privateKey is missing");
         }
 
-        return result;
-    }
+        if (!this.client) {
+            throw new Error("Client configuration is missing");
+        }
 
-    public getNetwork(): string {
-        return this.network;
-    }
+        if (!args) {
+            throw new Error("Service args are missing");
+        }
 
-    public getMethod(): DidSyntax.Method {
-        return DidSyntax.Method.HEDERA_HCS;
-    }
+        if (!args.id || !args.type || !args.serviceEndpoint) {
+            throw new Error("Service args are missing");
+        }
 
-    public toString(): string {
-        return this.did;
-    }
+        /**
+         * Build create Service message
+         */
+        const event = new HcsDidServiceEvent(args.id, args.type, args.serviceEndpoint);
+        await this.submitTransaciton(DidMethodOperation.CREATE, event, this.privateKey);
 
-    public getDidTopicId(): TopicId {
-        return this.didTopicId;
-    }
-
-    public getIdString(): string {
-        return this.idString;
-    }
-
-    public toDid() {
-        return this.did;
+        return this;
     }
 
     /**
-     * Constructs DID string from the instance of DID object.
-     *
-     * @return A DID string.
+     * Add a Verification Method meta-information to DID
+     * @param args
+     * @returns this
      */
-    private buildDid(): string {
-        const methodNetwork = [this.getMethod().toString(), this.network].join(DidSyntax.DID_METHOD_SEPARATOR);
+    async addVerificaitonMethod(args: {
+        id: string;
+        type: VerificationMethodSupportedKeyType;
+        controller: string;
+        publicKey: PublicKey;
+    }) {
+        if (!this.privateKey) {
+            throw new Error("privateKey is missing");
+        }
 
-        let ret: string;
-        ret =
-            DidSyntax.DID_PREFIX +
-            DidSyntax.DID_METHOD_SEPARATOR +
-            methodNetwork +
-            DidSyntax.DID_METHOD_SEPARATOR +
-            this.idString +
-            DidSyntax.DID_TOPIC_SEPARATOR +
-            this.didTopicId.toString();
+        if (!this.client) {
+            throw new Error("Client configuration is missing");
+        }
 
-        return ret;
+        if (!args) {
+            throw new Error("Verification Method args are missing");
+        }
+
+        if (!args.id || !args.type || !args.controller || !args.publicKey) {
+            throw new Error("Verification Method args are missing");
+        }
+
+        /**
+         * Build create Service message
+         */
+        const event = new HcsDidVerificationMethodEvent(args.id, args.type, args.controller, args.publicKey);
+        await this.submitTransaciton(DidMethodOperation.CREATE, event, this.privateKey);
+
+        return this;
     }
 
     /**
-     * Constructs an id-string of a DID from a given public key.
-     *
-     * @param didRootKey Public Key from which the DID is created.
-     * @return The id-string of a DID that is a Base58-encoded SHA-256 hash of a given public key.
+     * Add a Verification Relationship to DID
+     * @param args
+     * @returns this
      */
-    public static publicKeyToIdString(didRootKey: PublicKey): string {
-        return Hashing.multibase.encode(Hashing.sha256.digest(didRootKey.toBytes()));
+    async addVerificaitonRelationship(args: {
+        id: string;
+        relationshipType: VerificationRelationshipType;
+        type: VerificationRelationshipSupportedKeyType;
+        controller: string;
+        publicKey: PublicKey;
+    }) {
+        if (!this.privateKey) {
+            throw new Error("privateKey is missing");
+        }
+
+        if (!this.client) {
+            throw new Error("Client configuration is missing");
+        }
+
+        if (!args) {
+            throw new Error("Verification Relationship args are missing");
+        }
+
+        if (!args.id || !args.relationshipType || !args.type || !args.controller || !args.publicKey) {
+            throw new Error("Verification Relationship args are missing");
+        }
+
+        /**
+         * Build create Service message
+         */
+        const event = new HcsDidVerificationRelationshipEvent(
+            args.id,
+            args.relationshipType,
+            args.type,
+            args.controller,
+            args.publicKey
+        );
+        await this.submitTransaciton(DidMethodOperation.CREATE, event, this.privateKey);
+
+        return this;
     }
 
     /**
-     * Returns a private key of DID root key.
-     * This is only available if it was provided during {@link HcsDid} construction.
-     *
-     * @return The private key of DID root key.
+     * Submit Message Transaciton to Hashgraph
      */
-    public getPrivateDidRootKey(): PrivateKey {
-        return this.privateDidRootKey;
-    }
+    private async submitTransaciton(
+        didMethodOperation: DidMethodOperation,
+        event: HcsDidEvent,
+        privateKey: PrivateKey
+    ) {
+        const message = new HcsDidMessage(didMethodOperation, this.getIdentifier(), event);
+        const envelope = new MessageEnvelope(message);
 
-    /**
-     * Returns a public key of DID root key.
-     * This is only available if it was provided during {@link HcsDid} construction.
-     *
-     * @return The private key of DID root key.
-     */
-    public getPublicDidRootKey(): PublicKey {
-        return this.didRootKey;
+        const transaction = new HcsDidTransaction(envelope, this.getTopicId());
+        new Promise((resolve, reject) => {
+            transaction
+                .signMessage((msg) => privateKey.sign(msg))
+                .buildAndSignTransaction((tx) => tx.setMaxTransactionFee(HcsDid.TRANSACTION_FEE))
+                .onMessageConfirmed((msg) => {
+                    console.log("Message Published");
+                    console.log(
+                        `Explor on dragonglass: https://testnet.dragonglass.me/hedera/topics/${this.getTopicId()}`
+                    );
+                    resolve(msg);
+                })
+                .execute(this.client);
+        });
     }
 }
