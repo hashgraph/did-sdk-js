@@ -1,13 +1,12 @@
 import { PublicKey } from "@hashgraph/sdk";
 import { Hashing } from "../../../..";
-import { DidDocumentBase } from "../../../did-document-base";
 import { HcsDidEvent } from "./hcs-did-event";
 import { HcsDidEventName } from "./hcs-did-event-name";
 
 export class HcsDidDidOwnerEvent extends HcsDidEvent {
     public static KEY_TYPE = "Ed25519VerificationKey2018";
 
-    protected readonly name = HcsDidEventName.DID_OWNER;
+    public readonly name = HcsDidEventName.DID_OWNER;
 
     protected id: string;
     protected type = HcsDidDidOwnerEvent.KEY_TYPE;
@@ -63,16 +62,5 @@ export class HcsDidDidOwnerEvent extends HcsDidEvent {
     static fromJsonTree(tree: any): HcsDidDidOwnerEvent {
         const publicKey = PublicKey.fromBytes(Hashing.multibase.decode(tree.publicKeyMultibase));
         return new HcsDidDidOwnerEvent(tree.id, tree.controller, publicKey);
-    }
-
-    process(didDoc: DidDocumentBase): DidDocumentBase {
-        didDoc.addOwner({
-            id: this.getId() + "#did-root-key",
-            type: this.getType(),
-            controller: this.getController(),
-            publicKeyMultibase: this.getPublicKeyMultibase(),
-        });
-
-        return didDoc;
     }
 }
