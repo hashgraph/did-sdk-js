@@ -344,7 +344,101 @@ describe("HcsDid", function () {
             await (
                 await did.register()
             ).addVerificaitonMethod({
-                id: "did:hedera:testnet:z6Mkkcn1EDXc5vzpmvnQeCKpEswyrnQG7qq59k92gFRm1EGk_0.0.29617801#public-key-0",
+                id: newVerificaitonDid,
+                type: "Ed25519VerificationKey2018",
+                controller: did.getIdentifier(),
+                publicKey,
+            });
+
+            /**
+             *  wait for 9s so DIDOwner and VerificationMethod event to be propogated to mirror node
+             */
+            await new Promise((resolve) => setTimeout(resolve, 9000));
+
+            console.log(`${did.getIdentifier()}`);
+            console.log(`https://testnet.dragonglass.me/hedera/topics/${did.getTopicId().toString()}`);
+
+            const messages = [];
+
+            new TopicMessageQuery()
+                .setTopicId(did.getTopicId())
+                .setStartTime(new Timestamp(0, 0))
+                .setEndTime(Timestamp.fromDate(new Date()))
+                .subscribe(client, (msg) => {
+                    messages.push(msg);
+                });
+
+            /**
+             * wait for 3s and assume all messages were read
+             */
+            await new Promise((resolve) => setTimeout(resolve, 3000));
+
+            // DIDOwner and VerificationMethod event
+            assert.equal(messages.length, 2);
+        }).timeout(60000);
+    });
+
+    describe("Add VerificationMethod Relationship meta-information", async () => {
+        let client;
+
+        before(async () => {
+            const operatorId = AccountId.fromString(OPERATOR_ID);
+            const operatorKey = PrivateKey.fromString(OPERATOR_KEY);
+            client = Client.forTestnet();
+            client.setMirrorNetwork(["hcs." + NETWORK + ".mirrornode.hedera.com:5600"]);
+            client.setOperator(operatorId, operatorKey);
+        });
+
+        it("throws error if privatekey is missing", async () => {
+            const identifier = "did:hedera:testnet:z6MkgUv5CvjRP6AsvEYqSRN7djB6p4zK9bcMQ93g5yK6Td7N_0.0.29613327";
+            const did = new HcsDid({ identifier });
+
+            try {
+                await did.verificationMethod({});
+            } catch (err) {
+                assert.instanceOf(err, Error);
+                assert.equal(err.message, "privateKey is missing");
+            }
+        });
+
+        it("throws error if client configuration is missing", async () => {
+            const privateKey = PrivateKey.generate();
+            const did = new HcsDid({ privateKey });
+
+            try {
+                await did.addVerificaitonMethod({});
+            } catch (err) {
+                assert.instanceOf(err, Error);
+                assert.equal(err.message, "Client configuration is missing");
+            }
+        });
+
+        it("throws error if Verification Relationship arguments are missing", async () => {
+            const privateKey = PrivateKey.generate();
+            const did = new HcsDid({ privateKey, client });
+
+            try {
+                await did.addVerificaitonRelationship();
+            } catch (err) {
+                assert.instanceOf(err, Error);
+                assert.equal(err.message, "Verification Relationship args are missing");
+            }
+        });
+
+        it("publish a new VerificationRelationship message", async () => {
+            const privateKey = PrivateKey.fromString(OPERATOR_KEY);
+            const did = new HcsDid({ privateKey, client });
+
+            //new verificaiton DID and publickey
+            const newVerificaitonDid =
+                "did:hedera:testnet:z6Mkkcn1EDXc5vzpmvnQeCKpEswyrnQG7qq59k92gFRm1EGk_0.0.29617801#delegate-key1";
+            const publicKey = HcsDid.stringToPublicKey("z6Mkkcn1EDXc5vzpmvnQeCKpEswyrnQG7qq59k92gFRm1EGk");
+
+            await (
+                await did.register()
+            ).addVerificaitonRelationship({
+                id: newVerificaitonDid,
+                relationshipType: "authentication",
                 type: "Ed25519VerificationKey2018",
                 controller: did.getIdentifier(),
                 publicKey,
