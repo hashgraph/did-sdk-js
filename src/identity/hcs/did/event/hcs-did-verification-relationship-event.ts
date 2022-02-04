@@ -1,5 +1,5 @@
 import { PublicKey } from "@hashgraph/sdk";
-import { DidDocumentBase, Hashing } from "../../../..";
+import { Hashing } from "../../../..";
 import { HcsDidEvent } from "./hcs-did-event";
 import { HcsDidEventName } from "./hcs-did-event-name";
 
@@ -13,7 +13,7 @@ export type VerificationRelationshipType =
 export type VerificationRelationshipSupportedKeyType = "Ed25519VerificationKey2018";
 
 export class HcsDidVerificationRelationshipEvent extends HcsDidEvent {
-    protected readonly name = HcsDidEventName.VERIFICATION_RELATIONSHIP;
+    public readonly name = HcsDidEventName.VERIFICATION_RELATIONSHIP;
 
     protected id: string;
     protected type: VerificationRelationshipSupportedKeyType = "Ed25519VerificationKey2018";
@@ -89,10 +89,5 @@ export class HcsDidVerificationRelationshipEvent extends HcsDidEvent {
             tree.controller,
             publicKey
         );
-    }
-
-    // TODO: apply verification method event
-    process(didDoc: DidDocumentBase): DidDocumentBase {
-        throw new Error("Method not implemented.");
     }
 }

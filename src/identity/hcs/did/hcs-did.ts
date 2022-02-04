@@ -106,12 +106,7 @@ export class HcsDid {
                 .setTimeout(3000)
                 .whenFinished((messages) => {
                     this.messages = messages;
-                    resolve(
-                        this.messages.reduce(
-                            (doc, msg) => msg.getEvent().process(doc),
-                            new DidDocumentBase(this.identifier)
-                        )
-                    );
+                    resolve(new DidDocumentBase(this.identifier, this.messages));
                 })
                 .onError((err) => {
                     console.log(err);
