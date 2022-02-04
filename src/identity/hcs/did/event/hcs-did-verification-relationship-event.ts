@@ -10,13 +10,13 @@ export type VerificationRelationshipType =
     | "capabilityInvocation"
     | "capabilityDelegation";
 
-export class HcsDidVerificationRelationshipEvent extends HcsDidEvent {
-    public static KEY_TYPE = "Ed25519VerificationKey2018";
+export type VerificationRelationshipSupportedKeyType = "Ed25519VerificationKey2018";
 
+export class HcsDidVerificationRelationshipEvent extends HcsDidEvent {
     protected readonly name = HcsDidEventName.VERIFICATION_RELATIONSHIP;
 
     protected id: string;
-    protected type = HcsDidVerificationRelationshipEvent.KEY_TYPE;
+    protected type: VerificationRelationshipSupportedKeyType = "Ed25519VerificationKey2018";
     protected relationshipType: VerificationRelationshipType;
     protected controller: string;
     protected publicKey: PublicKey;
@@ -24,10 +24,17 @@ export class HcsDidVerificationRelationshipEvent extends HcsDidEvent {
     /**
      * TODO: I guess controller param is not necessary and can be derived from the publicKey, right?
      */
-    constructor(id: string, relationshipType: VerificationRelationshipType, controller: string, publicKey: PublicKey) {
+    constructor(
+        id: string,
+        relationshipType: VerificationRelationshipType,
+        type: VerificationRelationshipSupportedKeyType,
+        controller: string,
+        publicKey: PublicKey
+    ) {
         super();
 
         this.id = id;
+        this.type = type;
         this.relationshipType = relationshipType;
         this.controller = controller;
         this.publicKey = publicKey;
@@ -75,7 +82,13 @@ export class HcsDidVerificationRelationshipEvent extends HcsDidEvent {
 
     static fromJsonTree(tree: any): HcsDidVerificationRelationshipEvent {
         const publicKey = PublicKey.fromBytes(Hashing.multibase.decode(tree.publicKeyMultibase));
-        return new HcsDidVerificationRelationshipEvent(tree.id, tree.relationshipType, tree.controller, publicKey);
+        return new HcsDidVerificationRelationshipEvent(
+            tree.id,
+            tree.relationshipType,
+            tree.type,
+            tree.controller,
+            publicKey
+        );
     }
 
     // TODO: apply verification method event
