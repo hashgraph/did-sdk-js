@@ -10,7 +10,7 @@ const NETWORK = "testnet";
 // hedera, kabuto (note kabuto not available on previewnet)
 const MIRROR_PROVIDER = "hedera";
 
-describe("HcsDid", function () {
+describe("HcsDid", () => {
     describe("#constructor", () => {
         it("throws error because of missing identifier and privateKey", () => {
             expect(() => new HcsDid({})).toThrowError(new Error("identifier and privateKey cannot both be empty"));
