@@ -7,9 +7,6 @@ export class DidDocument {
     private id: string;
     private context: string;
 
-    private keyId = 0;
-    private serviceId = 0;
-
     private owners: Map<string, any> = new Map();
     private services: Map<string, any> = new Map();
     private verificationMethods: Map<string, any> = new Map();
@@ -105,27 +102,40 @@ export class DidDocument {
 
         switch (event.name) {
             case HcsDidEventName.DID_OWNER:
-                this.owners.set(event.getId() + "#did-root-key", {
-                    id: event.getId() + "#did-root-key",
+                if (this.owners.has(event.getId())) {
+                    console.warn(`Duplicate create DIDOwner event ID: ${event.getId()}. Event will be ignored...`);
+                    return;
+                }
+
+                this.owners.set(event.getId(), {
+                    id: event.getId(),
                     type: (event as any).getType(),
                     controller: (event as any).getController(),
                     publicKeyMultibase: (event as any).getPublicKeyMultibase(),
                 });
                 return;
             case HcsDidEventName.SERVICE:
-                const serviceIdPostfix = `#service-${++this.serviceId}`;
+                if (this.services.has(event.getId())) {
+                    console.warn(`Duplicate create Service event ID: ${event.getId()}. Event will be ignored...`);
+                    return;
+                }
 
-                this.services.set(event.getId() + serviceIdPostfix, {
-                    id: event.getId() + serviceIdPostfix,
+                this.services.set(event.getId(), {
+                    id: event.getId(),
                     type: (event as any).getType(),
                     serviceEndpoint: (event as any).getServiceEndpoint(),
                 });
                 return;
             case HcsDidEventName.VERIFICATION_METHOD:
-                const methodPostfix = `#key-${++this.keyId}`;
+                if (this.verificationMethods.has(event.getId())) {
+                    console.warn(
+                        `Duplicate create VerificationMethod event ID: ${event.getId()}. Event will be ignored...`
+                    );
+                    return;
+                }
 
-                this.verificationMethods.set(event.getId() + methodPostfix, {
-                    id: event.getId() + methodPostfix,
+                this.verificationMethods.set(event.getId(), {
+                    id: event.getId(),
                     type: (event as any).getType(),
                     controller: (event as any).getController(),
                     publicKeyMultibase: (event as any).getPublicKeyMultibase(),
@@ -135,15 +145,27 @@ export class DidDocument {
                 const type = (event as any).getRelationshipType();
 
                 if (this.verificationRelationships[type]) {
-                    const relationshipPostfix = `#key-${++this.keyId}`;
+                    if (this.verificationRelationships[type].includes(event.getId())) {
+                        console.warn(
+                            `Duplicate create VerificationRelationship event ID: ${event.getId()}. Event will be ignored...`
+                        );
+                        return;
+                    }
 
-                    this.verificationRelationships[type].push(event.getId() + relationshipPostfix);
-                    this.verificationMethods.set(event.getId() + relationshipPostfix, {
-                        id: event.getId() + relationshipPostfix,
-                        type: (event as any).getType(),
-                        controller: (event as any).getController(),
-                        publicKeyMultibase: (event as any).getPublicKeyMultibase(),
-                    });
+                    this.verificationRelationships[type].push(event.getId());
+
+                    if (!this.verificationMethods.has(event.getId())) {
+                        this.verificationMethods.set(event.getId(), {
+                            id: event.getId(),
+                            type: (event as any).getType(),
+                            controller: (event as any).getController(),
+                            publicKeyMultibase: (event as any).getPublicKeyMultibase(),
+                        });
+                    }
+                } else {
+                    console.warn(
+                        `Create verificationRelationship event with type ${type} is not supported. Event will be ignored...`
+                    );
                 }
                 return;
             default:

@@ -18,7 +18,11 @@ async function main() {
     /**
      * Build create Service message
      */
-    did.addService({ id: did.getIdentifier(), type: "LinkedDomains", serviceEndpoint: "https://test.meeco.me/vcs" });
+    did.addService({
+        id: did.getIdentifier() + "#service-1",
+        type: "LinkedDomains",
+        serviceEndpoint: "https://test.meeco.me/vcs",
+    });
 }
 
 main();
