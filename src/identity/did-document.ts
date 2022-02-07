@@ -100,6 +100,7 @@ export class DidDocument {
                     return;
                 case DidMethodOperation.REVOKE:
                     this.processRevokeMessage(msg);
+                    return;
                 default:
                     /**
                      * TODO: for debugging - later we should probably try to ignore such messages
@@ -296,7 +297,7 @@ export class DidDocument {
                 const type = (event as any).getRelationshipType();
 
                 if (this.verificationRelationships[type]) {
-                    if (this.verificationRelationships[type].includes(event.getId())) {
+                    if (!this.verificationRelationships[type].includes(event.getId())) {
                         console.warn(
                             `Revoke VerificationRelationship event: verificationRelationship with ID: ${event.getId()}. Event will be ignored...`
                         );
