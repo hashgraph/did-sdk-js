@@ -1,4 +1,4 @@
-import { DidDocumentBase } from "./identity/did-document-base";
+import { DidDocumentBuilder } from "./identity/did-document-builder";
 import { DidDocumentJsonProperties } from "./identity/did-document-json-properties";
 import { DidMethodOperation } from "./identity/did-method-operation";
 import { DidParser } from "./identity/did-parser";
@@ -9,7 +9,7 @@ import { HcsDidVerificationMethodEvent } from "./identity/hcs/did/event/hcs-did-
 import { HcsDidVerificationRelationshipEvent } from "./identity/hcs/did/event/hcs-did-verification-relationship-event";
 import { HcsDid } from "./identity/hcs/did/hcs-did";
 import { HcsDidMessage } from "./identity/hcs/did/hcs-did-message";
-import { HcsDidResolver } from "./identity/hcs/did/hcs-did-resolver";
+import { HcsDidEventMessageResolver } from "./identity/hcs/did/hcs-did-event-message-resolver";
 import { HcsDidTopicListener } from "./identity/hcs/did/hcs-did-topic-listener";
 import { HcsDidTransaction } from "./identity/hcs/did/hcs-did-transaction";
 import { JsonClass } from "./identity/hcs/json-class";
@@ -19,7 +19,6 @@ import { MessageListener } from "./identity/hcs/message-listener";
 import { MessageMode } from "./identity/hcs/message-mode";
 import { MessageTransaction } from "./identity/hcs/message-transaction";
 import { SerializableMirrorConsensusResponse } from "./identity/hcs/serializable-mirror-consensus-response";
-import { HederaDid } from "./identity/hedera-did";
 import { ArraysUtils } from "./utils/arrays-utils";
 import { Ed25519PubCodec } from "./utils/ed25519PubCodec";
 import { Hashing } from "./utils/hashing";
@@ -28,7 +27,7 @@ import { Validator } from "./utils/validator";
 
 export {
     ArraysUtils,
-    DidDocumentBase,
+    DidDocumentBuilder,
     DidDocumentJsonProperties,
     DidMethodOperation,
     DidParser,
@@ -36,14 +35,13 @@ export {
     Hashing,
     HcsDid,
     HcsDidMessage,
-    HcsDidResolver,
+    HcsDidEventMessageResolver,
     HcsDidTopicListener,
     HcsDidTransaction,
     HcsDidDidOwnerEvent,
     HcsDidServiceEvent,
     HcsDidVerificationMethodEvent,
     HcsDidVerificationRelationshipEvent,
-    HederaDid,
     JsonClass,
     Message,
     MessageEnvelope,
