@@ -4,7 +4,6 @@ import Long from "long";
 import { ArraysUtils } from "../../utils/arrays-utils";
 import { JsonClass } from "./json-class";
 import { Message } from "./message";
-import { MessageMode } from "./message-mode";
 import { SerializableMirrorConsensusResponse } from "./serializable-mirror-consensus-response";
 
 export type PublicKeyProvider<T extends Message> = (evn: MessageEnvelope<T>) => PublicKey;
@@ -19,7 +18,6 @@ export class MessageEnvelope<T extends Message> {
 
     private static serialVersionUID = Long.fromInt(1);
 
-    protected mode: MessageMode;
     protected message: T;
     protected signature: string;
 
@@ -46,7 +44,6 @@ export class MessageEnvelope<T extends Message> {
             const [message] = args;
 
             this.message = message;
-            this.mode = MessageMode.PLAIN;
         } else {
             throw new Error("Wrong arguments passed to constructor");
         }
@@ -76,7 +73,6 @@ export class MessageEnvelope<T extends Message> {
 
     public toJsonTree(): any {
         const result: any = {};
-        result.mode = this.mode;
         if (this.message) {
             result[MessageEnvelope.MESSAGE_KEY] = this.message.toJsonTree();
         }
@@ -126,7 +122,6 @@ export class MessageEnvelope<T extends Message> {
     public static fromJson<U extends Message>(json: string, messageClass: JsonClass<U>): MessageEnvelope<U> {
         const result = new MessageEnvelope<U>();
         const root = JSON.parse(json);
-        result.mode = root.mode;
         result.signature = root[MessageEnvelope.SIGNATURE_KEY];
         if (root.hasOwnProperty(MessageEnvelope.MESSAGE_KEY)) {
             result.message = messageClass.fromJsonTree(root[MessageEnvelope.MESSAGE_KEY]);
@@ -191,10 +186,6 @@ export class MessageEnvelope<T extends Message> {
 
     public getConsensusTimestamp(): Timestamp {
         return !this.mirrorResponse ? null : this.mirrorResponse.consensusTimestamp;
-    }
-
-    public getMode(): MessageMode {
-        return this.mode;
     }
 
     public getMirrorResponse(): SerializableMirrorConsensusResponse {

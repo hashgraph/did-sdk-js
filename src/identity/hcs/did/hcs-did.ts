@@ -1,6 +1,6 @@
 import { Client, Hbar, PrivateKey, PublicKey, Timestamp, TopicCreateTransaction, TopicId } from "@hashgraph/sdk";
 import {
-    DidDocumentBuilder,
+    DidDocument,
     DidMethodOperation,
     Hashing,
     HcsDidDidOwnerEvent,
@@ -107,7 +107,7 @@ export class HcsDid {
                 .setTimeout(3000)
                 .whenFinished((messages) => {
                     this.messages = messages;
-                    resolve(new DidDocumentBuilder(this.identifier, this.messages));
+                    resolve(new DidDocument(this.identifier, this.messages));
                 })
                 .onError((err) => {
                     console.log(err);
@@ -143,8 +143,8 @@ export class HcsDid {
      * @param args
      * @returns this
      */
-    public async addService(args: { id: string; type: ServiceTypes; serviceEndpoint: string }) {
-        return await this.AddUpdateRevokeService(args, DidMethodOperation.CREATE);
+    public addService(args: { id: string; type: ServiceTypes; serviceEndpoint: string }) {
+        return this.addUpdateRevokeService(args, DidMethodOperation.CREATE);
     }
 
     /**
@@ -152,8 +152,8 @@ export class HcsDid {
      * @param args
      * @returns this
      */
-    public async updateService(args: { id: string; type: ServiceTypes; serviceEndpoint: string }) {
-        return await this.AddUpdateRevokeService(args, DidMethodOperation.UPDATE);
+    public updateService(args: { id: string; type: ServiceTypes; serviceEndpoint: string }) {
+        return this.addUpdateRevokeService(args, DidMethodOperation.UPDATE);
     }
 
     /**
@@ -161,8 +161,8 @@ export class HcsDid {
      * @param args
      * @returns this
      */
-    public async revokeService(args: { id: string; type: ServiceTypes; serviceEndpoint: string }) {
-        return await this.AddUpdateRevokeService(args, DidMethodOperation.REVOKE);
+    public revokeService(args: { id: string; type: ServiceTypes; serviceEndpoint: string }) {
+        return this.addUpdateRevokeService(args, DidMethodOperation.REVOKE);
     }
 
     /**
@@ -170,13 +170,13 @@ export class HcsDid {
      * @param args
      * @returns this
      */
-    public async addVerificaitonMethod(args: {
+    public addVerificaitonMethod(args: {
         id: string;
         type: VerificationMethodSupportedKeyType;
         controller: string;
         publicKey: PublicKey;
     }) {
-        return await this.AddUpdateRevokeVerificationMethod(args, DidMethodOperation.CREATE);
+        return this.addUpdateRevokeVerificationMethod(args, DidMethodOperation.CREATE);
     }
 
     /**
@@ -184,13 +184,13 @@ export class HcsDid {
      * @param args
      * @returns this
      */
-    public async updateVerificaitonMethod(args: {
+    public updateVerificaitonMethod(args: {
         id: string;
         type: VerificationMethodSupportedKeyType;
         controller: string;
         publicKey: PublicKey;
     }) {
-        return await this.AddUpdateRevokeVerificationMethod(args, DidMethodOperation.UPDATE);
+        return this.addUpdateRevokeVerificationMethod(args, DidMethodOperation.UPDATE);
     }
 
     /**
@@ -198,13 +198,13 @@ export class HcsDid {
      * @param args
      * @returns this
      */
-    public async revokeVerificaitonMethod(args: {
+    public revokeVerificaitonMethod(args: {
         id: string;
         type: VerificationMethodSupportedKeyType;
         controller: string;
         publicKey: PublicKey;
     }) {
-        return await this.AddUpdateRevokeVerificationMethod(args, DidMethodOperation.REVOKE);
+        return this.addUpdateRevokeVerificationMethod(args, DidMethodOperation.REVOKE);
     }
 
     /**
@@ -212,14 +212,14 @@ export class HcsDid {
      * @param args
      * @returns this
      */
-    public async addVerificaitonRelationship(args: {
+    public addVerificaitonRelationship(args: {
         id: string;
         relationshipType: VerificationRelationshipType;
         type: VerificationRelationshipSupportedKeyType;
         controller: string;
         publicKey: PublicKey;
     }) {
-        return await this.AddUpdateRevokeVerificationRelationship(args, DidMethodOperation.CREATE);
+        return this.addUpdateRevokeVerificationRelationship(args, DidMethodOperation.CREATE);
     }
 
     /**
@@ -227,14 +227,14 @@ export class HcsDid {
      * @param args
      * @returns this
      */
-    public async updateVerificaitonRelationship(args: {
+    public updateVerificaitonRelationship(args: {
         id: string;
         relationshipType: VerificationRelationshipType;
         type: VerificationRelationshipSupportedKeyType;
         controller: string;
         publicKey: PublicKey;
     }) {
-        return await this.AddUpdateRevokeVerificationRelationship(args, DidMethodOperation.UPDATE);
+        return this.addUpdateRevokeVerificationRelationship(args, DidMethodOperation.UPDATE);
     }
 
     /**
@@ -242,14 +242,14 @@ export class HcsDid {
      * @param args
      * @returns this
      */
-    public async revokeVerificaitonRelationship(args: {
+    public revokeVerificaitonRelationship(args: {
         id: string;
         relationshipType: VerificationRelationshipType;
         type: VerificationRelationshipSupportedKeyType;
         controller: string;
         publicKey: PublicKey;
     }) {
-        return await this.AddUpdateRevokeVerificationRelationship(args, DidMethodOperation.REVOKE);
+        return this.addUpdateRevokeVerificationRelationship(args, DidMethodOperation.REVOKE);
     }
 
     /**
@@ -357,7 +357,7 @@ export class HcsDid {
      * @param didMethodOperation
      * @returns this
      */
-    private async AddUpdateRevokeService(
+    private async addUpdateRevokeService(
         args: { id: string; type: ServiceTypes; serviceEndpoint: string },
         didMethodOperation: DidMethodOperation
     ) {
@@ -388,7 +388,7 @@ export class HcsDid {
      * @param didMethodOperation
      * @returns this
      */
-    private async AddUpdateRevokeVerificationMethod(
+    private async addUpdateRevokeVerificationMethod(
         args: { id: string; type: VerificationMethodSupportedKeyType; controller: string; publicKey: PublicKey },
         didMethodOperation: DidMethodOperation
     ) {
@@ -419,7 +419,7 @@ export class HcsDid {
      * @param didMethodOperation
      * @returns this
      */
-    private async AddUpdateRevokeVerificationRelationship(
+    private async addUpdateRevokeVerificationRelationship(
         args: {
             id: string;
             relationshipType: VerificationRelationshipType;

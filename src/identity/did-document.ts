@@ -3,7 +3,7 @@ import { DidDocumentJsonProperties } from "./did-document-json-properties";
 import { DidSyntax } from "./did-syntax";
 import { HcsDidEventName } from "./hcs/did/event/hcs-did-event-name";
 
-export class DidDocumentBuilder {
+export class DidDocument {
     private id: string;
     private context: string;
 
@@ -14,7 +14,7 @@ export class DidDocumentBuilder {
     private services: Map<string, any> = new Map();
     private verificationMethods: Map<string, any> = new Map();
 
-    private relationships = {
+    private verificationRelationships = {
         authentication: [],
         assertionMethod: [],
         keyAgreement: [],
@@ -50,27 +50,27 @@ export class DidDocumentBuilder {
 
         rootObject[DidDocumentJsonProperties.ASSERTION_METHOD] = [
             ...Array.from(this.owners.keys()),
-            ...this.relationships[DidDocumentJsonProperties.ASSERTION_METHOD],
+            ...this.verificationRelationships[DidDocumentJsonProperties.ASSERTION_METHOD],
         ];
 
         rootObject[DidDocumentJsonProperties.AUTHENTICATION] = [
             ...Array.from(this.owners.keys()),
-            ...this.relationships[DidDocumentJsonProperties.AUTHENTICATION],
+            ...this.verificationRelationships[DidDocumentJsonProperties.AUTHENTICATION],
         ];
 
-        if (this.relationships[DidDocumentJsonProperties.KEY_AGREEMENT].length > 0) {
+        if (this.verificationRelationships[DidDocumentJsonProperties.KEY_AGREEMENT].length > 0) {
             rootObject[DidDocumentJsonProperties.KEY_AGREEMENT] = [
-                ...this.relationships[DidDocumentJsonProperties.KEY_AGREEMENT],
+                ...this.verificationRelationships[DidDocumentJsonProperties.KEY_AGREEMENT],
             ];
         }
-        if (this.relationships[DidDocumentJsonProperties.CAPABILITY_INVOCATION].length > 0) {
+        if (this.verificationRelationships[DidDocumentJsonProperties.CAPABILITY_INVOCATION].length > 0) {
             rootObject[DidDocumentJsonProperties.CAPABILITY_INVOCATION] = [
-                ...this.relationships[DidDocumentJsonProperties.CAPABILITY_INVOCATION],
+                ...this.verificationRelationships[DidDocumentJsonProperties.CAPABILITY_INVOCATION],
             ];
         }
-        if (this.relationships[DidDocumentJsonProperties.CAPABILITY_DELEGATION].length > 0) {
+        if (this.verificationRelationships[DidDocumentJsonProperties.CAPABILITY_DELEGATION].length > 0) {
             rootObject[DidDocumentJsonProperties.CAPABILITY_DELEGATION] = [
-                ...this.relationships[DidDocumentJsonProperties.CAPABILITY_DELEGATION],
+                ...this.verificationRelationships[DidDocumentJsonProperties.CAPABILITY_DELEGATION],
             ];
         }
 
@@ -134,10 +134,10 @@ export class DidDocumentBuilder {
             case HcsDidEventName.VERIFICATION_RELATIONSHIP:
                 const type = (event as any).getRelationshipType();
 
-                if (this.relationships[type]) {
+                if (this.verificationRelationships[type]) {
                     const relationshipPostfix = `#key-${++this.keyId}`;
 
-                    this.relationships[type].push(event.getId() + relationshipPostfix);
+                    this.verificationRelationships[type].push(event.getId() + relationshipPostfix);
                     this.verificationMethods.set(event.getId() + relationshipPostfix, {
                         id: event.getId() + relationshipPostfix,
                         type: (event as any).getType(),
