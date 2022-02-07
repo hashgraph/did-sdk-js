@@ -1,11 +1,10 @@
-import { DidDocumentBase } from "../../../did-document-base";
 import { HcsDidEvent } from "./hcs-did-event";
 import { HcsDidEventName } from "./hcs-did-event-name";
 
 export type ServiceTypes = "LinkedDomains" | "DIDCommMessaging";
 
 export class HcsDidServiceEvent extends HcsDidEvent {
-    protected readonly name = HcsDidEventName.SERVICE;
+    public readonly name = HcsDidEventName.SERVICE;
 
     protected id: string;
     protected type: ServiceTypes;
@@ -50,14 +49,5 @@ export class HcsDidServiceEvent extends HcsDidEvent {
 
     static fromJsonTree(tree: any): HcsDidServiceEvent {
         return new HcsDidServiceEvent(tree.id, tree.type, tree.serviceEndpoint);
-    }
-
-    // TODO: apply service event
-    process(didDoc: DidDocumentBase): DidDocumentBase {
-        // add relevent service json properties to didDoc
-        if (didDoc.getServices().find((service) => service.getId() === this.getId())) return didDoc;
-
-        didDoc.addService(this);
-        return didDoc;
     }
 }
