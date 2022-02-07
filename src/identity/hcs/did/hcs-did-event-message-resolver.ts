@@ -8,9 +8,9 @@ import { HcsDidMessage } from "./hcs-did-message";
 import { HcsDidTopicListener } from "./hcs-did-topic-listener";
 
 /**
- * Resolves the DID from Hedera network.
+ * Resolves the DID Events from Hedera network.
  */
-export class HcsDidResolver {
+export class HcsDidEventMessageResolver {
     /**
      * Default time to wait before finishing resolution and after the last message was received.
      */
@@ -34,7 +34,7 @@ export class HcsDidResolver {
     constructor(topicId: TopicId) {
         this.topicId = topicId;
 
-        this.noMoreMessagesTimeout = HcsDidResolver.DEFAULT_TIMEOUT;
+        this.noMoreMessagesTimeout = HcsDidEventMessageResolver.DEFAULT_TIMEOUT;
         this.lastMessageArrivalTime = Long.fromInt(Date.now());
     }
 
@@ -106,7 +106,7 @@ export class HcsDidResolver {
      * @param handler The results handler.
      * @return This resolver instance.
      */
-    public whenFinished(handler: (input: HcsDidMessage[]) => void): HcsDidResolver {
+    public whenFinished(handler: (input: HcsDidMessage[]) => void): HcsDidEventMessageResolver {
         this.resultsHandler = handler;
         return this;
     }
@@ -117,7 +117,7 @@ export class HcsDidResolver {
      * @param handler The error handler.
      * @return This resolver instance.
      */
-    public onError(handler: (input: Error) => void): HcsDidResolver {
+    public onError(handler: (input: Error) => void): HcsDidEventMessageResolver {
         this.errorHandler = handler;
         return this;
     }
@@ -129,7 +129,7 @@ export class HcsDidResolver {
      * @param timeout The timeout in milliseconds to wait for new messages from the topic.
      * @return This resolver instance.
      */
-    public setTimeout(timeout: Long | number): HcsDidResolver {
+    public setTimeout(timeout: Long | number): HcsDidEventMessageResolver {
         this.noMoreMessagesTimeout = Long.fromValue(timeout);
         return this;
     }

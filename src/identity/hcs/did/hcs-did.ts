@@ -1,6 +1,6 @@
 import { Client, Hbar, PrivateKey, PublicKey, Timestamp, TopicCreateTransaction, TopicId } from "@hashgraph/sdk";
 import {
-    DidDocumentBase,
+    DidDocumentBuilder,
     DidMethodOperation,
     Hashing,
     HcsDidDidOwnerEvent,
@@ -22,7 +22,7 @@ import {
     VerificationRelationshipSupportedKeyType,
     VerificationRelationshipType,
 } from "./event/hcs-did-verification-relationship-event";
-import { HcsDidResolver } from "./hcs-did-resolver";
+import { HcsDidEventMessageResolver } from "./hcs-did-event-message-resolver";
 
 export class HcsDid {
     public static DID_METHOD = DidSyntax.Method.HEDERA_HCS;
@@ -103,11 +103,11 @@ export class HcsDid {
         }
 
         return new Promise((resolve, reject) => {
-            new HcsDidResolver(this.topicId)
+            new HcsDidEventMessageResolver(this.topicId)
                 .setTimeout(3000)
                 .whenFinished((messages) => {
                     this.messages = messages;
-                    resolve(new DidDocumentBase(this.identifier, this.messages));
+                    resolve(new DidDocumentBuilder(this.identifier, this.messages));
                 })
                 .onError((err) => {
                     console.log(err);
