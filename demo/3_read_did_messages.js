@@ -1,5 +1,5 @@
 const { Client } = require("@hashgraph/sdk");
-const { HcsDid, HcsDidResolver } = require("../dist");
+const { HcsDid, HcsDidEventMessageResolver } = require("../dist");
 const { TEST_DID_STR } = require("./config");
 
 async function main() {
@@ -16,7 +16,7 @@ async function main() {
     /**
      * Read DID resolver setup
      */
-    new HcsDidResolver(did.getTopicId())
+    new HcsDidEventMessageResolver(did.getTopicId())
         .setTimeout(3000)
         .whenFinished((messages) => {
             messages.forEach((msg) => {
