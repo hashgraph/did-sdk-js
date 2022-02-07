@@ -1,4 +1,5 @@
 import { Hashing } from "../../../..";
+import { HcsDidDeleteEvent } from "./hcs-did-delete-event";
 import { HcsDidDidOwnerEvent } from "./hcs-did-did-owner-event";
 import { HcsDidEvent } from "./hcs-did-event";
 import { HcsDidEventName } from "./hcs-did-event-name";
@@ -11,6 +12,7 @@ const EVENT_NAME_TO_CLASS = {
     [HcsDidEventName.SERVICE]: HcsDidServiceEvent,
     [HcsDidEventName.VERIFICATION_METHOD]: HcsDidVerificationMethodEvent,
     [HcsDidEventName.VERIFICATION_RELATIONSHIP]: HcsDidVerificationRelationshipEvent,
+    [HcsDidEventName.DELETE]: HcsDidDeleteEvent,
 };
 
 export class HcsDidEventParser {
