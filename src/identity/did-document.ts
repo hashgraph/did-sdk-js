@@ -1,4 +1,11 @@
-import { DidMethodOperation, HcsDidMessage } from "..";
+import {
+    DidMethodOperation,
+    HcsDidDidOwnerEvent,
+    HcsDidMessage,
+    HcsDidServiceEvent,
+    HcsDidVerificationMethodEvent,
+    HcsDidVerificationRelationshipEvent,
+} from "..";
 import { DidDocumentJsonProperties } from "./did-document-json-properties";
 import { DidSyntax } from "./did-syntax";
 import { HcsDidEventName } from "./hcs/did/event/hcs-did-event-name";
@@ -11,7 +18,7 @@ export class DidDocument {
     private services: Map<string, any> = new Map();
     private verificationMethods: Map<string, any> = new Map();
 
-    private verificationRelationships = {
+    private verificationRelationships: { [key: string]: string[] } = {
         authentication: [],
         assertionMethod: [],
         keyAgreement: [],
@@ -82,12 +89,17 @@ export class DidDocument {
         return JSON.stringify(this.toJsonTree());
     }
 
-    private processMessages(messages: HcsDidMessage[]) {
+    private processMessages(messages: HcsDidMessage[]): void {
         messages.forEach((msg) => {
             switch (msg.getOperation()) {
                 case DidMethodOperation.CREATE:
                     this.processCreateMessage(msg);
                     return;
+                case DidMethodOperation.UPDATE:
+                    this.processUpdateMessage(msg);
+                    return;
+                case DidMethodOperation.REVOKE:
+                    this.processRevokeMessage(msg);
                 default:
                     /**
                      * TODO: for debugging - later we should probably try to ignore such messages
@@ -97,7 +109,7 @@ export class DidDocument {
         });
     }
 
-    private processCreateMessage(message: HcsDidMessage) {
+    private processCreateMessage(message: HcsDidMessage): void {
         const event = message.getEvent();
 
         switch (event.name) {
@@ -109,9 +121,9 @@ export class DidDocument {
 
                 this.owners.set(event.getId(), {
                     id: event.getId(),
-                    type: (event as any).getType(),
-                    controller: (event as any).getController(),
-                    publicKeyMultibase: (event as any).getPublicKeyMultibase(),
+                    type: (event as HcsDidDidOwnerEvent).getType(),
+                    controller: (event as HcsDidDidOwnerEvent).getController(),
+                    publicKeyMultibase: (event as HcsDidDidOwnerEvent).getPublicKeyMultibase(),
                 });
                 return;
             case HcsDidEventName.SERVICE:
@@ -122,8 +134,8 @@ export class DidDocument {
 
                 this.services.set(event.getId(), {
                     id: event.getId(),
-                    type: (event as any).getType(),
-                    serviceEndpoint: (event as any).getServiceEndpoint(),
+                    type: (event as HcsDidServiceEvent).getType(),
+                    serviceEndpoint: (event as HcsDidServiceEvent).getServiceEndpoint(),
                 });
                 return;
             case HcsDidEventName.VERIFICATION_METHOD:
@@ -136,13 +148,13 @@ export class DidDocument {
 
                 this.verificationMethods.set(event.getId(), {
                     id: event.getId(),
-                    type: (event as any).getType(),
-                    controller: (event as any).getController(),
-                    publicKeyMultibase: (event as any).getPublicKeyMultibase(),
+                    type: (event as HcsDidVerificationMethodEvent).getType(),
+                    controller: (event as HcsDidVerificationMethodEvent).getController(),
+                    publicKeyMultibase: (event as HcsDidVerificationMethodEvent).getPublicKeyMultibase(),
                 });
                 return;
             case HcsDidEventName.VERIFICATION_RELATIONSHIP:
-                const type = (event as any).getRelationshipType();
+                const type = (event as HcsDidVerificationRelationshipEvent).getRelationshipType();
 
                 if (this.verificationRelationships[type]) {
                     if (this.verificationRelationships[type].includes(event.getId())) {
@@ -157,14 +169,154 @@ export class DidDocument {
                     if (!this.verificationMethods.has(event.getId())) {
                         this.verificationMethods.set(event.getId(), {
                             id: event.getId(),
-                            type: (event as any).getType(),
-                            controller: (event as any).getController(),
-                            publicKeyMultibase: (event as any).getPublicKeyMultibase(),
+                            type: (event as HcsDidVerificationRelationshipEvent).getType(),
+                            controller: (event as HcsDidVerificationRelationshipEvent).getController(),
+                            publicKeyMultibase: (event as HcsDidVerificationRelationshipEvent).getPublicKeyMultibase(),
                         });
                     }
                 } else {
                     console.warn(
                         `Create verificationRelationship event with type ${type} is not supported. Event will be ignored...`
+                    );
+                }
+                return;
+            default:
+                /**
+                 * TODO: for debugging - later we should probably try to ignore such messages
+                 */
+                throw new Error("Not supported event detected!");
+        }
+    }
+
+    private processUpdateMessage(message: HcsDidMessage): void {
+        const event = message.getEvent();
+
+        switch (event.name) {
+            case HcsDidEventName.DID_OWNER:
+                /**
+                 * TODO: we need to decide what DIDOwner operations are possible and how do they reflect on the resolved document.
+                 */
+                console.warn(`Update DidOwner event is not supported. Event will be ignored...`);
+                return;
+            case HcsDidEventName.SERVICE:
+                if (!this.services.has(event.getId())) {
+                    console.warn(
+                        `Update Service event: service with ID ${event.getId()} was not found in the document. Event will be ignored...`
+                    );
+                    return;
+                }
+                this.services.set(event.getId(), {
+                    id: event.getId(),
+                    type: (event as HcsDidServiceEvent).getType(),
+                    serviceEndpoint: (event as HcsDidServiceEvent).getServiceEndpoint(),
+                });
+                return;
+            case HcsDidEventName.VERIFICATION_METHOD:
+                if (!this.verificationMethods.has(event.getId())) {
+                    console.warn(
+                        `Update VerificationMethod event: verificationMethod with ID: ${event.getId()} was not found in the document. Event will be ignored...`
+                    );
+                    return;
+                }
+
+                this.verificationMethods.set(event.getId(), {
+                    id: event.getId(),
+                    type: (event as HcsDidVerificationMethodEvent).getType(),
+                    controller: (event as HcsDidVerificationMethodEvent).getController(),
+                    publicKeyMultibase: (event as HcsDidVerificationMethodEvent).getPublicKeyMultibase(),
+                });
+                return;
+            case HcsDidEventName.VERIFICATION_RELATIONSHIP:
+                const type = (event as any).getRelationshipType();
+
+                if (this.verificationRelationships[type]) {
+                    if (!this.verificationRelationships[type].includes(event.getId())) {
+                        console.warn(
+                            `Update VerificationRelationship event: veritificationRelationship with ID: ${event.getId()} was not found in the document.  Event will be ignored...`
+                        );
+                        return;
+                    }
+
+                    this.verificationMethods.set(event.getId(), {
+                        id: event.getId(),
+                        type: (event as any).getType(),
+                        controller: (event as any).getController(),
+                        publicKeyMultibase: (event as any).getPublicKeyMultibase(),
+                    });
+                } else {
+                    console.warn(
+                        `Update verificationRelationship event with type ${type} is not supported. Event will be ignored...`
+                    );
+                }
+                return;
+            default:
+                /**
+                 * TODO: for debugging - later we should probably try to ignore such messages
+                 */
+                throw new Error("Not supported event detected!");
+        }
+    }
+
+    private processRevokeMessage(message: HcsDidMessage): void {
+        const event = message.getEvent();
+
+        switch (event.name) {
+            case HcsDidEventName.DID_OWNER:
+                /**
+                 * TODO: we need to decide what DIDOwner operations are possible and how do they reflect on the resolved document.
+                 */
+                console.warn(`Revoke DidOwner event is not supported. Event will be ignored...`);
+                return;
+            case HcsDidEventName.SERVICE:
+                if (!this.services.has(event.getId())) {
+                    console.warn(`Revoke Service event: service event ID: ${event.getId()}. Event will be ignored...`);
+                    return;
+                }
+
+                this.services.delete(event.getId());
+                return;
+            case HcsDidEventName.VERIFICATION_METHOD:
+                if (!this.verificationMethods.has(event.getId())) {
+                    console.warn(
+                        `Revoke VerificationMethod event: verificationMethod with ID: ${event.getId()}. Event will be ignored...`
+                    );
+                    return;
+                }
+
+                this.verificationMethods.delete(event.getId());
+
+                Object.keys(this.verificationRelationships).forEach((relName) => {
+                    this.verificationRelationships[relName] = this.verificationRelationships[relName].filter(
+                        (id) => id !== event.getId()
+                    );
+                });
+
+                return;
+            case HcsDidEventName.VERIFICATION_RELATIONSHIP:
+                const type = (event as any).getRelationshipType();
+
+                if (this.verificationRelationships[type]) {
+                    if (this.verificationRelationships[type].includes(event.getId())) {
+                        console.warn(
+                            `Revoke VerificationRelationship event: verificationRelationship with ID: ${event.getId()}. Event will be ignored...`
+                        );
+                        return;
+                    }
+
+                    this.verificationRelationships[type] = this.verificationRelationships[type].filter(
+                        (id) => id !== event.getId()
+                    );
+
+                    const canRemoveVerificationMethod = Object.values(this.verificationRelationships).every(
+                        (rel) => !rel.includes(event.getId())
+                    );
+
+                    if (canRemoveVerificationMethod) {
+                        this.verificationMethods.delete(event.getId());
+                    }
+                } else {
+                    console.warn(
+                        `Revoke verificationRelationship event with type ${type} is not supported. Event will be ignored...`
                     );
                 }
                 return;
