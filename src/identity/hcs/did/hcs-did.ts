@@ -87,7 +87,11 @@ export class HcsDid {
         /**
          * Set ownership
          */
-        const event = new HcsDidDidOwnerEvent(this.identifier, this.identifier, this.privateKey.publicKey);
+        const event = new HcsDidDidOwnerEvent(
+            this.identifier + "#did-root-key",
+            this.identifier,
+            this.privateKey.publicKey
+        );
         await this.submitTransaciton(DidMethodOperation.CREATE, event, this.privateKey);
 
         return this;
@@ -351,6 +355,22 @@ export class HcsDid {
         }
     }
 
+    private isEventIdValid(eventId: string) {
+        const [identifer, id] = eventId.split("#");
+
+        if (!identifer || !id) {
+            return false;
+        }
+
+        this.parseIdentifier(identifer);
+
+        if (!/^(key|service)\-[0-9]{1,}$/.test(id)) {
+            return false;
+        }
+
+        return true;
+    }
+
     /**
      *
      * @param args
@@ -371,6 +391,10 @@ export class HcsDid {
 
         if (!args || !args.id || !args.type || !args.serviceEndpoint) {
             throw new Error("Service args are missing");
+        }
+
+        if (!this.isEventIdValid(args.id)) {
+            throw new Error("Event ID is invalid. Expected format: {did}#{key|service}-{integer}");
         }
 
         /**
@@ -402,6 +426,10 @@ export class HcsDid {
 
         if (!args || !args.id || !args.type || !args.controller || !args.publicKey) {
             throw new Error("Verification Method args are missing");
+        }
+
+        if (!this.isEventIdValid(args.id)) {
+            throw new Error("Event ID is invalid. Expected format: {did}#{key|service}-{integer}");
         }
 
         /**
@@ -439,6 +467,10 @@ export class HcsDid {
 
         if (!args || !args.id || !args.relationshipType || !args.type || !args.controller || !args.publicKey) {
             throw new Error("Verification Relationship args are missing");
+        }
+
+        if (!this.isEventIdValid(args.id)) {
+            throw new Error("Event ID is invalid. Expected format: {did}#{key|service}-{integer}");
         }
 
         /**
