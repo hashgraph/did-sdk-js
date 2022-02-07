@@ -1,9 +1,8 @@
 import { Client, Timestamp, TopicId, TopicMessage, TopicMessageQuery } from "@hashgraph/sdk";
 import SubscriptionHandle from "@hashgraph/sdk/lib/topic/SubscriptionHandle";
 import Long from "long";
-import { Decrypter, Message } from "./message";
+import { Message } from "./message";
 import { MessageEnvelope } from "./message-envelope";
-import { MessageMode } from "./message-mode";
 
 /**
  * A listener of confirmed messages from a HCS identity topic.
