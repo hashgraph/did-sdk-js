@@ -1,6 +1,5 @@
-import { AccountId, PrivateKey, Client, Timestamp, TopicMessageQuery } from "@hashgraph/sdk";
-
-import { HcsDid, Hashing } from "../../../dist";
+import { AccountId, Client, PrivateKey, Timestamp, TopicMessageQuery } from "@hashgraph/sdk";
+import { Hashing, HcsDid } from "../../../dist";
 
 const TOPIC_REGEXP = /^0\.0\.[0-9]{8,}/;
 const OPERATOR_ID = "0.0.12710106";
@@ -126,12 +125,9 @@ describe("HcsDid", function () {
             expect(did.getClient()).toEqual(client);
             expect(did.getNetwork()).toEqual("testnet");
 
-            /**
-             * TODO: FIX ME
-             */
-            // const messages = await readtTopicMessages(did.getTopicId(), client);
+            const messages = await readtTopicMessages(did.getTopicId(), client);
 
-            //  expect(messages.length).toEqual(1);
+            expect(messages.length).toEqual(1);
         });
     });
 
@@ -180,18 +176,19 @@ describe("HcsDid", function () {
             const newLocal: any = await did.resolve();
             const didDocument = newLocal.toJsonTree();
 
-            expect(didDocument["@context"]).toEqual("https://www.w3.org/ns/did/v1");
-            expect(didDocument["id"]).toEqual(did.getIdentifier());
-            expect(didDocument["assertionMethod"].length).toEqual(1);
-            expect(didDocument["assertionMethod"][0]).toEqual(`${did.getIdentifier()}#did-root-key`);
-            expect(didDocument["authentication"].length).toEqual(1);
-            expect(didDocument["authentication"][0]).toEqual(`${did.getIdentifier()}#did-root-key`);
-            expect(didDocument["verificationMethod"].length).toEqual(1);
-            expect(didDocument["verificationMethod"][0]).toStrictEqual({
-                id: `${did.getIdentifier()}#did-root-key`,
-                type: "Ed25519VerificationKey2018",
-                controller: did.getIdentifier(),
-                publicKeyMultibase: Hashing.multibase.encode(privateKey.publicKey.toBytes()),
+            expect(didDocument).toEqual({
+                "@context": "https://www.w3.org/ns/did/v1",
+                assertionMethod: [`${did.getIdentifier()}#did-root-key`],
+                authentication: [`${did.getIdentifier()}#did-root-key`],
+                id: did.getIdentifier(),
+                verificationMethod: [
+                    {
+                        controller: did.getIdentifier(),
+                        id: `${did.getIdentifier()}#did-root-key`,
+                        publicKeyMultibase: Hashing.multibase.encode(privateKey.publicKey.toBytes()),
+                        type: "Ed25519VerificationKey2018",
+                    },
+                ],
             });
         });
     });
@@ -215,7 +212,6 @@ describe("HcsDid", function () {
                 await did.addService(undefined);
             } catch (err) {
                 expect(err).toBeInstanceOf(Error);
-
                 expect(err.message).toEqual("privateKey is missing");
             }
         });
@@ -228,7 +224,6 @@ describe("HcsDid", function () {
                 await did.addService(undefined);
             } catch (err) {
                 expect(err).toBeInstanceOf(Error);
-
                 expect(err.message).toEqual("Client configuration is missing");
             }
         });
@@ -241,30 +236,41 @@ describe("HcsDid", function () {
                 await did.addService(undefined);
             } catch (err) {
                 expect(err).toBeInstanceOf(Error);
-
                 expect(err.message).toEqual("Service args are missing");
+            }
+        });
+
+        it("thorws error if event id is not valid", async () => {
+            const privateKey = PrivateKey.fromString(OPERATOR_KEY);
+            const did = new HcsDid({ privateKey, client });
+
+            try {
+                await did.register();
+                await did.addService({
+                    id: did.getIdentifier() + "#invalid-1",
+                    type: "LinkedDomains",
+                    serviceEndpoint: "https://test.meeco.me/vcs",
+                });
+            } catch (err) {
+                expect(err).toBeInstanceOf(Error);
+                expect(err.message).toEqual("Event ID is invalid. Expected format: {did}#{key|service}-{integer}");
             }
         });
 
         it("publish a new Service message", async () => {
             const privateKey = PrivateKey.fromString(OPERATOR_KEY);
             const did = new HcsDid({ privateKey, client });
-            await (
-                await did.register()
-            ).addService({
-                id: did.getIdentifier(),
+
+            await did.register();
+            await did.addService({
+                id: did.getIdentifier() + "#service-1",
                 type: "LinkedDomains",
                 serviceEndpoint: "https://test.meeco.me/vcs",
             });
 
-            /**
-             *  wait for 9s so didowner and service event to be propogated to mirror node
-             */
-            await new Promise((resolve) => setTimeout(resolve, 9000));
-
             console.log(`https://testnet.dragonglass.me/hedera/topics/${did.getTopicId().toString()}`);
 
-            const messages = await readtTopicMessages(did.getTopicId(), client);
+            const messages = await readtTopicMessages(did.getTopicId(), client, 15000);
 
             // DIDOwner and Service event
             expect(messages.length).toEqual(2);
@@ -437,7 +443,7 @@ describe("HcsDid", function () {
  * Test Helpers
  */
 
-async function readtTopicMessages(topicId, client) {
+async function readtTopicMessages(topicId, client, timeout = null) {
     const messages = [];
 
     new TopicMessageQuery()
@@ -451,7 +457,7 @@ async function readtTopicMessages(topicId, client) {
     /**
      * wait for READ_MESSAGES_TIMEOUT seconds and assume all messages were read
      */
-    await new Promise((resolve) => setTimeout(resolve, 60000));
+    await new Promise((resolve) => setTimeout(resolve, timeout || 6000));
 
     return messages;
 }
