@@ -3,7 +3,7 @@ import { DidDocumentJsonProperties } from "./did-document-json-properties";
 import { DidSyntax } from "./did-syntax";
 import { HcsDidEventName } from "./hcs/did/event/hcs-did-event-name";
 
-export class DidDocumentBase {
+export class DidDocumentBuilder {
     private id: string;
     private context: string;
 
