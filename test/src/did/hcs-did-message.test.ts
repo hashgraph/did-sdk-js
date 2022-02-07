@@ -1,14 +1,36 @@
-const { encrypt, decrypt } = require("../aes-encryption-util");
-const { TopicId, PrivateKey, Client } = require("@hashgraph/sdk");
-const { HcsDidMessage, MessageEnvelope, DidMethodOperation, HcsDid, ArraysUtils } = require("../../dist");
-
-const { assert } = require("chai");
+import crypto from "crypto";
+import { TopicId, PrivateKey, Client } from "@hashgraph/sdk";
+import { HcsDidMessage, MessageEnvelope, DidMethodOperation, HcsDid, ArraysUtils } from "../../../dist";
 
 const network = "testnet";
 const DID_TOPIC_ID1 = TopicId.fromString("0.0.2");
 const DID_TOPIC_ID2 = TopicId.fromString("0.0.3");
 
+const encrypt = (plainText, key) => {
+    const cipher = crypto.createCipheriv(
+        "aes-128-ecb",
+        crypto.createHash("sha256").update(String(key)).digest("base64").substr(0, 16),
+        null
+    );
+    return Buffer.concat([cipher.update(plainText, "utf8"), cipher.final()]).toString("base64");
+};
+
+const decrypt = (cipherText, key) => {
+    const cipher = crypto.createDecipheriv(
+        "aes-128-ecb",
+        crypto.createHash("sha256").update(String(key)).digest("base64").substr(0, 16),
+        null
+    );
+    return Buffer.concat([cipher.update(cipherText, "base64"), cipher.final()]).toString("utf8");
+};
+
+exports.encrypt = encrypt;
+exports.decrypt = decrypt;
+
 describe("HcsDidMessage", function () {
+    it("test", () => {
+        expect(true).toBeTruthy();
+    });
     // it("Test Valid Message", async function () {
     //     const client = Client.forTestnet();
     //     const privateKey = PrivateKey.generate();
