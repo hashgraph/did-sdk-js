@@ -84,14 +84,15 @@ describe("HcsDid", () => {
         });
 
         it("throws error if DID is already registered", async () => {
-            const identifier = "did:hedera:testnet:z6MkgUv5CvjRP6AsvEYqSRN7djB6p4zK9bcMQ93g5yK6Td7N_0.0.29613327";
-            const did = new HcsDid({ identifier });
+            const privateKey = PrivateKey.fromString(OPERATOR_KEY);
+            const did = new HcsDid({ privateKey, client });
+
+            await did.register();
 
             try {
                 await did.register();
             } catch (err) {
                 expect(err).toBeInstanceOf(Error);
-
                 expect(err.message).toEqual("DID is already registered");
             }
         });
@@ -129,6 +130,29 @@ describe("HcsDid", () => {
             const messages = await readtTopicMessages(did.getTopicId(), client);
 
             expect(messages.length).toEqual(1);
+        });
+
+        it("deletes DID document and registers it again without creating a new topic", async () => {
+            const privateKey = PrivateKey.fromString(OPERATOR_KEY);
+            const did = new HcsDid({ privateKey, client });
+
+            await did.register();
+            const topicId = did.getTopicId();
+
+            let messages = await readtTopicMessages(did.getTopicId(), client);
+            expect(messages.length).toEqual(1);
+
+            await did.delete();
+            expect(did.getTopicId()).toEqual(topicId);
+
+            messages = await readtTopicMessages(did.getTopicId(), client);
+            expect(messages.length).toEqual(2);
+
+            await did.register();
+            expect(did.getTopicId()).toEqual(topicId);
+
+            messages = await readtTopicMessages(did.getTopicId(), client);
+            expect(messages.length).toEqual(3);
         });
     });
 

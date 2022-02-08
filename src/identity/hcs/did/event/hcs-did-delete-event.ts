@@ -2,7 +2,7 @@ import { HcsDidEvent } from "./hcs-did-event";
 import { HcsDidEventName } from "./hcs-did-event-name";
 
 export class HcsDidDeleteEvent extends HcsDidEvent {
-    public readonly name = HcsDidEventName.DELETE;
+    public readonly name = HcsDidEventName.DID;
 
     constructor() {
         super();
@@ -13,13 +13,15 @@ export class HcsDidDeleteEvent extends HcsDidEvent {
     }
 
     public toJsonTree() {
-        return {
-            [this.name]: {},
-        };
+        return null;
     }
 
     public toJSON() {
         return JSON.stringify(this.toJsonTree());
+    }
+
+    public getBase64() {
+        return null;
     }
 
     static fromJsonTree(tree: any): HcsDidDeleteEvent {
