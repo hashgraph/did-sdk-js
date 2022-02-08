@@ -1,6 +1,5 @@
 import crypto from "crypto";
-import { TopicId, PrivateKey, Client } from "@hashgraph/sdk";
-import { HcsDidMessage, MessageEnvelope, DidMethodOperation, HcsDid, ArraysUtils } from "../../../dist";
+import { TopicId } from "@hashgraph/sdk";
 
 const network = "testnet";
 const DID_TOPIC_ID1 = TopicId.fromString("0.0.2");
