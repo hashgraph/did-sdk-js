@@ -4,6 +4,7 @@ import { DidMethodOperation } from "./identity/did-method-operation";
 import { DidParser } from "./identity/did-parser";
 import { DidSyntax } from "./identity/did-syntax";
 import { HcsDidDeleteEvent } from "./identity/hcs/did/event/document/hcs-did-delete-event";
+import { HcsDidEventTargetName } from "./identity/hcs/did/event/hcs-did-event-target-name";
 import { HcsDidCreateDidOwnerEvent } from "./identity/hcs/did/event/owner/hcs-did-create-did-owner-event";
 import { HcsDidCreateServiceEvent } from "./identity/hcs/did/event/service/hcs-did-create-service-event";
 import { HcsDidRevokeServiceEvent } from "./identity/hcs/did/event/service/hcs-did-revoke-service-event";
@@ -38,23 +39,25 @@ export {
     DidMethodOperation,
     DidParser,
     DidSyntax,
+    Ed25519PubCodec,
     Hashing,
     HcsDid,
-    HcsDidMessage,
+    HcsDidCreateDidOwnerEvent,
+    HcsDidCreateServiceEvent,
+    HcsDidCreateVerificationMethodEvent,
+    HcsDidCreateVerificationRelationshipEvent,
+    HcsDidDeleteEvent,
     HcsDidEventMessageResolver,
+    HcsDidEventTargetName,
+    HcsDidMessage,
+    HcsDidRevokeServiceEvent,
+    HcsDidRevokeVerificationMethodEvent,
+    HcsDidRevokeVerificationRelationshipEvent,
     HcsDidTopicListener,
     HcsDidTransaction,
-    HcsDidCreateDidOwnerEvent,
-    HcsDidDeleteEvent,
-    HcsDidCreateServiceEvent,
     HcsDidUpdateServiceEvent,
-    HcsDidRevokeServiceEvent,
-    HcsDidCreateVerificationMethodEvent,
     HcsDidUpdateVerificationMethodEvent,
-    HcsDidRevokeVerificationMethodEvent,
-    HcsDidCreateVerificationRelationshipEvent,
     HcsDidUpdateVerificationRelationshipEvent,
-    HcsDidRevokeVerificationRelationshipEvent,
     JsonClass,
     Message,
     MessageEnvelope,
@@ -63,5 +66,4 @@ export {
     SerializableMirrorConsensusResponse,
     TimestampUtils,
     Validator,
-    Ed25519PubCodec,
 };

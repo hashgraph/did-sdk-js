@@ -7,6 +7,7 @@ import {
     HcsDidCreateServiceEvent,
     HcsDidCreateVerificationMethodEvent,
     HcsDidCreateVerificationRelationshipEvent,
+    HcsDidDeleteEvent,
     HcsDidMessage,
 } from "../../dist";
 
@@ -54,6 +55,26 @@ describe("DidDocument", () => {
                         type: "Ed25519VerificationKey2018",
                     },
                 ],
+            });
+        });
+
+        it("handes DID delete event", () => {
+            const messages = [
+                new HcsDidMessage(
+                    DidMethodOperation.CREATE,
+                    identifier,
+                    new HcsDidCreateDidOwnerEvent(identifier + "#did-root-key", identifier, privateKey.publicKey)
+                ),
+                new HcsDidMessage(DidMethodOperation.DELETE, identifier, new HcsDidDeleteEvent()),
+            ];
+            const doc = new DidDocument(identifier, messages);
+
+            expect(doc.toJsonTree()).toEqual({
+                "@context": "https://www.w3.org/ns/did/v1",
+                assertionMethod: [],
+                authentication: [],
+                id: identifier,
+                verificationMethod: [],
             });
         });
 
