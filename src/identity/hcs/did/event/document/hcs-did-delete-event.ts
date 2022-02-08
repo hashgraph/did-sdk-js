@@ -1,8 +1,8 @@
-import { HcsDidEvent } from "./hcs-did-event";
-import { HcsDidEventName } from "./hcs-did-event-name";
+import { HcsDidEvent } from "../hcs-did-event";
+import { HcsDidEventTargetName } from "../hcs-did-event-target-name";
 
 export class HcsDidDeleteEvent extends HcsDidEvent {
-    public readonly name = HcsDidEventName.DID;
+    public readonly targetName = HcsDidEventTargetName.Document;
 
     constructor() {
         super();

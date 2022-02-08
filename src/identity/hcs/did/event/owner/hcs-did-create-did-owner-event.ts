@@ -1,12 +1,12 @@
 import { PublicKey } from "@hashgraph/sdk";
 import { Hashing } from "../../../../..";
 import { HcsDidEvent } from "../hcs-did-event";
-import { HcsDidEventName } from "../hcs-did-event-name";
+import { HcsDidEventTargetName } from "../hcs-did-event-target-name";
 
 export class HcsDidCreateDidOwnerEvent extends HcsDidEvent {
     public static KEY_TYPE = "Ed25519VerificationKey2018";
 
-    public readonly name = HcsDidEventName.DID_OWNER;
+    public readonly targetName = HcsDidEventTargetName.DID_OWNER;
 
     protected id: string;
     protected type = HcsDidCreateDidOwnerEvent.KEY_TYPE;
@@ -46,7 +46,7 @@ export class HcsDidCreateDidOwnerEvent extends HcsDidEvent {
 
     public toJsonTree() {
         return {
-            [this.name]: {
+            [this.targetName]: {
                 id: this.getId(),
                 type: this.getType(),
                 controller: this.getController(),

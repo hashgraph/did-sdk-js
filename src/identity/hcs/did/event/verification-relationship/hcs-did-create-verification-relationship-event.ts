@@ -1,11 +1,11 @@
 import { PublicKey } from "@hashgraph/sdk";
 import { Hashing } from "../../../../..";
 import { HcsDidEvent } from "../hcs-did-event";
-import { HcsDidEventName } from "../hcs-did-event-name";
+import { HcsDidEventTargetName } from "../hcs-did-event-target-name";
 import { VerificationRelationshipSupportedKeyType, VerificationRelationshipType } from "./types";
 
 export class HcsDidCreateVerificationRelationshipEvent extends HcsDidEvent {
-    public readonly name = HcsDidEventName.VERIFICATION_RELATIONSHIP;
+    public readonly targetName = HcsDidEventTargetName.VERIFICATION_RELATIONSHIP;
 
     protected id: string;
     protected type: VerificationRelationshipSupportedKeyType = "Ed25519VerificationKey2018";
@@ -55,7 +55,7 @@ export class HcsDidCreateVerificationRelationshipEvent extends HcsDidEvent {
 
     public toJsonTree() {
         return {
-            [this.name]: {
+            [this.targetName]: {
                 id: this.getId(),
                 relationshipType: this.getRelationshipType(),
                 type: this.getType(),

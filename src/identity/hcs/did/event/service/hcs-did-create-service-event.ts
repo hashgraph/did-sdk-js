@@ -1,9 +1,9 @@
 import { HcsDidEvent } from "../hcs-did-event";
-import { HcsDidEventName } from "../hcs-did-event-name";
+import { HcsDidEventTargetName } from "../hcs-did-event-target-name";
 import { ServiceTypes } from "./types";
 
 export class HcsDidCreateServiceEvent extends HcsDidEvent {
-    public readonly name = HcsDidEventName.SERVICE;
+    public readonly targetName = HcsDidEventTargetName.SERVICE;
 
     protected id: string;
     protected type: ServiceTypes;
@@ -31,7 +31,7 @@ export class HcsDidCreateServiceEvent extends HcsDidEvent {
 
     public toJsonTree() {
         return {
-            [this.name]: {
+            [this.targetName]: {
                 id: this.getId(),
                 type: this.getType(),
                 serviceEndpoint: this.getServiceEndpoint(),

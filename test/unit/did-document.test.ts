@@ -5,10 +5,10 @@ import {
     Hashing,
     HcsDidCreateDidOwnerEvent,
     HcsDidCreateServiceEvent,
+    HcsDidCreateVerificationMethodEvent,
+    HcsDidCreateVerificationRelationshipEvent,
     HcsDidMessage,
 } from "../../dist";
-import { HcsDidCreateVerificationMethodEvent } from "../../dist/identity/hcs/did/event/verification-method/hcs-did-create-verification-method-event";
-import { HcsDidCreateVerificationRelationshipEvent } from "../../dist/identity/hcs/did/event/verification-relationship/hcs-did-create-verification-relationship-event";
 
 describe("DidDocument", () => {
     describe("#toJsonTree", () => {
