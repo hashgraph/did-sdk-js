@@ -60,6 +60,10 @@ export class HcsDidCreateDidOwnerEvent extends HcsDidEvent {
     }
 
     static fromJsonTree(tree: any): HcsDidCreateDidOwnerEvent {
+        if (!tree.id || !tree.controller || !tree.publicKeyMultibase) {
+            throw new Error("Tree data is missing one of the attributes: id, controller, publicKeyMultibase");
+        }
+
         const publicKey = PublicKey.fromBytes(Hashing.multibase.decode(tree.publicKeyMultibase));
         return new HcsDidCreateDidOwnerEvent(tree.id, tree.controller, publicKey);
     }
