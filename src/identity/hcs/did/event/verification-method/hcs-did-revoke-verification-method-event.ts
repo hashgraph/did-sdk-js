@@ -1,8 +1,8 @@
 import { HcsDidEvent } from "../hcs-did-event";
-import { HcsDidEventName } from "../hcs-did-event-name";
+import { HcsDidEventTargetName } from "../hcs-did-event-target-name";
 
 export class HcsDidRevokeVerificationMethodEvent extends HcsDidEvent {
-    public readonly name = HcsDidEventName.VERIFICATION_METHOD;
+    public readonly targetName = HcsDidEventTargetName.VERIFICATION_METHOD;
 
     protected id: string;
 
@@ -18,7 +18,7 @@ export class HcsDidRevokeVerificationMethodEvent extends HcsDidEvent {
 
     public toJsonTree() {
         return {
-            [this.name]: {
+            [this.targetName]: {
                 id: this.getId(),
             },
         };
