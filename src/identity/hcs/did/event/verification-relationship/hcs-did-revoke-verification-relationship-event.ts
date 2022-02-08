@@ -37,6 +37,9 @@ export class HcsDidRevokeVerificationRelationshipEvent extends HcsDidEvent {
     }
 
     static fromJsonTree(tree: any): HcsDidRevokeVerificationRelationshipEvent {
+        if (!tree.id || !tree.relationshipType) {
+            throw new Error("Tree data is missing one of the attributes: id, relationshipType");
+        }
         return new HcsDidRevokeVerificationRelationshipEvent(tree.id, tree.relationshipType);
     }
 }

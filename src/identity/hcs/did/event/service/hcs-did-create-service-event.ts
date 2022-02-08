@@ -44,6 +44,9 @@ export class HcsDidCreateServiceEvent extends HcsDidEvent {
     }
 
     static fromJsonTree(tree: any): HcsDidCreateServiceEvent {
+        if (!tree.id || !tree.type || !tree.serviceEndpoint) {
+            throw new Error("Tree data is missing one of the attributes: id, type, serviceEndpoint");
+        }
         return new HcsDidCreateServiceEvent(tree.id, tree.type, tree.serviceEndpoint);
     }
 }
