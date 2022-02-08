@@ -1,18 +1,10 @@
 import { PublicKey } from "@hashgraph/sdk";
-import { Hashing } from "../../../..";
-import { HcsDidEvent } from "./hcs-did-event";
-import { HcsDidEventName } from "./hcs-did-event-name";
+import { Hashing } from "../../../../..";
+import { HcsDidEvent } from "../hcs-did-event";
+import { HcsDidEventName } from "../hcs-did-event-name";
+import { VerificationRelationshipSupportedKeyType, VerificationRelationshipType } from "./types";
 
-export type VerificationRelationshipType =
-    | "authentication"
-    | "assertionMethod"
-    | "keyAgreement"
-    | "capabilityInvocation"
-    | "capabilityDelegation";
-
-export type VerificationRelationshipSupportedKeyType = "Ed25519VerificationKey2018";
-
-export class HcsDidVerificationRelationshipEvent extends HcsDidEvent {
+export class HcsDidCreateVerificationRelationshipEvent extends HcsDidEvent {
     public readonly name = HcsDidEventName.VERIFICATION_RELATIONSHIP;
 
     protected id: string;
@@ -21,9 +13,6 @@ export class HcsDidVerificationRelationshipEvent extends HcsDidEvent {
     protected controller: string;
     protected publicKey: PublicKey;
 
-    /**
-     * TODO: I guess controller param is not necessary and can be derived from the publicKey, right?
-     */
     constructor(
         id: string,
         relationshipType: VerificationRelationshipType,
@@ -80,9 +69,9 @@ export class HcsDidVerificationRelationshipEvent extends HcsDidEvent {
         return JSON.stringify(this.toJsonTree());
     }
 
-    static fromJsonTree(tree: any): HcsDidVerificationRelationshipEvent {
+    static fromJsonTree(tree: any): HcsDidCreateVerificationRelationshipEvent {
         const publicKey = PublicKey.fromBytes(Hashing.multibase.decode(tree.publicKeyMultibase));
-        return new HcsDidVerificationRelationshipEvent(
+        return new HcsDidCreateVerificationRelationshipEvent(
             tree.id,
             tree.relationshipType,
             tree.type,

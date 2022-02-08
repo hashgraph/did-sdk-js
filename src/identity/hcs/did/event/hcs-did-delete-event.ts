@@ -4,15 +4,12 @@ import { HcsDidEventName } from "./hcs-did-event-name";
 export class HcsDidDeleteEvent extends HcsDidEvent {
     public readonly name = HcsDidEventName.DELETE;
 
-    /**
-     * TODO: are there any restrictions on type?
-     */
     constructor() {
         super();
     }
 
     getId(): string {
-        throw new Error("Method not implemented.");
+        return undefined;
     }
 
     public toJsonTree() {

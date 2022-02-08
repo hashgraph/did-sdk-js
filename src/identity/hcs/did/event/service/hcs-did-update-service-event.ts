@@ -1,18 +1,14 @@
-import { HcsDidEvent } from "./hcs-did-event";
-import { HcsDidEventName } from "./hcs-did-event-name";
+import { HcsDidEvent } from "../hcs-did-event";
+import { HcsDidEventName } from "../hcs-did-event-name";
+import { ServiceTypes } from "./types";
 
-export type ServiceTypes = "LinkedDomains" | "DIDCommMessaging";
-
-export class HcsDidServiceEvent extends HcsDidEvent {
+export class HcsDidUpdateServiceEvent extends HcsDidEvent {
     public readonly name = HcsDidEventName.SERVICE;
 
     protected id: string;
     protected type: ServiceTypes;
     protected serviceEndpoint: string;
 
-    /**
-     * TODO: are there any restrictions on type?
-     */
     constructor(id: string, type: ServiceTypes, serviceEndpoint: string) {
         super();
 
@@ -47,7 +43,7 @@ export class HcsDidServiceEvent extends HcsDidEvent {
         return JSON.stringify(this.toJsonTree());
     }
 
-    static fromJsonTree(tree: any): HcsDidServiceEvent {
-        return new HcsDidServiceEvent(tree.id, tree.type, tree.serviceEndpoint);
+    static fromJsonTree(tree: any): HcsDidUpdateServiceEvent {
+        return new HcsDidUpdateServiceEvent(tree.id, tree.type, tree.serviceEndpoint);
     }
 }
