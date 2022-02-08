@@ -1,8 +1,8 @@
 import { Hashing } from "../../../..";
 import { DidMethodOperation } from "../../../did-method-operation";
-import { HcsDidDeleteEvent } from "./hcs-did-delete-event";
+import { HcsDidDeleteEvent } from "./document/hcs-did-delete-event";
 import { HcsDidEvent } from "./hcs-did-event";
-import { HcsDidEventName } from "./hcs-did-event-name";
+import { HcsDidEventTargetName } from "./hcs-did-event-target-name";
 import { HcsDidCreateDidOwnerEvent } from "./owner/hcs-did-create-did-owner-event";
 import { HcsDidCreateServiceEvent } from "./service/hcs-did-create-service-event";
 import { HcsDidRevokeServiceEvent } from "./service/hcs-did-revoke-service-event";
@@ -16,20 +16,20 @@ import { HcsDidUpdateVerificationRelationshipEvent } from "./verification-relati
 
 const EVENT_NAME_TO_CLASS = {
     [DidMethodOperation.CREATE]: {
-        [HcsDidEventName.DID_OWNER]: HcsDidCreateDidOwnerEvent,
-        [HcsDidEventName.SERVICE]: HcsDidCreateServiceEvent,
-        [HcsDidEventName.VERIFICATION_METHOD]: HcsDidCreateVerificationMethodEvent,
-        [HcsDidEventName.VERIFICATION_RELATIONSHIP]: HcsDidCreateVerificationRelationshipEvent,
+        [HcsDidEventTargetName.DID_OWNER]: HcsDidCreateDidOwnerEvent,
+        [HcsDidEventTargetName.SERVICE]: HcsDidCreateServiceEvent,
+        [HcsDidEventTargetName.VERIFICATION_METHOD]: HcsDidCreateVerificationMethodEvent,
+        [HcsDidEventTargetName.VERIFICATION_RELATIONSHIP]: HcsDidCreateVerificationRelationshipEvent,
     },
     [DidMethodOperation.UPDATE]: {
-        [HcsDidEventName.SERVICE]: HcsDidUpdateServiceEvent,
-        [HcsDidEventName.VERIFICATION_METHOD]: HcsDidUpdateVerificationMethodEvent,
-        [HcsDidEventName.VERIFICATION_RELATIONSHIP]: HcsDidUpdateVerificationRelationshipEvent,
+        [HcsDidEventTargetName.SERVICE]: HcsDidUpdateServiceEvent,
+        [HcsDidEventTargetName.VERIFICATION_METHOD]: HcsDidUpdateVerificationMethodEvent,
+        [HcsDidEventTargetName.VERIFICATION_RELATIONSHIP]: HcsDidUpdateVerificationRelationshipEvent,
     },
     [DidMethodOperation.REVOKE]: {
-        [HcsDidEventName.SERVICE]: HcsDidRevokeServiceEvent,
-        [HcsDidEventName.VERIFICATION_METHOD]: HcsDidRevokeVerificationMethodEvent,
-        [HcsDidEventName.VERIFICATION_RELATIONSHIP]: HcsDidRevokeVerificationRelationshipEvent,
+        [HcsDidEventTargetName.SERVICE]: HcsDidRevokeServiceEvent,
+        [HcsDidEventTargetName.VERIFICATION_METHOD]: HcsDidRevokeVerificationMethodEvent,
+        [HcsDidEventTargetName.VERIFICATION_RELATIONSHIP]: HcsDidRevokeVerificationRelationshipEvent,
     },
 };
 

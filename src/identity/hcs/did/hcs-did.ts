@@ -10,7 +10,7 @@ import {
     MessageEnvelope,
 } from "../../..";
 import { DidSyntax } from "../../did-syntax";
-import { HcsDidDeleteEvent } from "./event/hcs-did-delete-event";
+import { HcsDidDeleteEvent } from "./event/document/hcs-did-delete-event";
 import { HcsDidEvent } from "./event/hcs-did-event";
 import { HcsDidRevokeServiceEvent } from "./event/service/hcs-did-revoke-service-event";
 import { HcsDidUpdateServiceEvent } from "./event/service/hcs-did-update-service-event";

@@ -1,9 +1,9 @@
 import { HcsDidEvent } from "../hcs-did-event";
-import { HcsDidEventName } from "../hcs-did-event-name";
+import { HcsDidEventTargetName } from "../hcs-did-event-target-name";
 import { VerificationRelationshipType } from "./types";
 
 export class HcsDidRevokeVerificationRelationshipEvent extends HcsDidEvent {
-    public readonly name = HcsDidEventName.VERIFICATION_RELATIONSHIP;
+    public readonly targetName = HcsDidEventTargetName.VERIFICATION_RELATIONSHIP;
 
     protected id: string;
     protected relationshipType: VerificationRelationshipType;
@@ -25,7 +25,7 @@ export class HcsDidRevokeVerificationRelationshipEvent extends HcsDidEvent {
 
     public toJsonTree() {
         return {
-            [this.name]: {
+            [this.targetName]: {
                 id: this.getId(),
                 relationshipType: this.getRelationshipType(),
             },
