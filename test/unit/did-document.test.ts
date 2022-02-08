@@ -3,12 +3,12 @@ import {
     DidDocument,
     DidMethodOperation,
     Hashing,
-    HcsDidDidOwnerEvent,
+    HcsDidCreateDidOwnerEvent,
+    HcsDidCreateServiceEvent,
     HcsDidMessage,
-    HcsDidServiceEvent,
-    HcsDidVerificationMethodEvent,
-    HcsDidVerificationRelationshipEvent,
 } from "../../dist";
+import { HcsDidCreateVerificationMethodEvent } from "../../dist/identity/hcs/did/event/verification-method/hcs-did-create-verification-method-event";
+import { HcsDidCreateVerificationRelationshipEvent } from "../../dist/identity/hcs/did/event/verification-relationship/hcs-did-create-verification-relationship-event";
 
 describe("DidDocument", () => {
     describe("#toJsonTree", () => {
@@ -36,7 +36,7 @@ describe("DidDocument", () => {
                 new HcsDidMessage(
                     DidMethodOperation.CREATE,
                     identifier,
-                    new HcsDidDidOwnerEvent(identifier + "#did-root-key", identifier, privateKey.publicKey)
+                    new HcsDidCreateDidOwnerEvent(identifier + "#did-root-key", identifier, privateKey.publicKey)
                 ),
             ];
             const doc = new DidDocument(identifier, messages);
@@ -65,17 +65,21 @@ describe("DidDocument", () => {
                 new HcsDidMessage(
                     DidMethodOperation.CREATE,
                     identifier,
-                    new HcsDidDidOwnerEvent(identifier + "#did-root-key", identifier, privateKey.publicKey)
+                    new HcsDidCreateDidOwnerEvent(identifier + "#did-root-key", identifier, privateKey.publicKey)
                 ),
                 new HcsDidMessage(
                     DidMethodOperation.CREATE,
                     identifier,
-                    new HcsDidServiceEvent(identifier + "#service-1", "LinkedDomains", "https://test.identity.com")
+                    new HcsDidCreateServiceEvent(
+                        identifier + "#service-1",
+                        "LinkedDomains",
+                        "https://test.identity.com"
+                    )
                 ),
                 new HcsDidMessage(
                     DidMethodOperation.CREATE,
                     identifier,
-                    new HcsDidVerificationMethodEvent(
+                    new HcsDidCreateVerificationMethodEvent(
                         identifier + "#key-1",
                         "Ed25519VerificationKey2018",
                         identifier,
@@ -85,7 +89,7 @@ describe("DidDocument", () => {
                 new HcsDidMessage(
                     DidMethodOperation.CREATE,
                     identifier,
-                    new HcsDidVerificationRelationshipEvent(
+                    new HcsDidCreateVerificationRelationshipEvent(
                         identifier + "#key-2",
                         "capabilityDelegation",
                         "Ed25519VerificationKey2018",
@@ -144,22 +148,30 @@ describe("DidDocument", () => {
                 new HcsDidMessage(
                     DidMethodOperation.CREATE,
                     identifier,
-                    new HcsDidDidOwnerEvent(identifier + "#did-root-key", identifier, privateKey.publicKey)
+                    new HcsDidCreateDidOwnerEvent(identifier + "#did-root-key", identifier, privateKey.publicKey)
                 ),
                 new HcsDidMessage(
                     DidMethodOperation.CREATE,
                     identifier,
-                    new HcsDidServiceEvent(identifier + "#service-1", "LinkedDomains", "https://test.identity.com")
+                    new HcsDidCreateServiceEvent(
+                        identifier + "#service-1",
+                        "LinkedDomains",
+                        "https://test.identity.com"
+                    )
                 ),
                 new HcsDidMessage(
                     DidMethodOperation.CREATE,
                     identifier,
-                    new HcsDidServiceEvent(identifier + "#service-2", "LinkedDomains", "https://test2.identity.com")
+                    new HcsDidCreateServiceEvent(
+                        identifier + "#service-2",
+                        "LinkedDomains",
+                        "https://test2.identity.com"
+                    )
                 ),
                 new HcsDidMessage(
                     DidMethodOperation.CREATE,
                     identifier,
-                    new HcsDidVerificationMethodEvent(
+                    new HcsDidCreateVerificationMethodEvent(
                         identifier + "#key-1",
                         "Ed25519VerificationKey2018",
                         identifier,
@@ -169,7 +181,7 @@ describe("DidDocument", () => {
                 new HcsDidMessage(
                     DidMethodOperation.CREATE,
                     identifier,
-                    new HcsDidVerificationRelationshipEvent(
+                    new HcsDidCreateVerificationRelationshipEvent(
                         identifier + "#key-2",
                         "capabilityDelegation",
                         "Ed25519VerificationKey2018",
@@ -180,7 +192,7 @@ describe("DidDocument", () => {
                 new HcsDidMessage(
                     DidMethodOperation.CREATE,
                     identifier,
-                    new HcsDidVerificationRelationshipEvent(
+                    new HcsDidCreateVerificationRelationshipEvent(
                         identifier + "#key-3",
                         "authentication",
                         "Ed25519VerificationKey2018",
@@ -191,12 +203,16 @@ describe("DidDocument", () => {
                 new HcsDidMessage(
                     DidMethodOperation.UPDATE,
                     identifier,
-                    new HcsDidServiceEvent(identifier + "#service-1", "LinkedDomains", "https://new.test.identity.com")
+                    new HcsDidCreateServiceEvent(
+                        identifier + "#service-1",
+                        "LinkedDomains",
+                        "https://new.test.identity.com"
+                    )
                 ),
                 new HcsDidMessage(
                     DidMethodOperation.UPDATE,
                     identifier,
-                    new HcsDidVerificationMethodEvent(
+                    new HcsDidCreateVerificationMethodEvent(
                         identifier + "#key-1",
                         "Ed25519VerificationKey2018",
                         identifier,
@@ -206,7 +222,7 @@ describe("DidDocument", () => {
                 new HcsDidMessage(
                     DidMethodOperation.UPDATE,
                     identifier,
-                    new HcsDidVerificationRelationshipEvent(
+                    new HcsDidCreateVerificationRelationshipEvent(
                         identifier + "#key-2",
                         "capabilityDelegation",
                         "Ed25519VerificationKey2018",
@@ -273,22 +289,30 @@ describe("DidDocument", () => {
                 new HcsDidMessage(
                     DidMethodOperation.CREATE,
                     identifier,
-                    new HcsDidDidOwnerEvent(identifier + "#did-root-key", identifier, privateKey.publicKey)
+                    new HcsDidCreateDidOwnerEvent(identifier + "#did-root-key", identifier, privateKey.publicKey)
                 ),
                 new HcsDidMessage(
                     DidMethodOperation.CREATE,
                     identifier,
-                    new HcsDidServiceEvent(identifier + "#service-1", "LinkedDomains", "https://test.identity.com")
+                    new HcsDidCreateServiceEvent(
+                        identifier + "#service-1",
+                        "LinkedDomains",
+                        "https://test.identity.com"
+                    )
                 ),
                 new HcsDidMessage(
                     DidMethodOperation.CREATE,
                     identifier,
-                    new HcsDidServiceEvent(identifier + "#service-2", "LinkedDomains", "https://test2.identity.com")
+                    new HcsDidCreateServiceEvent(
+                        identifier + "#service-2",
+                        "LinkedDomains",
+                        "https://test2.identity.com"
+                    )
                 ),
                 new HcsDidMessage(
                     DidMethodOperation.CREATE,
                     identifier,
-                    new HcsDidVerificationMethodEvent(
+                    new HcsDidCreateVerificationMethodEvent(
                         identifier + "#key-1",
                         "Ed25519VerificationKey2018",
                         identifier,
@@ -298,7 +322,7 @@ describe("DidDocument", () => {
                 new HcsDidMessage(
                     DidMethodOperation.CREATE,
                     identifier,
-                    new HcsDidVerificationRelationshipEvent(
+                    new HcsDidCreateVerificationRelationshipEvent(
                         identifier + "#key-2",
                         "capabilityDelegation",
                         "Ed25519VerificationKey2018",
@@ -309,7 +333,7 @@ describe("DidDocument", () => {
                 new HcsDidMessage(
                     DidMethodOperation.CREATE,
                     identifier,
-                    new HcsDidVerificationRelationshipEvent(
+                    new HcsDidCreateVerificationRelationshipEvent(
                         identifier + "#key-3",
                         "authentication",
                         "Ed25519VerificationKey2018",
@@ -320,12 +344,16 @@ describe("DidDocument", () => {
                 new HcsDidMessage(
                     DidMethodOperation.REVOKE,
                     identifier,
-                    new HcsDidServiceEvent(identifier + "#service-1", "LinkedDomains", "https://test.identity.com")
+                    new HcsDidCreateServiceEvent(
+                        identifier + "#service-1",
+                        "LinkedDomains",
+                        "https://test.identity.com"
+                    )
                 ),
                 new HcsDidMessage(
                     DidMethodOperation.REVOKE,
                     identifier,
-                    new HcsDidVerificationMethodEvent(
+                    new HcsDidCreateVerificationMethodEvent(
                         identifier + "#key-1",
                         "Ed25519VerificationKey2018",
                         identifier,
@@ -335,7 +363,7 @@ describe("DidDocument", () => {
                 new HcsDidMessage(
                     DidMethodOperation.REVOKE,
                     identifier,
-                    new HcsDidVerificationRelationshipEvent(
+                    new HcsDidCreateVerificationRelationshipEvent(
                         identifier + "#key-2",
                         "capabilityDelegation",
                         "Ed25519VerificationKey2018",

@@ -90,7 +90,7 @@ export class HcsDidMessage extends Message {
     public isValid(...args: any[]): boolean {
         const didTopicId: TopicId = args[0] || null;
 
-        if (this.did == null || this.event == null) {
+        if (this.did == null || this.event == null || this.operation == null) {
             return false;
         }
 
@@ -143,7 +143,7 @@ export class HcsDidMessage extends Message {
     }
 
     public static fromJsonTree(tree: any, result?: HcsDidMessage): HcsDidMessage {
-        const event = HcsDidEventParser.fromBase64(tree.event);
+        const event = HcsDidEventParser.fromBase64(tree.operation, tree.event);
 
         if (!result) {
             result = new HcsDidMessage(tree.operation, tree.did, event);

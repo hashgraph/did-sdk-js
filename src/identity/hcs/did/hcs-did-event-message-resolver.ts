@@ -33,6 +33,7 @@ export class HcsDidEventMessageResolver {
      */
     constructor(topicId: TopicId) {
         this.topicId = topicId;
+        this.listener = new HcsDidTopicListener(this.topicId);
 
         this.noMoreMessagesTimeout = HcsDidEventMessageResolver.DEFAULT_TIMEOUT;
         this.lastMessageArrivalTime = Long.fromInt(Date.now());
@@ -44,8 +45,6 @@ export class HcsDidEventMessageResolver {
         });
 
         this.existingSignatures = [];
-
-        this.listener = this.supplyMessageListener();
 
         this.listener
             .setStartTime(new Timestamp(0, 0))
@@ -77,7 +76,8 @@ export class HcsDidEventMessageResolver {
         }
 
         this.existingSignatures.push(envelope.getSignature());
-        this.processMessage(envelope);
+        const message: HcsDidMessage = envelope.open();
+        this.messages.push(message);
     }
 
     /**
@@ -146,24 +146,5 @@ export class HcsDidEventMessageResolver {
 
     protected matchesSearchCriteria(message: HcsDidMessage): boolean {
         return true;
-    }
-
-    protected processMessage(envelope: MessageEnvelope<HcsDidMessage>): void {
-        const message: HcsDidMessage = envelope.open();
-
-        // // Preserve created and updated timestamps
-        // message.setUpdated(envelope.getConsensusTimestamp());
-        // if (DidMethodOperation.CREATE == message.getOperation()) {
-        //     message.setCreated(envelope.getConsensusTimestamp());
-        // } else if (existing != null) {
-        //     message.setCreated(existing.open().getCreated());
-        // }
-
-        // Add valid message to the results
-        this.messages.push(message);
-    }
-
-    protected supplyMessageListener(): MessageListener<HcsDidMessage> {
-        return new HcsDidTopicListener(this.topicId);
     }
 }
