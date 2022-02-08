@@ -3,5 +3,5 @@ export enum HcsDidEventName {
     VERIFICATION_METHOD = "VerificationMethod",
     VERIFICATION_RELATIONSHIP = "VerificationRelationship",
     SERVICE = "Service",
-    DELETE = "Delete",
+    DID = "DID",
 }
