@@ -3,10 +3,10 @@ import { DidDocumentJsonProperties } from "./identity/did-document-json-properti
 import { DidMethodOperation } from "./identity/did-method-operation";
 import { DidParser } from "./identity/did-parser";
 import { DidSyntax } from "./identity/did-syntax";
-import { HcsDidDidOwnerEvent } from "./identity/hcs/did/event/hcs-did-did-owner-event";
-import { HcsDidServiceEvent } from "./identity/hcs/did/event/hcs-did-service-event";
-import { HcsDidVerificationMethodEvent } from "./identity/hcs/did/event/hcs-did-verification-method-event";
-import { HcsDidVerificationRelationshipEvent } from "./identity/hcs/did/event/hcs-did-verification-relationship-event";
+import { HcsDidCreateDidOwnerEvent } from "./identity/hcs/did/event/owner/hcs-did-create-did-owner-event";
+import { HcsDidCreateServiceEvent } from "./identity/hcs/did/event/service/hcs-did-create-service-event";
+import { HcsDidCreateVerificationMethodEvent } from "./identity/hcs/did/event/verification-method/hcs-did-create-verification-method-event";
+import { HcsDidCreateVerificationRelationshipEvent } from "./identity/hcs/did/event/verification-relationship/hcs-did-create-verification-relationship-event";
 import { HcsDid } from "./identity/hcs/did/hcs-did";
 import { HcsDidEventMessageResolver } from "./identity/hcs/did/hcs-did-event-message-resolver";
 import { HcsDidMessage } from "./identity/hcs/did/hcs-did-message";
@@ -37,10 +37,10 @@ export {
     HcsDidEventMessageResolver,
     HcsDidTopicListener,
     HcsDidTransaction,
-    HcsDidDidOwnerEvent,
-    HcsDidServiceEvent,
-    HcsDidVerificationMethodEvent,
-    HcsDidVerificationRelationshipEvent,
+    HcsDidCreateDidOwnerEvent,
+    HcsDidCreateServiceEvent,
+    HcsDidCreateVerificationMethodEvent as HcsDidVerificationMethodEvent,
+    HcsDidCreateVerificationRelationshipEvent as HcsDidVerificationRelationshipEvent,
     JsonClass,
     Message,
     MessageEnvelope,

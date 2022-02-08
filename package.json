@@ -19,7 +19,9 @@
         "build:dev": "tsc --sourceMap -w",
         "start": "node dist/index.js",
         "start:dev": "nodemon --inspect dist/index.js",
-        "test": "jest"
+        "test": "jest",
+        "test:unit": "jest --testPathPattern=test/unit",
+        "test:integration": "jest --testPathPattern=test/integration"
     },
     "repository": {
         "type": "git",
