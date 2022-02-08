@@ -2,8 +2,9 @@ import { AccountId, Client, PrivateKey, Timestamp, TopicMessageQuery } from "@ha
 import { Hashing, HcsDid } from "../../dist";
 
 const TOPIC_REGEXP = /^0\.0\.[0-9]{8,}/;
-const OPERATOR_ID = "";
-const OPERATOR_KEY = "";
+
+const OPERATOR_ID = process.env.OPERATOR_ID;
+const OPERATOR_KEY = process.env.OPERATOR_KEY;
 // testnet, previewnet, mainnet
 const NETWORK = "testnet";
 
