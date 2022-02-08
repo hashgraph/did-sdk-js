@@ -40,6 +40,7 @@ export class HcsDid {
 
     protected messages: HcsDidMessage[];
     protected resolvedAt: Timestamp;
+    protected document: DidDocument;
 
     constructor(args: { identifier?: string; privateKey?: PrivateKey; client?: Client }) {
         this.identifier = args.identifier;
@@ -62,10 +63,6 @@ export class HcsDid {
      */
 
     public async register() {
-        if (this.identifier) {
-            throw new Error("DID is already registered");
-        }
-
         if (!this.privateKey) {
             throw new Error("privateKey is missing");
         }
@@ -74,19 +71,27 @@ export class HcsDid {
             throw new Error("Client configuration is missing");
         }
 
-        /**
-         * Create topic
-         */
-        const topicCreateTransaction = new TopicCreateTransaction()
-            .setMaxTransactionFee(HcsDid.TRANSACTION_FEE)
-            .setAdminKey(this.privateKey.publicKey);
+        if (this.identifier) {
+            await this.resolve();
 
-        const txId = await topicCreateTransaction.execute(this.client);
-        const topicId = (await txId.getReceipt(this.client)).topicId;
+            if (this.document.hasOwner()) {
+                throw new Error("DID is already registered");
+            }
+        } else {
+            /**
+             * Create topic
+             */
+            const topicCreateTransaction = new TopicCreateTransaction()
+                .setMaxTransactionFee(HcsDid.TRANSACTION_FEE)
+                .setAdminKey(this.privateKey.publicKey);
 
-        this.topicId = topicId;
-        this.network = this.client.networkName;
-        this.identifier = this.buildIdentifier(this.privateKey.publicKey);
+            const txId = await topicCreateTransaction.execute(this.client);
+            const topicId = (await txId.getReceipt(this.client)).topicId;
+
+            this.topicId = topicId;
+            this.network = this.client.networkName;
+            this.identifier = this.buildIdentifier(this.privateKey.publicKey);
+        }
 
         /**
          * Set ownership
@@ -115,7 +120,8 @@ export class HcsDid {
                 .setTimeout(3000)
                 .whenFinished((messages) => {
                     this.messages = messages;
-                    resolve(new DidDocument(this.identifier, this.messages));
+                    this.document = new DidDocument(this.identifier, this.messages);
+                    resolve(this.document);
                 })
                 .onError((err) => {
                     console.log(err);

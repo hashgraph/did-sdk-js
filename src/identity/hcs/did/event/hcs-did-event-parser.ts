@@ -31,13 +31,14 @@ const EVENT_NAME_TO_CLASS = {
         [HcsDidEventName.VERIFICATION_METHOD]: HcsDidRevokeVerificationMethodEvent,
         [HcsDidEventName.VERIFICATION_RELATIONSHIP]: HcsDidRevokeVerificationRelationshipEvent,
     },
-    [DidMethodOperation.DELETE]: {
-        [HcsDidEventName.DELETE]: HcsDidDeleteEvent,
-    },
 };
 
 export class HcsDidEventParser {
     static fromBase64(operation: DidMethodOperation, eventBase64: any): HcsDidEvent {
+        if (operation === DidMethodOperation.DELETE) {
+            return HcsDidDeleteEvent.fromJsonTree(null);
+        }
+
         const tree = JSON.parse(Hashing.base64.decode(eventBase64));
         const eventsByOpration = EVENT_NAME_TO_CLASS[operation];
         const eventName = Object.keys(eventsByOpration).find((eventName) => !!tree[eventName]);

@@ -31,6 +31,10 @@ export class DidDocument {
         this.processMessages(messages);
     }
 
+    public hasOwner() {
+        return this.owners.size > 0;
+    }
+
     public getContext(): string {
         return this.context;
     }
@@ -98,6 +102,9 @@ export class DidDocument {
                     return;
                 case DidMethodOperation.REVOKE:
                     this.processRevokeMessage(msg);
+                    return;
+                case DidMethodOperation.DELETE:
+                    this.processDeleteMessage(msg);
                     return;
                 default:
                     /**
@@ -327,6 +334,23 @@ export class DidDocument {
                 /**
                  * TODO: for debugging - later we should probably try to ignore such messages
                  */
+                throw new Error("Not supported event detected!");
+        }
+    }
+
+    private processDeleteMessage(message: HcsDidMessage): void {
+        const event = message.getEvent();
+
+        switch (event.name) {
+            case HcsDidEventName.DID:
+                this.owners.clear();
+                this.services.clear();
+                this.verificationMethods.clear();
+                Object.keys(this.verificationRelationships).forEach(
+                    (relName) => (this.verificationRelationships[relName] = [])
+                );
+                return;
+            default:
                 throw new Error("Not supported event detected!");
         }
     }
