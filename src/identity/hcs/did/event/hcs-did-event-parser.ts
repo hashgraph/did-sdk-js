@@ -39,15 +39,14 @@ export class HcsDidEventParser {
             return HcsDidDeleteEvent.fromJsonTree(null);
         }
 
-        const tree = JSON.parse(Hashing.base64.decode(eventBase64));
-        const eventsByOpration = EVENT_NAME_TO_CLASS[operation];
-        const eventName = Object.keys(eventsByOpration).find((eventName) => !!tree[eventName]);
+        try {
+            const tree = JSON.parse(Hashing.base64.decode(eventBase64));
+            const eventsByOpration = EVENT_NAME_TO_CLASS[operation];
+            const eventTargetName = Object.keys(eventsByOpration).find((etn) => !!tree[etn]);
 
-        if (!eventName) {
-            // return null;
-            throw new Error("Invalid DID event");
+            return eventsByOpration[eventTargetName].fromJsonTree(tree[eventTargetName]);
+        } catch {
+            return null;
         }
-
-        return eventsByOpration[eventName].fromJsonTree(tree[eventName]);
     }
 }

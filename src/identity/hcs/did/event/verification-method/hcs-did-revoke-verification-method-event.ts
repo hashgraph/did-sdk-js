@@ -29,6 +29,9 @@ export class HcsDidRevokeVerificationMethodEvent extends HcsDidEvent {
     }
 
     static fromJsonTree(tree: any): HcsDidRevokeVerificationMethodEvent {
+        if (!tree.id) {
+            throw new Error("Tree data is missing one of the attributes: id");
+        }
         return new HcsDidRevokeVerificationMethodEvent(tree.id);
     }
 }
