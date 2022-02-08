@@ -1,8 +1,8 @@
 import { Hashing } from "../../../..";
-import { HcsDidEventName } from "./hcs-did-event-name";
+import { HcsDidEventTargetName } from "./hcs-did-event-target-name";
 
 export abstract class HcsDidEvent {
-    public abstract readonly name: HcsDidEventName;
+    public abstract readonly targetName: HcsDidEventTargetName;
 
     constructor() {}
 

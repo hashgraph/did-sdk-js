@@ -8,7 +8,4 @@ export module DidDocumentJsonProperties {
     export const CAPABILITY_INVOCATION = "capabilityInvocation";
     export const CAPABILITY_DELEGATION = "capabilityDelegation";
     export const SERVICE = "service";
-    export const CREATED = "created";
-    export const UPDATED = "updated";
-    export const PROOF = "proof";
 }

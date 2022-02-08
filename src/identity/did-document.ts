@@ -1,11 +1,12 @@
 import { DidMethodOperation, HcsDidCreateDidOwnerEvent, HcsDidCreateServiceEvent, HcsDidMessage } from "..";
 import { DidDocumentJsonProperties } from "./did-document-json-properties";
 import { DidSyntax } from "./did-syntax";
-import { HcsDidEventName } from "./hcs/did/event/hcs-did-event-name";
+import { HcsDidEventTargetName } from "./hcs/did/event/hcs-did-event-target-name";
 import { HcsDidUpdateServiceEvent } from "./hcs/did/event/service/hcs-did-update-service-event";
 import { HcsDidCreateVerificationMethodEvent } from "./hcs/did/event/verification-method/hcs-did-create-verification-method-event";
 import { HcsDidUpdateVerificationMethodEvent } from "./hcs/did/event/verification-method/hcs-did-update-verification-method-event";
 import { HcsDidCreateVerificationRelationshipEvent } from "./hcs/did/event/verification-relationship/hcs-did-create-verification-relationship-event";
+import { HcsDidRevokeVerificationRelationshipEvent } from "./hcs/did/event/verification-relationship/hcs-did-revoke-verification-relationship-event";
 import { HcsDidUpdateVerificationRelationshipEvent } from "./hcs/did/event/verification-relationship/hcs-did-update-verification-relationship-event";
 
 export class DidDocument {
@@ -118,8 +119,8 @@ export class DidDocument {
     private processCreateMessage(message: HcsDidMessage): void {
         const event = message.getEvent();
 
-        switch (event.name) {
-            case HcsDidEventName.DID_OWNER:
+        switch (event.targetName) {
+            case HcsDidEventTargetName.DID_OWNER:
                 if (this.owners.has(event.getId())) {
                     console.warn(`Duplicate create DIDOwner event ID: ${event.getId()}. Event will be ignored...`);
                     return;
@@ -132,7 +133,7 @@ export class DidDocument {
                     publicKeyMultibase: (event as HcsDidCreateDidOwnerEvent).getPublicKeyMultibase(),
                 });
                 return;
-            case HcsDidEventName.SERVICE:
+            case HcsDidEventTargetName.SERVICE:
                 if (this.services.has(event.getId())) {
                     console.warn(`Duplicate create Service event ID: ${event.getId()}. Event will be ignored...`);
                     return;
@@ -144,7 +145,7 @@ export class DidDocument {
                     serviceEndpoint: (event as HcsDidCreateServiceEvent).getServiceEndpoint(),
                 });
                 return;
-            case HcsDidEventName.VERIFICATION_METHOD:
+            case HcsDidEventTargetName.VERIFICATION_METHOD:
                 if (this.verificationMethods.has(event.getId())) {
                     console.warn(
                         `Duplicate create VerificationMethod event ID: ${event.getId()}. Event will be ignored...`
@@ -159,7 +160,7 @@ export class DidDocument {
                     publicKeyMultibase: (event as HcsDidCreateVerificationMethodEvent).getPublicKeyMultibase(),
                 });
                 return;
-            case HcsDidEventName.VERIFICATION_RELATIONSHIP:
+            case HcsDidEventTargetName.VERIFICATION_RELATIONSHIP:
                 const type = (event as HcsDidCreateVerificationRelationshipEvent).getRelationshipType();
 
                 if (this.verificationRelationships[type]) {
@@ -199,14 +200,14 @@ export class DidDocument {
     private processUpdateMessage(message: HcsDidMessage): void {
         const event = message.getEvent();
 
-        switch (event.name) {
-            case HcsDidEventName.DID_OWNER:
+        switch (event.targetName) {
+            case HcsDidEventTargetName.DID_OWNER:
                 /**
                  * TODO: we need to decide what DIDOwner operations are possible and how do they reflect on the resolved document.
                  */
                 console.warn(`Update DidOwner event is not supported. Event will be ignored...`);
                 return;
-            case HcsDidEventName.SERVICE:
+            case HcsDidEventTargetName.SERVICE:
                 if (!this.services.has(event.getId())) {
                     console.warn(
                         `Update Service event: service with ID ${event.getId()} was not found in the document. Event will be ignored...`
@@ -219,7 +220,7 @@ export class DidDocument {
                     serviceEndpoint: (event as HcsDidUpdateServiceEvent).getServiceEndpoint(),
                 });
                 return;
-            case HcsDidEventName.VERIFICATION_METHOD:
+            case HcsDidEventTargetName.VERIFICATION_METHOD:
                 if (!this.verificationMethods.has(event.getId())) {
                     console.warn(
                         `Update VerificationMethod event: verificationMethod with ID: ${event.getId()} was not found in the document. Event will be ignored...`
@@ -234,7 +235,7 @@ export class DidDocument {
                     publicKeyMultibase: (event as HcsDidUpdateVerificationMethodEvent).getPublicKeyMultibase(),
                 });
                 return;
-            case HcsDidEventName.VERIFICATION_RELATIONSHIP:
+            case HcsDidEventTargetName.VERIFICATION_RELATIONSHIP:
                 const type = (event as HcsDidUpdateVerificationRelationshipEvent).getRelationshipType();
 
                 if (this.verificationRelationships[type]) {
@@ -270,14 +271,14 @@ export class DidDocument {
     private processRevokeMessage(message: HcsDidMessage): void {
         const event = message.getEvent();
 
-        switch (event.name) {
-            case HcsDidEventName.DID_OWNER:
+        switch (event.targetName) {
+            case HcsDidEventTargetName.DID_OWNER:
                 /**
                  * TODO: we need to decide what DIDOwner operations are possible and how do they reflect on the resolved document.
                  */
                 console.warn(`Revoke DidOwner event is not supported. Event will be ignored...`);
                 return;
-            case HcsDidEventName.SERVICE:
+            case HcsDidEventTargetName.SERVICE:
                 if (!this.services.has(event.getId())) {
                     console.warn(`Revoke Service event: service event ID: ${event.getId()}. Event will be ignored...`);
                     return;
@@ -285,7 +286,7 @@ export class DidDocument {
 
                 this.services.delete(event.getId());
                 return;
-            case HcsDidEventName.VERIFICATION_METHOD:
+            case HcsDidEventTargetName.VERIFICATION_METHOD:
                 if (!this.verificationMethods.has(event.getId())) {
                     console.warn(
                         `Revoke VerificationMethod event: verificationMethod with ID: ${event.getId()}. Event will be ignored...`
@@ -302,8 +303,8 @@ export class DidDocument {
                 });
 
                 return;
-            case HcsDidEventName.VERIFICATION_RELATIONSHIP:
-                const type = (event as HcsDidUpdateVerificationRelationshipEvent).getRelationshipType();
+            case HcsDidEventTargetName.VERIFICATION_RELATIONSHIP:
+                const type = (event as HcsDidRevokeVerificationRelationshipEvent).getRelationshipType();
 
                 if (this.verificationRelationships[type]) {
                     if (!this.verificationRelationships[type].includes(event.getId())) {
@@ -341,8 +342,8 @@ export class DidDocument {
     private processDeleteMessage(message: HcsDidMessage): void {
         const event = message.getEvent();
 
-        switch (event.name) {
-            case HcsDidEventName.DID:
+        switch (event.targetName) {
+            case HcsDidEventTargetName.Document:
                 this.owners.clear();
                 this.services.clear();
                 this.verificationMethods.clear();
@@ -351,6 +352,9 @@ export class DidDocument {
                 );
                 return;
             default:
+                /**
+                 * TODO: for debugging - later we should probably try to ignore such messages
+                 */
                 throw new Error("Not supported event detected!");
         }
     }

@@ -3,10 +3,17 @@ import { DidDocumentJsonProperties } from "./identity/did-document-json-properti
 import { DidMethodOperation } from "./identity/did-method-operation";
 import { DidParser } from "./identity/did-parser";
 import { DidSyntax } from "./identity/did-syntax";
+import { HcsDidDeleteEvent } from "./identity/hcs/did/event/document/hcs-did-delete-event";
 import { HcsDidCreateDidOwnerEvent } from "./identity/hcs/did/event/owner/hcs-did-create-did-owner-event";
 import { HcsDidCreateServiceEvent } from "./identity/hcs/did/event/service/hcs-did-create-service-event";
+import { HcsDidRevokeServiceEvent } from "./identity/hcs/did/event/service/hcs-did-revoke-service-event";
+import { HcsDidUpdateServiceEvent } from "./identity/hcs/did/event/service/hcs-did-update-service-event";
 import { HcsDidCreateVerificationMethodEvent } from "./identity/hcs/did/event/verification-method/hcs-did-create-verification-method-event";
+import { HcsDidRevokeVerificationMethodEvent } from "./identity/hcs/did/event/verification-method/hcs-did-revoke-verification-method-event";
+import { HcsDidUpdateVerificationMethodEvent } from "./identity/hcs/did/event/verification-method/hcs-did-update-verification-method-event";
 import { HcsDidCreateVerificationRelationshipEvent } from "./identity/hcs/did/event/verification-relationship/hcs-did-create-verification-relationship-event";
+import { HcsDidRevokeVerificationRelationshipEvent } from "./identity/hcs/did/event/verification-relationship/hcs-did-revoke-verification-relationship-event";
+import { HcsDidUpdateVerificationRelationshipEvent } from "./identity/hcs/did/event/verification-relationship/hcs-did-update-verification-relationship-event";
 import { HcsDid } from "./identity/hcs/did/hcs-did";
 import { HcsDidEventMessageResolver } from "./identity/hcs/did/hcs-did-event-message-resolver";
 import { HcsDidMessage } from "./identity/hcs/did/hcs-did-message";
@@ -38,9 +45,16 @@ export {
     HcsDidTopicListener,
     HcsDidTransaction,
     HcsDidCreateDidOwnerEvent,
+    HcsDidDeleteEvent,
     HcsDidCreateServiceEvent,
-    HcsDidCreateVerificationMethodEvent as HcsDidVerificationMethodEvent,
-    HcsDidCreateVerificationRelationshipEvent as HcsDidVerificationRelationshipEvent,
+    HcsDidUpdateServiceEvent,
+    HcsDidRevokeServiceEvent,
+    HcsDidCreateVerificationMethodEvent,
+    HcsDidUpdateVerificationMethodEvent,
+    HcsDidRevokeVerificationMethodEvent,
+    HcsDidCreateVerificationRelationshipEvent,
+    HcsDidUpdateVerificationRelationshipEvent,
+    HcsDidRevokeVerificationRelationshipEvent,
     JsonClass,
     Message,
     MessageEnvelope,

@@ -1,7 +1,7 @@
-export enum HcsDidEventName {
+export enum HcsDidEventTargetName {
     DID_OWNER = "DIDOwner",
     VERIFICATION_METHOD = "VerificationMethod",
     VERIFICATION_RELATIONSHIP = "VerificationRelationship",
     SERVICE = "Service",
-    DID = "DID",
+    Document = "Document",
 }
