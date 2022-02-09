@@ -7,6 +7,7 @@ import {
     HcsDidCreateServiceEvent,
     HcsDidMessage,
     HcsDidTransaction,
+    HcsDidUpdateDidOwnerEvent,
     MessageEnvelope,
 } from "../../..";
 import { DidSyntax } from "../../did-syntax";
@@ -106,11 +107,29 @@ export class HcsDid {
         return this;
     }
 
-    public async changeOwner() {
+    public async changeOwner(args: { id: string; controller: string; publicKey: PublicKey }) {
+        if (!this.privateKey) {
+            throw new Error("privateKey is missing");
+        }
+
+        if (!this.client) {
+            throw new Error("Client configuration is missing");
+        }
+
         /**
-         * TODO: implementation of change owner functionality
+         * There should probably some more checks on new owner information
          */
-        throw new Error("not implemented yet");
+        /**
+         * TODO: how do we transfer control of the topic to this new user?
+         * TODO: how messages are going to be signed from now on?
+         */
+
+        await this.submitTransaciton(
+            DidMethodOperation.UPDATE,
+            new HcsDidUpdateDidOwnerEvent(args.id, args.controller, args.publicKey),
+            this.privateKey
+        );
+        return this;
     }
 
     public async delete() {
