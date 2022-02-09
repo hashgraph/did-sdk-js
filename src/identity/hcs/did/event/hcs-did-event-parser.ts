@@ -4,6 +4,7 @@ import { HcsDidDeleteEvent } from "./document/hcs-did-delete-event";
 import { HcsDidEvent } from "./hcs-did-event";
 import { HcsDidEventTargetName } from "./hcs-did-event-target-name";
 import { HcsDidCreateDidOwnerEvent } from "./owner/hcs-did-create-did-owner-event";
+import { HcsDidUpdateDidOwnerEvent } from "./owner/hcs-did-update-did-owner-event";
 import { HcsDidCreateServiceEvent } from "./service/hcs-did-create-service-event";
 import { HcsDidRevokeServiceEvent } from "./service/hcs-did-revoke-service-event";
 import { HcsDidUpdateServiceEvent } from "./service/hcs-did-update-service-event";
@@ -22,6 +23,7 @@ const EVENT_NAME_TO_CLASS = {
         [HcsDidEventTargetName.VERIFICATION_RELATIONSHIP]: HcsDidCreateVerificationRelationshipEvent,
     },
     [DidMethodOperation.UPDATE]: {
+        [HcsDidEventTargetName.DID_OWNER]: HcsDidUpdateDidOwnerEvent,
         [HcsDidEventTargetName.SERVICE]: HcsDidUpdateServiceEvent,
         [HcsDidEventTargetName.VERIFICATION_METHOD]: HcsDidUpdateVerificationMethodEvent,
         [HcsDidEventTargetName.VERIFICATION_RELATIONSHIP]: HcsDidUpdateVerificationRelationshipEvent,
