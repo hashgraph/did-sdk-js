@@ -177,7 +177,7 @@ export class HcsDid {
      * @param args
      * @returns this
      */
-    public updateService(args: { id: string; type: ServiceTypes; serviceEndpoint: string }) {
+    public async updateService(args: { id: string; type: ServiceTypes; serviceEndpoint: string }) {
         this.validateClientConfig();
 
         if (!args || !args.id || !args.type || !args.serviceEndpoint) {
@@ -187,7 +187,8 @@ export class HcsDid {
             throw new Error("Event ID is invalid. Expected format: {did}#{key|service}-{integer}");
         }
         const event = new HcsDidUpdateServiceEvent(args.id, args.type, args.serviceEndpoint);
-        return this.submitTransaciton(DidMethodOperation.UPDATE, event, this.privateKey);
+        await this.submitTransaciton(DidMethodOperation.UPDATE, event, this.privateKey);
+        return this;
     }
 
     /**
@@ -195,7 +196,7 @@ export class HcsDid {
      * @param args
      * @returns this
      */
-    public revokeService(args: { id: string }) {
+    public async revokeService(args: { id: string }) {
         this.validateClientConfig();
         if (!args || !args.id) {
             throw new Error("Validation failed. Services args are missing");
@@ -204,7 +205,8 @@ export class HcsDid {
             throw new Error("Event ID is invalid. Expected format: {did}#{key|service}-{integer}");
         }
         const event = new HcsDidRevokeServiceEvent(args.id);
-        return this.submitTransaciton(DidMethodOperation.REVOKE, event, this.privateKey);
+        await this.submitTransaciton(DidMethodOperation.REVOKE, event, this.privateKey);
+        return this;
     }
 
     /**
@@ -341,6 +343,7 @@ export class HcsDid {
             args.publicKey
         );
         await this.submitTransaciton(DidMethodOperation.UPDATE, event, this.privateKey);
+        return this;
     }
 
     /**
