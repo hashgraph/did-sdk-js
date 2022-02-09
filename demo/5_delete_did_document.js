@@ -16,7 +16,7 @@ async function main() {
     const did = new HcsDid({ identifier: TEST_DID_STR, privateKey: privateKey, client: client });
 
     /**
-     * Build create Service message
+     * Delete DID
      */
     did.delete();
 }
