@@ -77,12 +77,6 @@ export class HcsDidMessage extends Message {
     /**
      * Validates this DID message by checking its completeness, signature and DID document.
      *
-     * @return True if the message is valid, false otherwise.
-     */
-    public isValid(): boolean;
-    /**
-     * Validates this DID message by checking its completeness, signature and DID document.
-     *
      * @param didTopicId The DID topic ID against which the message is validated.
      * @return True if the message is valid, false otherwise.
      */
@@ -94,34 +88,8 @@ export class HcsDidMessage extends Message {
             return false;
         }
 
-        /**
-         * TODO: review this logic and update accoridingly
-         */
-
         try {
-            // const doc: DidDocumentBase = DidDocumentBase.fromJson(this.getDidDocument());
-
-            // // Validate if DID and DID document are present and match
-            // if (this.did != doc.getId()) {
-            //     return false;
-            // }
-
-            // // Validate if DID root key is present in the document
-            // if (doc.getDidRootKey() == null || doc.getDidRootKey().getPublicKeyMultibase() == null) {
-            //     return false;
-            // }
-
-            // // Verify that DID was derived from this DID root key
-
             const hcsDid: HcsDid = DidParser.parse(this.did);
-
-            // // Extract public key from the DID document
-            // const publicKeyBytes: Uint8Array = Hashing.multibase.decode(doc.getDidRootKey().getPublicKeyMultibase());
-            // const publicKey: PublicKey = PublicKey.fromBytes(publicKeyBytes);
-
-            // if (HcsDid.publicKeyToIdString(publicKey) != hcsDid.getIdString()) {
-            //     return false;
-            // }
 
             // Verify that the message was sent to the right topic, if the DID contains the topic
             if (!!didTopicId && !!hcsDid.getTopicId() && didTopicId.toString() != hcsDid.getTopicId().toString()) {

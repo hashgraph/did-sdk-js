@@ -52,7 +52,7 @@ export class HcsDid {
         }
 
         if (this.identifier) {
-            const [networkName, topicId] = this.parseIdentifier(this.identifier);
+            const [networkName, topicId] = HcsDid.parseIdentifier(this.identifier);
             this.network = networkName;
             this.topicId = topicId;
         }
@@ -409,6 +409,11 @@ export class HcsDid {
         return PublicKey.fromBytes(Hashing.multibase.decode(idString));
     }
 
+    public static parsePublicKeyFromIdentifier(identifier: string): PublicKey {
+        const [_networkName, _topicId, didIdString] = HcsDid.parseIdentifier(identifier);
+        return HcsDid.stringToPublicKey(didIdString);
+    }
+
     /**
      * Private
      */
@@ -429,7 +434,7 @@ export class HcsDid {
         return ret;
     }
 
-    private parseIdentifier(identifier: string): [string, TopicId] {
+    private static parseIdentifier(identifier: string): [string, TopicId, string] {
         const [didPart, topicIdPart] = identifier.split(DidSyntax.DID_TOPIC_SEPARATOR);
 
         if (!topicIdPart) {
@@ -462,7 +467,7 @@ export class HcsDid {
                 throw new Error("DID string is invalid.");
             }
 
-            return [networkName, topicId];
+            return [networkName, topicId, didIdString];
         } catch (e) {
             throw new Error("DID string is invalid. " + e.message);
         }
@@ -475,7 +480,7 @@ export class HcsDid {
             return false;
         }
 
-        this.parseIdentifier(identifer);
+        HcsDid.parseIdentifier(identifer);
 
         if (!/^(key|service)\-[0-9]{1,}$/.test(id)) {
             return false;
