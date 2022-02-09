@@ -4,7 +4,7 @@ const { TEST_DID_STR } = require("./config");
 
 async function main() {
     /**
-     * Client setup
+     * Setup
      */
     const client = Client.forTestnet();
 
