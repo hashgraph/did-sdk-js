@@ -1,4 +1,10 @@
-import { DidMethodOperation, HcsDidCreateDidOwnerEvent, HcsDidCreateServiceEvent, HcsDidMessage } from "..";
+import {
+    DidMethodOperation,
+    HcsDidCreateDidOwnerEvent,
+    HcsDidCreateServiceEvent,
+    HcsDidMessage,
+    HcsDidUpdateDidOwnerEvent,
+} from "..";
 import { DidDocumentJsonProperties } from "./did-document-json-properties";
 import { DidSyntax } from "./did-syntax";
 import { HcsDidEventTargetName } from "./hcs/did/event/hcs-did-event-target-name";
@@ -13,7 +19,7 @@ export class DidDocument {
     private id: string;
     private context: string;
 
-    private owners: Map<string, any> = new Map();
+    private controller: any;
     private services: Map<string, any> = new Map();
     private verificationMethods: Map<string, any> = new Map();
 
@@ -33,7 +39,7 @@ export class DidDocument {
     }
 
     public hasOwner() {
-        return this.owners.size > 0;
+        return !this.controller;
     }
 
     public getContext(): string {
@@ -50,20 +56,25 @@ export class DidDocument {
         rootObject[DidDocumentJsonProperties.CONTEXT] = this.context;
         rootObject[DidDocumentJsonProperties.ID] = this.id;
 
-        rootObject[DidDocumentJsonProperties.VERIFICATION_METHOD] = [
-            ...Array.from(this.owners.values()),
-            ...Array.from(this.verificationMethods.values()),
-        ];
+        if (this.controller && this.id !== this.controller.controller) {
+            rootObject[DidDocumentJsonProperties.CONTROLLER] = this.controller.controller;
+        }
+
+        rootObject[DidDocumentJsonProperties.VERIFICATION_METHOD] = Array.from(this.verificationMethods.values());
 
         rootObject[DidDocumentJsonProperties.ASSERTION_METHOD] = [
-            ...Array.from(this.owners.keys()),
             ...this.verificationRelationships[DidDocumentJsonProperties.ASSERTION_METHOD],
         ];
 
         rootObject[DidDocumentJsonProperties.AUTHENTICATION] = [
-            ...Array.from(this.owners.keys()),
             ...this.verificationRelationships[DidDocumentJsonProperties.AUTHENTICATION],
         ];
+
+        if (this.controller) {
+            rootObject[DidDocumentJsonProperties.VERIFICATION_METHOD].unshift(this.controller);
+            rootObject[DidDocumentJsonProperties.ASSERTION_METHOD].unshift(this.controller.id);
+            rootObject[DidDocumentJsonProperties.AUTHENTICATION].unshift(this.controller.id);
+        }
 
         if (this.verificationRelationships[DidDocumentJsonProperties.KEY_AGREEMENT].length > 0) {
             rootObject[DidDocumentJsonProperties.KEY_AGREEMENT] = [
@@ -94,6 +105,15 @@ export class DidDocument {
 
     private processMessages(messages: HcsDidMessage[]): void {
         messages.forEach((msg) => {
+            if (
+                !this.controller &&
+                msg.getOperation() === DidMethodOperation.CREATE &&
+                msg.getEvent().targetName !== HcsDidEventTargetName.DID_OWNER
+            ) {
+                console.warn("DID document owner is not registered. Event will be ignored...");
+                return;
+            }
+
             switch (msg.getOperation()) {
                 case DidMethodOperation.CREATE:
                     this.processCreateMessage(msg);
@@ -121,17 +141,17 @@ export class DidDocument {
 
         switch (event.targetName) {
             case HcsDidEventTargetName.DID_OWNER:
-                if (this.owners.has(event.getId())) {
-                    console.warn(`Duplicate create DIDOwner event ID: ${event.getId()}. Event will be ignored...`);
+                if (this.controller) {
+                    console.warn(`DID owner is already registered: ${this.controller}. Event will be ignored...`);
                     return;
                 }
 
-                this.owners.set(event.getId(), {
+                this.controller = {
                     id: event.getId(),
                     type: (event as HcsDidCreateDidOwnerEvent).getType(),
                     controller: (event as HcsDidCreateDidOwnerEvent).getController(),
                     publicKeyMultibase: (event as HcsDidCreateDidOwnerEvent).getPublicKeyMultibase(),
-                });
+                };
                 return;
             case HcsDidEventTargetName.SERVICE:
                 if (this.services.has(event.getId())) {
@@ -202,10 +222,12 @@ export class DidDocument {
 
         switch (event.targetName) {
             case HcsDidEventTargetName.DID_OWNER:
-                /**
-                 * TODO: we need to decide what DIDOwner operations are possible and how do they reflect on the resolved document.
-                 */
-                console.warn(`Update DidOwner event is not supported. Event will be ignored...`);
+                this.controller = {
+                    id: event.getId(),
+                    type: (event as HcsDidUpdateDidOwnerEvent).getType(),
+                    controller: (event as HcsDidUpdateDidOwnerEvent).getController(),
+                    publicKeyMultibase: (event as HcsDidUpdateDidOwnerEvent).getPublicKeyMultibase(),
+                };
                 return;
             case HcsDidEventTargetName.SERVICE:
                 if (!this.services.has(event.getId())) {
@@ -272,12 +294,6 @@ export class DidDocument {
         const event = message.getEvent();
 
         switch (event.targetName) {
-            case HcsDidEventTargetName.DID_OWNER:
-                /**
-                 * TODO: we need to decide what DIDOwner operations are possible and how do they reflect on the resolved document.
-                 */
-                console.warn(`Revoke DidOwner event is not supported. Event will be ignored...`);
-                return;
             case HcsDidEventTargetName.SERVICE:
                 if (!this.services.has(event.getId())) {
                     console.warn(`Revoke Service event: service event ID: ${event.getId()}. Event will be ignored...`);
@@ -344,7 +360,7 @@ export class DidDocument {
 
         switch (event.targetName) {
             case HcsDidEventTargetName.Document:
-                this.owners.clear();
+                this.controller = null;
                 this.services.clear();
                 this.verificationMethods.clear();
                 Object.keys(this.verificationRelationships).forEach(

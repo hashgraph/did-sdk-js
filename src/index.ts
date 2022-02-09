@@ -6,6 +6,7 @@ import { DidSyntax } from "./identity/did-syntax";
 import { HcsDidDeleteEvent } from "./identity/hcs/did/event/document/hcs-did-delete-event";
 import { HcsDidEventTargetName } from "./identity/hcs/did/event/hcs-did-event-target-name";
 import { HcsDidCreateDidOwnerEvent } from "./identity/hcs/did/event/owner/hcs-did-create-did-owner-event";
+import { HcsDidUpdateDidOwnerEvent } from "./identity/hcs/did/event/owner/hcs-did-update-did-owner-event";
 import { HcsDidCreateServiceEvent } from "./identity/hcs/did/event/service/hcs-did-create-service-event";
 import { HcsDidRevokeServiceEvent } from "./identity/hcs/did/event/service/hcs-did-revoke-service-event";
 import { HcsDidUpdateServiceEvent } from "./identity/hcs/did/event/service/hcs-did-update-service-event";
@@ -43,6 +44,7 @@ export {
     Hashing,
     HcsDid,
     HcsDidCreateDidOwnerEvent,
+    HcsDidUpdateDidOwnerEvent,
     HcsDidCreateServiceEvent,
     HcsDidCreateVerificationMethodEvent,
     HcsDidCreateVerificationRelationshipEvent,
