@@ -1,4 +1,4 @@
-import { Timestamp, TopicId } from "@hashgraph/sdk";
+import { TopicId } from "@hashgraph/sdk";
 import { DidMethodOperation } from "../../did-method-operation";
 import { DidParser } from "../../did-parser";
 import { Message } from "../message";
@@ -13,26 +13,13 @@ export class HcsDidMessage extends Message {
     protected operation: DidMethodOperation;
     protected did: string;
     protected event: HcsDidEvent;
-    /**
-     * The date when the DID was created and published.
-     * It is equal to consensus timestamp of the first creation message.
-     * This property is set by the listener and injected into the DID document upon calling getDidDocument() method.
-     */
-
-    protected created: Timestamp;
-    /**
-     * The date when the DID was updated and published.
-     * It is equal to consensus timestamp of the last valid update or delete message.
-     * This property is set by the listener and injected into the DID document upon calling getDidDocument() method.
-     */
-    protected updated: Timestamp;
 
     /**
      * Creates a new instance of {@link HcsDidMessage}.
      *
      * @param operation         The operation on DID document.
      * @param did               The DID string.
-     * @param event The DID Event.
+     * @param event             The DID Event.
      */
     constructor(operation: DidMethodOperation, did: string, event: HcsDidEvent) {
         super();
@@ -58,28 +45,13 @@ export class HcsDidMessage extends Message {
         return this.getEvent().getBase64();
     }
 
-    public getCreated(): Timestamp {
-        return this.created;
-    }
-
-    public getUpdated(): Timestamp {
-        return this.updated;
-    }
-
-    public setUpdated(updated: Timestamp): void {
-        this.updated = updated;
-    }
-
-    public setCreated(created: Timestamp): void {
-        this.created = created;
-    }
-
     /**
      * Validates this DID message by checking its completeness, signature and DID document.
      *
      * @param didTopicId The DID topic ID against which the message is validated.
      * @return True if the message is valid, false otherwise.
      */
+    public isValid(): boolean;
     public isValid(didTopicId: TopicId): boolean;
     public isValid(...args: any[]): boolean {
         const didTopicId: TopicId = args[0] || null;

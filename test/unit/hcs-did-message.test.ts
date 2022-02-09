@@ -1,5 +1,6 @@
+import { Client, PrivateKey, TopicId } from "@hashgraph/sdk";
 import crypto from "crypto";
-import { TopicId } from "@hashgraph/sdk";
+import { DidMethodOperation, Hashing, HcsDid, HcsDidCreateDidOwnerEvent, HcsDidMessage } from "../../dist";
 
 const network = "testnet";
 const DID_TOPIC_ID1 = TopicId.fromString("0.0.2");
@@ -26,96 +27,106 @@ const decrypt = (cipherText, key) => {
 exports.encrypt = encrypt;
 exports.decrypt = decrypt;
 
-describe("HcsDidMessage", function () {
-    it("test", () => {
-        expect(true).toBeTruthy();
+describe("HcsDidMessage", () => {
+    const client = Client.forTestnet();
+    const privateKey = PrivateKey.generate();
+    const identifer = `did:hedera:${network}:${Hashing.multibase.encode(
+        privateKey.publicKey.toBytes()
+    )}_${DID_TOPIC_ID1}`;
+
+    it("Test Valid Message", () => {
+        const did = new HcsDid({ identifier: identifer, privateKey: privateKey, client: client });
+
+        const message = new HcsDidMessage(
+            DidMethodOperation.CREATE,
+            did.getIdentifier(),
+            new HcsDidCreateDidOwnerEvent(
+                did.getIdentifier() + "#did-root-key",
+                did.getIdentifier(),
+                privateKey.publicKey
+            )
+        );
+
+        expect(message.isValid(DID_TOPIC_ID1)).toEqual(true);
     });
-    // it("Test Valid Message", async function () {
-    //     const client = Client.forTestnet();
-    //     const privateKey = PrivateKey.generate();
-    //     const did = new HcsDid({privateKey: privateKey, client: client});
-    //     const doc = did.generateDidDocument();
-    //     const didJson = doc.toJSON();
-    //     const originalEnvelope = HcsDidMessage.fromDidDocumentJson(didJson, DidMethodOperation.CREATE);
-    //     const message = originalEnvelope.sign((msg) => privateKey.sign(msg));
-    //     const envelope = MessageEnvelope.fromJson(Buffer.from(message).toString("utf8"), HcsDidMessage);
-    //     assert.isTrue(envelope.isSignatureValid((e) => e.open().extractDidRootKey()));
-    //     assert.isTrue(envelope.open().isValid(DID_TOPIC_ID1));
-    //     assert.deepEqual(originalEnvelope.open().getTimestamp(), envelope.open().getTimestamp());
-    // });
-    // it("Test Encrypted Message", async function () {
-    //     const secret = "Secret encryption password";
-    //     const privateKey = PrivateKey.generate();
-    //     const did = new HcsDid(network, privateKey.publicKey, DID_TOPIC_ID1);
-    //     const doc = did.generateDidDocument();
-    //     const didJson = doc.toJSON();
-    //     const originalEnvelope = HcsDidMessage.fromDidDocumentJson(didJson, DidMethodOperation.CREATE);
-    //     const encryptedMsg = originalEnvelope.encrypt(HcsDidMessage.getEncrypter((m) => encrypt(m, secret)));
-    //     const encryptedSignedMsg = MessageEnvelope.fromJson(
-    //         ArraysUtils.toString(encryptedMsg.sign((m) => privateKey.sign(m))),
-    //         HcsDidMessage
-    //     );
-    //     assert.exists(encryptedSignedMsg);
-    //     assert.throw(() => {
-    //         encryptedSignedMsg.open();
-    //     });
-    //     const decryptedMsg = await encryptedSignedMsg.open(HcsDidMessage.getDecrypter((m, t) => decrypt(m, secret)));
-    //     assert.exists(decryptedMsg);
-    //     assert.equal(originalEnvelope.open().getDidDocumentBase64(), decryptedMsg.getDidDocumentBase64());
-    //     assert.equal(originalEnvelope.open().getDid(), decryptedMsg.getDid());
-    // });
-    // it("Test Invalid Did", async function () {
-    //     const privateKey = PrivateKey.generate();
-    //     const did = new HcsDid(network, privateKey.publicKey, DID_TOPIC_ID1);
-    //     const doc = did.generateDidDocument();
-    //     const didJson = doc.toJSON();
-    //     const message = HcsDidMessage.fromDidDocumentJson(didJson, DidMethodOperation.CREATE).sign((msg) =>
-    //         privateKey.sign(msg)
-    //     );
-    //     const msg = MessageEnvelope.fromJson(Buffer.from(message).toString("utf8"), HcsDidMessage).open();
-    //     const differentDid = new HcsDid(network, PrivateKey.generate().publicKey, DID_TOPIC_ID1);
-    //     msg.did = differentDid.toDid();
-    //     assert.isFalse(msg.isValid());
-    // });
-    // it("Test Invalid Topic", async function () {
-    //     const privateKey = PrivateKey.generate();
-    //     const did = new HcsDid(network, privateKey.publicKey, DID_TOPIC_ID1);
-    //     const doc = did.generateDidDocument();
-    //     const didJson = doc.toJSON();
-    //     const message = HcsDidMessage.fromDidDocumentJson(didJson, DidMethodOperation.CREATE).sign((msg) =>
-    //         privateKey.sign(msg)
-    //     );
-    //     const msg = await MessageEnvelope.fromJson(Buffer.from(message).toString("utf8"), HcsDidMessage).open();
-    //     assert.isTrue(msg.isValid(DID_TOPIC_ID1));
-    //     assert.isFalse(msg.isValid(DID_TOPIC_ID2));
-    // });
-    // it("Test Missing Data", async function () {
-    //     const privateKey = PrivateKey.generate();
-    //     const did = new HcsDid(network, privateKey.publicKey, DID_TOPIC_ID1);
-    //     const doc = did.generateDidDocument();
-    //     const operation = DidMethodOperation.CREATE;
-    //     const didJson = doc.toJSON();
-    //     const message = HcsDidMessage.fromDidDocumentJson(didJson, DidMethodOperation.CREATE).sign((msg) =>
-    //         privateKey.sign(msg)
-    //     );
-    //     const validMsg = MessageEnvelope.fromJson(Buffer.from(message).toString("utf8"), HcsDidMessage).open();
-    //     let msg = new HcsDidMessage(operation, null, validMsg.getDidDocumentBase64());
-    //     assert.isFalse(msg.isValid());
-    //     msg = new HcsDidMessage(operation, validMsg.getDid(), null);
-    //     assert.isFalse(msg.isValid());
-    //     assert.notExists(msg.getDidDocument());
-    //     assert.exists(msg.getDid());
-    //     assert.equal(operation, msg.getOperation());
-    // });
-    // it("Test Invalid Signature", async function () {
-    //     const privateKey = PrivateKey.generate();
-    //     const did = new HcsDid(network, privateKey.publicKey, DID_TOPIC_ID1);
-    //     const doc = did.generateDidDocument();
-    //     const didJson = doc.toJSON();
-    //     const message = HcsDidMessage.fromDidDocumentJson(didJson, DidMethodOperation.CREATE).sign((msg) =>
-    //         PrivateKey.generate().sign(msg)
-    //     );
-    //     const envelope = MessageEnvelope.fromJson(Buffer.from(message).toString("utf8"), HcsDidMessage);
-    //     assert.isFalse(envelope.isSignatureValid((e) => e.open().extractDidRootKey()));
-    // });
+
+    it("Test Invalid Did", () => {
+        const did = new HcsDid({ identifier: identifer, privateKey: privateKey, client: client });
+
+        const message = new HcsDidMessage(
+            DidMethodOperation.CREATE,
+            "invalid_did###",
+            new HcsDidCreateDidOwnerEvent(
+                did.getIdentifier() + "#did-root-key",
+                did.getIdentifier(),
+                privateKey.publicKey
+            )
+        );
+
+        expect(message.isValid()).toEqual(false);
+    });
+
+    it("Test Invalid Topic", () => {
+        const did = new HcsDid({ identifier: identifer, privateKey: privateKey, client: client });
+
+        const message = new HcsDidMessage(
+            DidMethodOperation.CREATE,
+            did.getIdentifier(),
+            new HcsDidCreateDidOwnerEvent(
+                did.getIdentifier() + "#did-root-key",
+                did.getIdentifier(),
+                privateKey.publicKey
+            )
+        );
+
+        expect(message.isValid(DID_TOPIC_ID1)).toEqual(true);
+        expect(message.isValid(DID_TOPIC_ID2)).toEqual(false);
+    });
+
+    it("Test Missing Data", () => {
+        const did = new HcsDid({ identifier: identifer, privateKey: privateKey, client: client });
+
+        let message = new HcsDidMessage(
+            null,
+            did.getIdentifier(),
+            new HcsDidCreateDidOwnerEvent(
+                did.getIdentifier() + "#did-root-key",
+                did.getIdentifier(),
+                privateKey.publicKey
+            )
+        );
+
+        expect(message.getOperation()).toEqual(null);
+        expect(message.isValid()).toEqual(false);
+
+        message = new HcsDidMessage(
+            DidMethodOperation.CREATE,
+            null,
+            new HcsDidCreateDidOwnerEvent(
+                did.getIdentifier() + "#did-root-key",
+                did.getIdentifier(),
+                privateKey.publicKey
+            )
+        );
+
+        expect(message.getDid()).toEqual(null);
+        expect(message.isValid()).toEqual(false);
+
+        message = new HcsDidMessage(DidMethodOperation.CREATE, did.getIdentifier(), null);
+
+        expect(message.getEvent()).toEqual(null);
+        expect(message.isValid()).toEqual(false);
+
+        message = new HcsDidMessage(
+            DidMethodOperation.CREATE,
+            did.getIdentifier(),
+            new HcsDidCreateDidOwnerEvent(
+                did.getIdentifier() + "#did-root-key",
+                did.getIdentifier(),
+                privateKey.publicKey
+            )
+        );
+
+        expect(message.isValid()).toEqual(true);
+    });
 });

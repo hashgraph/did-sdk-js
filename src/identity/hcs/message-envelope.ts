@@ -27,7 +27,6 @@ export class MessageEnvelope<T extends Message> {
         }
         return this.message.toJSON();
     }
-    protected decryptedMessage: T;
     protected mirrorResponse: SerializableMirrorConsensusResponse;
 
     /**
@@ -171,13 +170,7 @@ export class MessageEnvelope<T extends Message> {
      * @return The message object in a plain mode.
      */
     public open(): T {
-        if (this.decryptedMessage != null) {
-            return this.decryptedMessage;
-        }
-
-        this.decryptedMessage = this.message;
-
-        return this.decryptedMessage;
+        return this.message;
     }
 
     public getSignature(): string {
