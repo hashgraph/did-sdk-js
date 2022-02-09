@@ -300,6 +300,31 @@ didDocument = didDoc.toJsonTree();
 console.log(JSON.stringify(didDocument));
 ```
 
+### Delete DID Document
+
+```
+/**
+*  Setup
+*/
+const OPERATOR_ID=0.0.xxxx;
+const PRIVATE_KEY_STR=302...;
+const TEST_DID_STR = "did:hedera:testnet:z6Mkkcn1EDXc5vzpmvnQeCKpEswyrnQG7qq59k92gFRm1EGk_0.0.29637350";
+
+const privateKey = PrivateKey.fromString(PRIVATE_KEY_STR);
+const client = Client.forTestnet();
+client.setOperator(OPERATOR_ID, privateKey);
+
+/**
+* Build DID instance
+*/
+const did = new HcsDid({ identifier: TEST_DID_STR, privateKey: privateKey, client: client });
+
+/**
+* Delete DID
+*/
+did.delete();
+```
+
 ## Development
 
 ```
