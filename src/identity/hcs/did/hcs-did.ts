@@ -106,6 +106,26 @@ export class HcsDid {
         return this;
     }
 
+    public async changeOwner() {
+        /**
+         * TODO: implementation of change owner functionality
+         */
+        throw new Error("not implemented yet");
+    }
+
+    public async delete() {
+        if (!this.privateKey) {
+            throw new Error("privateKey is missing");
+        }
+
+        if (!this.client) {
+            throw new Error("Client configuration is missing");
+        }
+
+        await this.submitTransaciton(DidMethodOperation.DELETE, new HcsDidDeleteEvent(), this.privateKey);
+        return this;
+    }
+
     public async resolve(): Promise<DidDocument> {
         if (!this.identifier) {
             throw new Error("DID is not registered");
@@ -129,23 +149,6 @@ export class HcsDid {
                 })
                 .execute(this.client);
         });
-    }
-
-    public async delete() {
-        if (!this.privateKey) {
-            throw new Error("privateKey is missing");
-        }
-
-        if (!this.client) {
-            throw new Error("Client configuration is missing");
-        }
-
-        /**
-         * TODO: how to send empty message? we have only one listner that is event listner. you can not listen to different type of messages.
-         * I suggest we send DELETE event
-         */
-        await this.submitTransaciton(DidMethodOperation.DELETE, new HcsDidDeleteEvent(), this.privateKey);
-        return this;
     }
 
     /**

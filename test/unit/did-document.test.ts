@@ -32,6 +32,56 @@ describe("DidDocument", () => {
             });
         });
 
+        it("ignores events til first create DIDOwner event", () => {
+            const doc = new DidDocument(identifier, [
+                new HcsDidMessage(
+                    DidMethodOperation.CREATE,
+                    identifier,
+                    new HcsDidCreateServiceEvent(
+                        identifier + "#service-1",
+                        "LinkedDomains",
+                        "https://test.identity.com"
+                    )
+                ),
+                new HcsDidMessage(
+                    DidMethodOperation.CREATE,
+                    identifier,
+                    new HcsDidCreateDidOwnerEvent(identifier + "#did-root-key", identifier, privateKey.publicKey)
+                ),
+                new HcsDidMessage(
+                    DidMethodOperation.CREATE,
+                    identifier,
+                    new HcsDidCreateServiceEvent(
+                        identifier + "#service-2",
+                        "LinkedDomains",
+                        "https://test2.identity.com"
+                    )
+                ),
+            ]);
+
+            expect(doc.toJsonTree()).toEqual({
+                "@context": "https://www.w3.org/ns/did/v1",
+                id: identifier,
+                assertionMethod: [`${identifier}#did-root-key`],
+                authentication: [`${identifier}#did-root-key`],
+                service: [
+                    {
+                        id: `${identifier}#service-2`,
+                        serviceEndpoint: "https://test2.identity.com",
+                        type: "LinkedDomains",
+                    },
+                ],
+                verificationMethod: [
+                    {
+                        controller: identifier,
+                        id: `${identifier}#did-root-key`,
+                        publicKeyMultibase: "z6MkogVzoGJMVVLhaz82cA5jZQKAAqUghhCrpzkSDFDwxfJa",
+                        type: "Ed25519VerificationKey2018",
+                    },
+                ],
+            });
+        });
+
         it("handles create DIDOwner event", () => {
             const messages = [
                 new HcsDidMessage(
@@ -75,6 +125,65 @@ describe("DidDocument", () => {
                 authentication: [],
                 id: identifier,
                 verificationMethod: [],
+            });
+        });
+
+        it("handes change DID owner event", () => {
+            const otherOwnerKey = PrivateKey.generate();
+            const otherOwnerIdentifier =
+                "did:hedera:testnet:" + Hashing.multibase.encode(otherOwnerKey.publicKey.toBytes()) + "_0.0.29999999";
+            const key2 = PrivateKey.generate();
+
+            const messages = [
+                new HcsDidMessage(
+                    DidMethodOperation.CREATE,
+                    identifier,
+                    new HcsDidCreateDidOwnerEvent(identifier + "#did-root-key", identifier, privateKey.publicKey)
+                ),
+                new HcsDidMessage(
+                    DidMethodOperation.CREATE,
+                    identifier,
+                    new HcsDidCreateVerificationRelationshipEvent(
+                        identifier + "#key-2",
+                        "capabilityDelegation",
+                        "Ed25519VerificationKey2018",
+                        identifier,
+                        key2.publicKey
+                    )
+                ),
+                new HcsDidMessage(
+                    DidMethodOperation.UPDATE,
+                    identifier,
+                    new HcsDidCreateDidOwnerEvent(
+                        otherOwnerIdentifier + "#did-root-key",
+                        otherOwnerIdentifier,
+                        otherOwnerKey.publicKey
+                    )
+                ),
+            ];
+            const doc = new DidDocument(identifier, messages);
+
+            expect(doc.toJsonTree()).toEqual({
+                "@context": "https://www.w3.org/ns/did/v1",
+                assertionMethod: [`${otherOwnerIdentifier}#did-root-key`],
+                authentication: [`${otherOwnerIdentifier}#did-root-key`],
+                capabilityDelegation: [`${identifier}#key-2`],
+                controller: otherOwnerIdentifier,
+                id: identifier,
+                verificationMethod: [
+                    {
+                        controller: otherOwnerIdentifier,
+                        id: `${otherOwnerIdentifier}#did-root-key`,
+                        publicKeyMultibase: Hashing.multibase.encode(otherOwnerKey.publicKey.toBytes()),
+                        type: "Ed25519VerificationKey2018",
+                    },
+                    {
+                        controller: identifier,
+                        id: `${identifier}#key-2`,
+                        publicKeyMultibase: Hashing.multibase.encode(key2.publicKey.toBytes()),
+                        type: "Ed25519VerificationKey2018",
+                    },
+                ],
             });
         });
 
