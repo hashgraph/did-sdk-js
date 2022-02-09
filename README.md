@@ -353,10 +353,12 @@ npm run test:unit
 
 Run Integration Test
 
-Update the following environment variables with your `testnet` account details
+Open jest.setup.js file and update the following environment variables with your `testnet` account details
 
--   OPERATOR_ID=0.0.xxxx
--   OPERATOR_KEY=302...
+```
+process.env.OPERATOR_ID = "0.0.xxxxxx";
+process.env.OPERATOR_KEY = "302e02...";
+```
 
 ```
 npm run test:integration
