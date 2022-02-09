@@ -6,15 +6,15 @@ This repository contains the Javascript SDK for managing [DID Documents][did-cor
 
 ## Overview
 
-Hedera Consensus Service (HCS) allows applications to share common channels to publish and resolve an immutable and verifiable messages. These messages are submitted to Topic. SDK creates and uses DID topic on HCS for publishing DID Events Messages to resolve and validate DID Document.
+Hedera Consensus Service (HCS) allows applications to share common channels to publish and resolve immutable and verifiable messages. These messages are submitted to Topic. SDK creates and uses DID topic on HCS for publishing DID Events Messages to resolve and validate DID Document.
 
 This SDK is designed to simplify :
 
 -   Creation and initialization of the DID topic on HCS,
 -   Generation of decentralized identifiers for [Hedera DID Method][did-method-spec] and creation of DID documents,
--   Creation (publishing), update, revoke, deletion and resolution of DID documents based on DID documents event/log messages recorded on HCS Topic
+-   Creation (publishing), update, revoke, deletion, and resolution of DID documents based on DID documents event/log messages recorded on HCS Topic
 
-The SDK adhers to W3C standards to produce valid hedera:did and resolve it to DID Document. SDK also provide API to create, update, revoke and delete different DID Events Messages that represent different properties of a DID documents.
+The SDK adheres to W3C standards to produce valid hedera:did and resolve it to DID Document. SDK also provides API to create, update, revoke and delete different DID Events Messages that represent different properties of DID documents.
 
 ## Usage
 
@@ -36,7 +36,7 @@ npm install --save @hashgraph/did-sdk-js
 }
 ```
 
--   Following examples uses accountId as `OPERATOR_ID` and privateKey string value as `OPERATOR_KEY` to submit DID Event Messages to HCS.
+-   Following examples use accountId as `OPERATOR_ID` and privateKey string value as `OPERATOR_KEY` to submit DID Event Messages to HCS.
 
 ## Examples:
 
@@ -331,7 +331,7 @@ did.delete();
 git clone git@github.com:hashgraph/did-sdk-js.git
 ```
 
-First you need install dependencies and build project
+First, you need to install dependencies and build the project
 
 ```
 npm install
