@@ -1,146 +1,350 @@
 # did-sdk-js
-Support for the Hedera Hashgraph DID Method and Verifiable Credentials on the Hedera JavaScript/TypeScript SDK.
 
-This repository contains the Javascript SDK for managing [DID Documents][did-core] & [Verifiable Credentials][vc-data-model] registry using the Hedera Consensus Service.
+Support for the Hedera Hashgraph DID Method on the Hedera JavaScript/TypeScript SDK.
 
-did-sdk-js based on [did-sdk-java](https://github.com/hashgraph/did-sdk-java), so both of them contain similar methods and classes.
+This repository contains the Javascript SDK for managing [DID Documents][did-core] using the Hedera Consensus Service.
 
 ## Overview
 
-Identity networks are set of artifacts on Hedera Consensus Service that allow applications to share common channels to publish and resolve DID documents, issue verifiable credentials and control their validity status. These artifacts include:
-
-- address book - a file on Hedera File Service that provides information about HCS topics and appnet servers,
-- DID topic - an HCS topic intended for publishing DID documents,
-- and VC topic - an HCS topic playing a role of verifiable credentials registry.
+Hedera Consensus Service (HCS) allows applications to share common channels to publish and resolve an immutable and verifiable messages. These messages are submitted to Topic. SDK creates and uses DID topic on HCS for publishing DID Events Messages to resolve and validate DID Document.
 
 This SDK is designed to simplify :
 
-- creation of identity networks within appnets, that is: creation and initialization of the artifacts mentioned above,
-- generation of decentralized identifiers for [Hedera DID Method][did-method-spec] and creation of their basic DID documents,
-- creation (publishing), update, deletion and resolution of DID documents in appnet identity networks,
-- issuance, revocation and status verification of [Verifiable Credentials][vc-data-model].
+-   Creation and initialization of the DID topic on HCS,
+-   Generation of decentralized identifiers for [Hedera DID Method][did-method-spec] and creation of DID documents,
+-   Creation (publishing), update, revoke, deletion and resolution of DID documents based on DID documents event/log messages recorded on HCS Topic
 
-The SDK does not impose any particular way of how the DID or verifiable credential documents are constructed. Each appnet creators can choose their best way of creating those documents and as long as these are valid JSON-LD files adhering to W3C standards, they will be handled by the SDK.
+The SDK adhers to W3C standards to produce valid hedera:did and resolve it to DID Document. SDK also provide API to create, update, revoke and delete different DID Events Messages that represent different properties of a DID documents.
 
 ## Usage
+
 ```
 npm install --save @hashgraph/did-sdk-js
 ```
 
-## Example:
+## Setup Hedera Portal Account
 
-### Identity Network
+-   Register hedera portal Testnet account https://portal.hedera.com/register
+-   Login to portal https://portal.hedera.com/?network=testnet
+-   Obtain accountId & privateKey string value.
+
 ```
-const client = ... // Client
-
-const identityNetwork = new HcsIdentityNetworkBuilder()
-  .setNetwork("testnet")
-  .setAppnetName("MyIdentityAppnet")
-  .addAppnetDidServer("https://appnet-did-server-url:port/path-to-did-api")
-  .setPublicKey(publicKey)
-  .setMaxTransactionFee(new Hbar(2))
-  .setDidTopicMemo("MyIdentityAppnet DID topic")
-  .setVCTopicMemo("MyIdentityAppnet VC topic")
-  .execute(client);
+"operator": {
+  "accountId": "0.0.xxxx",
+  "publicKey": "...",
+  "privateKey": "302.."
+}
 ```
 
-### DID Generation
-From already instantiated network:
-```
-const identityNetwork = ...; //HcsIdentityNetwork
-// From a given DID root key:
-const didRootKey = ...; //PrivateKey
-const hcsDid = identityNetwork.generateDid(didRootKey.publicKey, false);
-```
-or:
-```
-// Without having a DID root key - it will be generated automatically:
-// Here we decided to add DID topic ID parameter `tid` to the DID.
-const hcsDidWithDidRootKey = identityNetwork.generateDid(true);
-const didRootKeyPrivateKey = hcsDidWithDidRootKey.getPrivateDidRootKey().get();
-```
-or by directly constructing HcsDid object:
-```
-const didRootKey = HcsDid.generateDidRootKey();
-const addressBookFileId = FileId.fromString("<hedera.address-book-file.id>");
+-   Following examples uses accountId as `OPERATOR_ID` and privateKey string value as `OPERATOR_KEY` to submit DID Event Messages to HCS.
 
-const hcsDid = new HcsDid(HederaNetwork.TESTNET, didRootKey.publicKey, addressBookFileId);
+## Examples:
+
+Sample demo setp by step javascript example are avalible at [Demo Folder][demo-location]. Make sure to add appropriate `testnet` account details in <b>`config.js`</b>
+
+-   OPERATOR_ID=0.0.xxxx
+-   OPERATOR_KEY=302...
+
+### DID Generation & Registration
+
 ```
-Existing Hedera DID strings can be parsed into HcsDid object by calling fromString method:
-```
-const didString = "did:hedera:testnet:7c38oC4ytrYDGCqsaZ1AXt7ZPQ8etzfwaxoKjfJNzfoc;hedera:testnet:fid=0.0.1";
-const did = HcsDid.fromString(didString);
+/**
+ * Client setup
+ */
+const OPERATOR_ID=0.0.xxxx;
+const OPERATOR_KEY=302...;
+const privateKey = PrivateKey.fromString(PRIVATE_KEY_STR);
+const client = Client.forTestnet();
+client.setOperator(OPERATOR_ID, privateKey);
+
+/**
+ * Register & Generate DID
+ */
+const did = new HcsDid({ privateKey: privateKey, client: client });
+const registeredDid = await did.register();
+console.log("\n");
+console.log(registeredDid.getIdentifier());
 ```
 
-### Transaction
+### DID Resolve
+
 ```
-const client = ...; //Client
-const identityNetwork = ...; //HcsIdentityNetwork
+/**
+ * Client setup
+ */
+const client = Client.forTestnet();
 
-const didRootKey = ...; //PrivateKey
-const hcsDid = ...; //HcsDid
+/**
+ * Build DID instance
+ */
+const TEST_DID_STR = "did:hedera:testnet:z6Mkkcn1EDXc5vzpmvnQeCKpEswyrnQG7qq59k92gFRm1EGk_0.0.29637350";
+const did = new HcsDid({ identifier: TEST_DID_STR, client: client });
 
-const didDocument = hcsDid.generateDidDocument().toJson();
+/**
+ * Resolve DID
+ */
+console.log("generating did doc");
+const didDoc = await did.resolve();
+console.log(didDoc.toJsonTree());
 
-// Build and execute transaction
-await identityNetwork.createDidTransaction(DidMethodOperation.CREATE)
-  // Provide DID document as JSON string
-  .setDidDocument(didDocument)
-  // Sign it with DID root key
-  .signMessage(doc => didRootKey.sign(doc))
-  // Configure ConsensusMessageSubmitTransaction, build it and sign if required by DID topic
-  .buildAndSignTransaction(tx => tx.setMaxTransactionFee(new Hbar(2)))
-  // Define callback function when consensus was reached and DID document came back from mirror node
-  .onMessageConfirmed(msg => {
-    //DID document published!
-  })
-  // Execute transaction
-  .execute(client);
+console.log("\n");
+console.log("===================================================");
+console.log("DID Event Messages Explorer:");
+console.log(`https://testnet.dragonglass.me/hedera/topics/${did.getTopicId().toString()}`);
+console.log("\n");
+```
+
+### Create, Update and Revoke [DID Document Core Properties][did-core-prop]
+
+#### Service
+
+```
+
+/**
+* Setup
+*/
+const OPERATOR_ID=0.0.xxxx;
+const PRIVATE_KEY_STR=302...;
+const TEST_DID_STR = "did:hedera:testnet:z6Mkkcn1EDXc5vzpmvnQeCKpEswyrnQG7qq59k92gFRm1EGk_0.0.29637350";
+
+const privateKey = PrivateKey.fromString(PRIVATE_KEY_STR);
+const client = Client.forTestnet();
+client.setOperator(OPERATOR_ID, privateKey);
+
+/**
+* Add Service
+*/
+let did = new HcsDid({ identifier: TEST_DID_STR, privateKey: privateKey, client: client });
+did = await did.addService({
+    id: did.getIdentifier() + "#service-1",
+    type: "LinkedDomains",
+    serviceEndpoint: "https://example.com/vcs",
+});
+
+console.log("\n");
+console.log("Added");
+let didDoc = await did.resolve();
+let didDocument = didDoc.toJsonTree();
+console.log(JSON.stringify(didDocument));
+
+/**
+* Update Service
+* ID must be same as ADD Service Event to update it
+*/
+did = await did.updateService({
+    id: did.getIdentifier() + "#service-1",
+    type: "LinkedDomains",
+    serviceEndpoint: "https://test.com/did",
+});
+
+console.log("\n");
+console.log("Updated");
+didDoc = await did.resolve();
+didDocument = didDoc.toJsonTree();
+console.log(JSON.stringify(didDocument));
+
+/**
+* Revoke Service
+*/
+did = await did.revokeService({
+    id: did.getIdentifier() + "#service-1",
+});
+
+console.log("\n");
+console.log("Revoked");
+didDoc = await did.resolve();
+didDocument = didDoc.toJsonTree();
+console.log(JSON.stringify(didDocument));
+
+```
+
+#### Verification Method
+
+```
+
+/**
+* Setup
+*/
+const OPERATOR_ID=0.0.xxxx;
+const PRIVATE_KEY_STR=302...;
+const TEST_DID_STR = "did:hedera:testnet:z6Mkkcn1EDXc5vzpmvnQeCKpEswyrnQG7qq59k92gFRm1EGk_0.0.29637350";
+
+const privateKey = PrivateKey.fromString(PRIVATE_KEY_STR);
+const client = Client.forTestnet();
+client.setOperator(OPERATOR_ID, privateKey);
+
+const newVerificaitonDid = "did:hedera:testnet:z6Mkkcn1EDXc5vzpmvnQeCKpEswyrnQG7qq59k92gFRm1EGk_0.0.29617801#key-1";
+const publicKey = HcsDid.stringToPublicKey("z6Mkkcn1EDXc5vzpmvnQeCKpEswyrnQG7qq59k92gFRm1EGk");
+const updatePublicKey = HcsDid.stringToPublicKey("z6MkhHbhBBLdKGiGnHPvrrH9GL7rgw6egpZiLgvQ9n7pHt1P");
+
+/**
+* Add Verification Method
+*/
+let did = new HcsDid({ identifier: TEST_DID_STR, privateKey: privateKey, client: client });
+did = await did.addVerificaitonMethod({
+    id: newVerificaitonDid,
+    type: "Ed25519VerificationKey2018",
+    controller: did.getIdentifier(),
+    publicKey,
+});
+
+console.log("\n");
+console.log("Added");
+let didDoc = await did.resolve();
+let didDocument = didDoc.toJsonTree();
+console.log(JSON.stringify(didDocument));
+
+/**
+* Update Verification Method
+* ID must be same as ADD Verification Method Event to update it
+*/
+did = await did.updateVerificaitonMethod({
+    id: newVerificaitonDid,
+    type: "Ed25519VerificationKey2018",
+    controller: did.getIdentifier(),
+    publicKey: updatePublicKey,
+});
+
+console.log("\n");
+console.log("Updated");
+didDoc = await did.resolve();
+didDocument = didDoc.toJsonTree();
+console.log(JSON.stringify(didDocument));
+
+/**
+* Revoke Verification Method
+*/
+did = await did.revokeVerificaitonMethod({
+    id: newVerificaitonDid,
+});
+
+console.log("\n");
+console.log("Revoked");
+didDoc = await did.resolve();
+didDocument = didDoc.toJsonTree();
+console.log(JSON.stringify(didDocument));
 ```
 
 [did-method-spec]: https://github.com/hashgraph/did-method
 [did-core]: https://www.w3.org/TR/did-core/
-[vc-data-model]: https://www.w3.org/TR/vc-data-model/
+[demo-location]: https://github.com/Meeco/did-sdk-js/tree/develop/demo
+[did-core-prop]: https://w3c.github.io/did-core/#core-properties
+
+#### Verification RelationShip - Authentication
+
+```
+/**
+* Setup
+*/
+const OPERATOR_ID=0.0.xxxx;
+const PRIVATE_KEY_STR=302...;
+const TEST_DID_STR = "did:hedera:testnet:z6Mkkcn1EDXc5vzpmvnQeCKpEswyrnQG7qq59k92gFRm1EGk_0.0.29637350";
+
+const privateKey = PrivateKey.fromString(PRIVATE_KEY_STR);
+const client = Client.forTestnet();
+client.setOperator(OPERATOR_ID, privateKey);
+
+const newVerificaitonDid = "did:hedera:testnet:z6Mkkcn1EDXc5vzpmvnQeCKpEswyrnQG7qq59k92gFRm1EGk_0.0.29617801#key-1";
+const publicKey = HcsDid.stringToPublicKey("z6Mkkcn1EDXc5vzpmvnQeCKpEswyrnQG7qq59k92gFRm1EGk");
+const updatePublicKey = HcsDid.stringToPublicKey("z6MkhHbhBBLdKGiGnHPvrrH9GL7rgw6egpZiLgvQ9n7pHt1P");
+
+/**
+* Add VerificationRelationship - authentication
+*/
+let did = new HcsDid({ identifier: TEST_DID_STR, privateKey: privateKey, client: client });
+did = await did.addVerificaitonRelationship({
+    id: newVerificaitonDid,
+    relationshipType: "authentication",
+    type: "Ed25519VerificationKey2018",
+    controller: did.getIdentifier(),
+    publicKey,
+});
+
+console.log("\n");
+console.log("Added");
+let didDoc = await did.resolve();
+let didDocument = didDoc.toJsonTree();
+console.log(JSON.stringify(didDocument));
+
+/**
+* Update VerificationRelationship - authentication
+* ID & relationshipType must be same as ADD Service Event to update it
+*/
+did = await did.updateVerificaitonRelationship({
+    id: newVerificaitonDid,
+    relationshipType: "authentication",
+    type: "Ed25519VerificationKey2018",
+    controller: did.getIdentifier(),
+    publicKey: updatePublicKey,
+});
+
+console.log("\n");
+console.log("Updated");
+didDoc = await did.resolve();
+didDocument = didDoc.toJsonTree();
+console.log(JSON.stringify(didDocument));
+
+/**
+* Revoke Service
+* ID & relationshipType must be same as ADD Service Event to update it
+*/
+did = await did.revokeVerificaitonRelationship({
+    id: newVerificaitonDid,
+    relationshipType: "authentication",
+});
+
+console.log("\n");
+console.log("Revoked");
+didDoc = await did.resolve();
+didDocument = didDoc.toJsonTree();
+console.log(JSON.stringify(didDocument));
+```
 
 ## Development
+
 ```
 git clone git@github.com:hashgraph/did-sdk-js.git
 ```
 
 First you need install dependencies and build project
+
 ```
 npm install
 ```
+
 Run build in dev mode (with sourcemap generation and following changes)
+
 ```
 npm run build:dev
 ```
 
 ## Tests
-For run tests you need to create and fill ```test/variables.js``` file before. There is ```test/variables.js.sample``` file as example.
+
+Run Unit Tests
+
+```
+npm run test:unit
+```
+
+Run Integration Test
 
 Update the following environment variables with your `testnet` account details
 
-* OPERATOR_ID=0.0.xxxx
-* OPERATOR_KEY=302...
+-   OPERATOR_ID=0.0.xxxx
+-   OPERATOR_KEY=302...
 
-You may also edit the following to use a different network (ensure your OPERATOR_ID and OPERATOR_KEY are valid)
-
-* NETWORK=testnet (can be `testnet`, `previewnet` or `mainnet`)
-* MIRROR_PROVIDER=hedera (can be `hedera` or `kabuto` (note `kabuto` not available on `previewnet`))
-
-Run tests
 ```
-npm run test
+npm run test:integration
 ```
 
 ## References
-- <https://github.com/hashgraph/did-method>
-- <https://github.com/hashgraph/hedera-sdk-js>
-- <https://docs.hedera.com/hedera-api/>
-- <https://www.hedera.com/>
-- <https://www.w3.org/TR/did-core/>
-- <https://www.w3.org/TR/vc-data-model/>
+
+-   <https://github.com/hashgraph/did-method>
+-   <https://github.com/hashgraph/hedera-sdk-js>
+-   <https://docs.hedera.com/hedera-api/>
+-   <https://www.hedera.com/>
+-   <https://www.w3.org/TR/did-core/>
+-   <https://www.w3.org/TR/vc-data-model/>
 
 ## License Information
 
