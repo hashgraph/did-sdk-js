@@ -1,5 +1,5 @@
 import { PublicKey } from "@hashgraph/sdk";
-import { Hashing } from "../../../../..";
+import { Hashing } from "../../../../../utils/hashing";
 import { HcsDidCreateDidOwnerEvent } from "./hcs-did-create-did-owner-event";
 
 export class HcsDidUpdateDidOwnerEvent extends HcsDidCreateDidOwnerEvent {

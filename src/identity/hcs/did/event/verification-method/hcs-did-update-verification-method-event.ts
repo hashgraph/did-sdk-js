@@ -1,5 +1,5 @@
 import { PublicKey } from "@hashgraph/sdk";
-import { Hashing } from "../../../../..";
+import { Hashing } from "../../../../../utils/hashing";
 import { HcsDidCreateVerificationMethodEvent } from "./hcs-did-create-verification-method-event";
 
 export class HcsDidUpdateVerificationMethodEvent extends HcsDidCreateVerificationMethodEvent {
