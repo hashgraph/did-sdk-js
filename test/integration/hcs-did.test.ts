@@ -425,7 +425,7 @@ describe("HcsDid", () => {
             const did = new HcsDid({ identifier });
 
             try {
-                await did.addVerificaitonMethod(undefined);
+                await did.addVerificationMethod(undefined);
             } catch (err) {
                 expect(err).toBeInstanceOf(Error);
                 expect(err.message).toEqual("privateKey is missing");
@@ -437,7 +437,7 @@ describe("HcsDid", () => {
             const did = new HcsDid({ privateKey });
 
             try {
-                await did.addVerificaitonMethod(undefined);
+                await did.addVerificationMethod(undefined);
             } catch (err) {
                 expect(err).toBeInstanceOf(Error);
                 expect(err.message).toEqual("Client configuration is missing");
@@ -449,7 +449,7 @@ describe("HcsDid", () => {
             const did = new HcsDid({ privateKey, client });
 
             try {
-                await did.addVerificaitonMethod(undefined);
+                await did.addVerificationMethod(undefined);
             } catch (err) {
                 expect(err).toBeInstanceOf(Error);
                 expect(err.message).toEqual("Validation failed. Verification Method args are missing");
@@ -460,14 +460,14 @@ describe("HcsDid", () => {
             const privateKey = PrivateKey.fromString(OPERATOR_KEY);
             const did = new HcsDid({ privateKey, client });
 
-            //new verificaiton DID and publickey
-            const newVerificaitonDid =
+            //new verification DID and publickey
+            const newVerificationDid =
                 "did:hedera:testnet:z6Mkkcn1EDXc5vzpmvnQeCKpEswyrnQG7qq59k92gFRm1EGk_0.0.29617801#key-1";
             const publicKey = HcsDid.stringToPublicKey("z6Mkkcn1EDXc5vzpmvnQeCKpEswyrnQG7qq59k92gFRm1EGk");
 
             await did.register();
-            await did.addVerificaitonMethod({
-                id: newVerificaitonDid,
+            await did.addVerificationMethod({
+                id: newVerificationDid,
                 type: "Ed25519VerificationKey2018",
                 controller: did.getIdentifier(),
                 publicKey,
@@ -498,7 +498,7 @@ describe("HcsDid", () => {
                     },
                     {
                         controller: did.getIdentifier(),
-                        id: newVerificaitonDid,
+                        id: newVerificationDid,
                         publicKeyMultibase: Hashing.multibase.encode(publicKey.toBytes()),
                         type: "Ed25519VerificationKey2018",
                     },
@@ -513,21 +513,21 @@ describe("HcsDid", () => {
             const privateKey = PrivateKey.fromString(OPERATOR_KEY);
             const did = new HcsDid({ privateKey, client });
 
-            //new verificaiton DID and publickey
-            const newVerificaitonDid =
+            //new verification DID and publickey
+            const newVerificationDid =
                 "did:hedera:testnet:z6Mkkcn1EDXc5vzpmvnQeCKpEswyrnQG7qq59k92gFRm1EGk_0.0.29617801#key-1";
             const publicKey = HcsDid.stringToPublicKey("z6Mkkcn1EDXc5vzpmvnQeCKpEswyrnQG7qq59k92gFRm1EGk");
             const updatePublicKey = HcsDid.stringToPublicKey("z6MkhHbhBBLdKGiGnHPvrrH9GL7rgw6egpZiLgvQ9n7pHt1P");
 
             await did.register();
-            await did.addVerificaitonMethod({
-                id: newVerificaitonDid,
+            await did.addVerificationMethod({
+                id: newVerificationDid,
                 type: "Ed25519VerificationKey2018",
                 controller: did.getIdentifier(),
                 publicKey,
             });
-            await did.updateVerificaitonMethod({
-                id: newVerificaitonDid,
+            await did.updateVerificationMethod({
+                id: newVerificationDid,
                 type: "Ed25519VerificationKey2018",
                 controller: did.getIdentifier(),
                 publicKey: updatePublicKey,
@@ -558,7 +558,7 @@ describe("HcsDid", () => {
                     },
                     {
                         controller: did.getIdentifier(),
-                        id: newVerificaitonDid,
+                        id: newVerificationDid,
                         publicKeyMultibase: Hashing.multibase.encode(updatePublicKey.toBytes()),
                         type: "Ed25519VerificationKey2018",
                     },
@@ -572,20 +572,20 @@ describe("HcsDid", () => {
             const privateKey = PrivateKey.fromString(OPERATOR_KEY);
             const did = new HcsDid({ privateKey, client });
 
-            //new verificaiton DID and publickey
-            const newVerificaitonDid =
+            //new verification DID and publickey
+            const newVerificationDid =
                 "did:hedera:testnet:z6Mkkcn1EDXc5vzpmvnQeCKpEswyrnQG7qq59k92gFRm1EGk_0.0.29617801#key-1";
             const publicKey = HcsDid.stringToPublicKey("z6Mkkcn1EDXc5vzpmvnQeCKpEswyrnQG7qq59k92gFRm1EGk");
 
             await did.register();
-            await did.addVerificaitonMethod({
-                id: newVerificaitonDid,
+            await did.addVerificationMethod({
+                id: newVerificationDid,
                 type: "Ed25519VerificationKey2018",
                 controller: did.getIdentifier(),
                 publicKey,
             });
-            await did.revokeVerificaitonMethod({
-                id: newVerificaitonDid,
+            await did.revokeVerificationMethod({
+                id: newVerificationDid,
             });
 
             /**
@@ -635,7 +635,7 @@ describe("HcsDid", () => {
             const did = new HcsDid({ identifier });
 
             try {
-                await did.addVerificaitonMethod(undefined);
+                await did.addVerificationMethod(undefined);
             } catch (err) {
                 expect(err).toBeInstanceOf(Error);
                 expect(err.message).toEqual("privateKey is missing");
@@ -647,7 +647,7 @@ describe("HcsDid", () => {
             const did = new HcsDid({ privateKey });
 
             try {
-                await did.addVerificaitonMethod(undefined);
+                await did.addVerificationMethod(undefined);
             } catch (err) {
                 expect(err).toBeInstanceOf(Error);
                 expect(err.message).toEqual("Client configuration is missing");
@@ -659,7 +659,7 @@ describe("HcsDid", () => {
             const did = new HcsDid({ privateKey, client });
 
             try {
-                await did.addVerificaitonRelationship(undefined);
+                await did.addVerificationRelationship(undefined);
             } catch (err) {
                 expect(err).toBeInstanceOf(Error);
                 expect(err.message).toEqual("Verification Relationship args are missing");
@@ -670,15 +670,15 @@ describe("HcsDid", () => {
             const privateKey = PrivateKey.fromString(OPERATOR_KEY);
             const did = new HcsDid({ privateKey, client });
 
-            //new verificaiton DID and publickey
-            const newVerificaitonDid =
+            //new verification DID and publickey
+            const newVerificationDid =
                 "did:hedera:testnet:z6Mkkcn1EDXc5vzpmvnQeCKpEswyrnQG7qq59k92gFRm1EGk_0.0.29617801#key-1";
             const publicKey = HcsDid.stringToPublicKey("z6Mkkcn1EDXc5vzpmvnQeCKpEswyrnQG7qq59k92gFRm1EGk");
 
             await (
                 await did.register()
-            ).addVerificaitonRelationship({
-                id: newVerificaitonDid,
+            ).addVerificationRelationship({
+                id: newVerificationDid,
                 relationshipType: "authentication",
                 type: "Ed25519VerificationKey2018",
                 controller: did.getIdentifier(),
@@ -691,7 +691,7 @@ describe("HcsDid", () => {
             expect(didDocument).toEqual({
                 "@context": "https://www.w3.org/ns/did/v1",
                 assertionMethod: [`${did.getIdentifier()}#did-root-key`],
-                authentication: [`${did.getIdentifier()}#did-root-key`, `${newVerificaitonDid}`],
+                authentication: [`${did.getIdentifier()}#did-root-key`, `${newVerificationDid}`],
                 id: did.getIdentifier(),
                 verificationMethod: [
                     {
@@ -702,7 +702,7 @@ describe("HcsDid", () => {
                     },
                     {
                         controller: did.getIdentifier(),
-                        id: newVerificaitonDid,
+                        id: newVerificationDid,
                         publicKeyMultibase: Hashing.multibase.encode(publicKey.toBytes()),
                         type: "Ed25519VerificationKey2018",
                     },
@@ -716,22 +716,22 @@ describe("HcsDid", () => {
             const privateKey = PrivateKey.fromString(OPERATOR_KEY);
             const did = new HcsDid({ privateKey, client });
 
-            //new verificaiton DID and publickey
-            const newVerificaitonDid =
+            //new verification DID and publickey
+            const newVerificationDid =
                 "did:hedera:testnet:z6Mkkcn1EDXc5vzpmvnQeCKpEswyrnQG7qq59k92gFRm1EGk_0.0.29617801#key-1";
             const publicKey = HcsDid.stringToPublicKey("z6Mkkcn1EDXc5vzpmvnQeCKpEswyrnQG7qq59k92gFRm1EGk");
             const updatePublicKey = HcsDid.stringToPublicKey("z6MkhHbhBBLdKGiGnHPvrrH9GL7rgw6egpZiLgvQ9n7pHt1P");
 
             await did.register();
-            await did.addVerificaitonRelationship({
-                id: newVerificaitonDid,
+            await did.addVerificationRelationship({
+                id: newVerificationDid,
                 relationshipType: "authentication",
                 type: "Ed25519VerificationKey2018",
                 controller: did.getIdentifier(),
                 publicKey,
             });
-            await did.updateVerificaitonRelationship({
-                id: newVerificaitonDid,
+            await did.updateVerificationRelationship({
+                id: newVerificationDid,
                 relationshipType: "authentication",
                 type: "Ed25519VerificationKey2018",
                 controller: did.getIdentifier(),
@@ -744,7 +744,7 @@ describe("HcsDid", () => {
             expect(didDocument).toEqual({
                 "@context": "https://www.w3.org/ns/did/v1",
                 assertionMethod: [`${did.getIdentifier()}#did-root-key`],
-                authentication: [`${did.getIdentifier()}#did-root-key`, `${newVerificaitonDid}`],
+                authentication: [`${did.getIdentifier()}#did-root-key`, `${newVerificationDid}`],
                 id: did.getIdentifier(),
                 verificationMethod: [
                     {
@@ -755,7 +755,7 @@ describe("HcsDid", () => {
                     },
                     {
                         controller: did.getIdentifier(),
-                        id: newVerificaitonDid,
+                        id: newVerificationDid,
                         publicKeyMultibase: Hashing.multibase.encode(updatePublicKey.toBytes()),
                         type: "Ed25519VerificationKey2018",
                     },
@@ -770,21 +770,21 @@ describe("HcsDid", () => {
             const privateKey = PrivateKey.fromString(OPERATOR_KEY);
             const did = new HcsDid({ privateKey, client });
 
-            //new verificaiton DID and publickey
-            const newVerificaitonDid =
+            //new verification DID and publickey
+            const newVerificationDid =
                 "did:hedera:testnet:z6Mkkcn1EDXc5vzpmvnQeCKpEswyrnQG7qq59k92gFRm1EGk_0.0.29617801#key-1";
             const publicKey = HcsDid.stringToPublicKey("z6Mkkcn1EDXc5vzpmvnQeCKpEswyrnQG7qq59k92gFRm1EGk");
 
             await did.register();
-            await did.addVerificaitonRelationship({
-                id: newVerificaitonDid,
+            await did.addVerificationRelationship({
+                id: newVerificationDid,
                 relationshipType: "authentication",
                 type: "Ed25519VerificationKey2018",
                 controller: did.getIdentifier(),
                 publicKey,
             });
-            await did.revokeVerificaitonRelationship({
-                id: newVerificaitonDid,
+            await did.revokeVerificationRelationship({
+                id: newVerificationDid,
                 relationshipType: "authentication",
             });
 

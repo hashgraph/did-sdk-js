@@ -23,7 +23,7 @@ export class HcsDidEventMessageResolver {
     private resultsHandler: (input: HcsDidMessage[]) => void;
     private errorHandler: (input: Error) => void;
     private existingSignatures: string[];
-    private listener: MessageListener<HcsDidMessage>;
+    private readonly listener: MessageListener<HcsDidMessage>;
     private noMoreMessagesTimeout: Long;
 
     /**
