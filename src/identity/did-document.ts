@@ -39,7 +39,7 @@ export class DidDocument {
     }
 
     public hasOwner() {
-        return !this.controller;
+        return !!this.controller;
     }
 
     public getContext(): string {
