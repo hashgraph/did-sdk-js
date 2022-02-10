@@ -8,20 +8,16 @@ import {
     TopicId,
     TopicUpdateTransaction,
 } from "@hashgraph/sdk";
-import {
-    DidDocument,
-    DidMethodOperation,
-    Hashing,
-    HcsDidCreateDidOwnerEvent,
-    HcsDidCreateServiceEvent,
-    HcsDidMessage,
-    HcsDidTransaction,
-    HcsDidUpdateDidOwnerEvent,
-    MessageEnvelope,
-} from "../../..";
+import { Hashing } from "../../../utils/hashing";
+import { DidDocument } from "../../did-document";
+import { DidMethodOperation } from "../../did-method-operation";
 import { DidSyntax } from "../../did-syntax";
+import { MessageEnvelope } from "../message-envelope";
 import { HcsDidDeleteEvent } from "./event/document/hcs-did-delete-event";
 import { HcsDidEvent } from "./event/hcs-did-event";
+import { HcsDidCreateDidOwnerEvent } from "./event/owner/hcs-did-create-did-owner-event";
+import { HcsDidUpdateDidOwnerEvent } from "./event/owner/hcs-did-update-did-owner-event";
+import { HcsDidCreateServiceEvent } from "./event/service/hcs-did-create-service-event";
 import { HcsDidRevokeServiceEvent } from "./event/service/hcs-did-revoke-service-event";
 import { HcsDidUpdateServiceEvent } from "./event/service/hcs-did-update-service-event";
 import { ServiceTypes } from "./event/service/types";
@@ -37,6 +33,8 @@ import {
     VerificationRelationshipType,
 } from "./event/verification-relationship/types";
 import { HcsDidEventMessageResolver } from "./hcs-did-event-message-resolver";
+import { HcsDidMessage } from "./hcs-did-message";
+import { HcsDidTransaction } from "./hcs-did-transaction";
 
 export class HcsDid {
     public static DID_METHOD = DidSyntax.Method.HEDERA_HCS;
