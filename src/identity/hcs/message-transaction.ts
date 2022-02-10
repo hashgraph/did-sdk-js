@@ -167,6 +167,8 @@ export abstract class MessageTransaction<T extends Message> {
 
         try {
             const response = await (await this.buildTransactionFunction(tx)).execute(client);
+            await response.getReceipt(client);
+
             transactionId = response.transactionId;
             this.executed = true;
         } catch (e) {
