@@ -10,7 +10,7 @@ async function main() {
     const client = Client.forTestnet();
     client.setOperator(OPERATOR_ID, privateKey);
 
-    const newVerificaitonDid = "did:hedera:testnet:z6Mkkcn1EDXc5vzpmvnQeCKpEswyrnQG7qq59k92gFRm1EGk_0.0.29617801#key-1";
+    const newVerificationDid = "did:hedera:testnet:z6Mkkcn1EDXc5vzpmvnQeCKpEswyrnQG7qq59k92gFRm1EGk_0.0.29617801#key-1";
     const publicKey = HcsDid.stringToPublicKey("z6Mkkcn1EDXc5vzpmvnQeCKpEswyrnQG7qq59k92gFRm1EGk");
     const updatePublicKey = HcsDid.stringToPublicKey("z6MkhHbhBBLdKGiGnHPvrrH9GL7rgw6egpZiLgvQ9n7pHt1P");
 
@@ -18,8 +18,8 @@ async function main() {
      * Add VerificationRelationship - authentication
      */
     let did = new HcsDid({ identifier: TEST_DID_STR, privateKey: privateKey, client: client });
-    did = await did.addVerificaitonRelationship({
-        id: newVerificaitonDid,
+    did = await did.addVerificationRelationship({
+        id: newVerificationDid,
         relationshipType: "authentication",
         type: "Ed25519VerificationKey2018",
         controller: did.getIdentifier(),
@@ -36,8 +36,8 @@ async function main() {
      * Update VerificationRelationship - authentication
      * ID & relationshipType must be same as ADD Service Event to update it
      */
-    did = await did.updateVerificaitonRelationship({
-        id: newVerificaitonDid,
+    did = await did.updateVerificationRelationship({
+        id: newVerificationDid,
         relationshipType: "authentication",
         type: "Ed25519VerificationKey2018",
         controller: did.getIdentifier(),
@@ -54,8 +54,8 @@ async function main() {
      * Revoke Service
      * ID & relationshipType must be same as ADD Service Event to update it
      */
-    did = await did.revokeVerificaitonRelationship({
-        id: newVerificaitonDid,
+    did = await did.revokeVerificationRelationship({
+        id: newVerificationDid,
         relationshipType: "authentication",
     });
 
