@@ -9,6 +9,14 @@ export class HcsDidRevokeVerificationMethodEvent extends HcsDidEvent {
     constructor(id: string) {
         super();
 
+        if (!id) {
+            throw new Error("Validation failed. Verification Method args are missing");
+        }
+
+        if (!this.isKeyEventIdValid(id)) {
+            throw new Error("Event ID is invalid. Expected format: {did}#key-{integer}");
+        }
+
         this.id = id;
     }
 
@@ -29,9 +37,6 @@ export class HcsDidRevokeVerificationMethodEvent extends HcsDidEvent {
     }
 
     static fromJsonTree(tree: any): HcsDidRevokeVerificationMethodEvent {
-        if (!tree.id) {
-            throw new Error("Tree data is missing one of the attributes: id");
-        }
-        return new HcsDidRevokeVerificationMethodEvent(tree.id);
+        return new HcsDidRevokeVerificationMethodEvent(tree?.id);
     }
 }
