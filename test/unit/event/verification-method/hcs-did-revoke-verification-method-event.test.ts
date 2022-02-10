@@ -12,6 +12,30 @@ describe("HcsDidRevokeVerificationMethodEvent", () => {
         it("targets verificationMethod", () => {
             expect(event.targetName).toEqual(HcsDidEventTargetName.VERIFICATION_METHOD);
         });
+
+        it("throws error if id is null", () => {
+            let error = null;
+            try {
+                new HcsDidRevokeVerificationMethodEvent(null);
+            } catch (err) {
+                error = err;
+            }
+
+            expect(error).toBeInstanceOf(Error);
+            expect(error.message).toEqual("Validation failed. Verification Method args are missing");
+        });
+
+        it("throws error if id is not valid", () => {
+            let error = null;
+            try {
+                new HcsDidRevokeVerificationMethodEvent(identifier);
+            } catch (err) {
+                error = err;
+            }
+
+            expect(error).toBeInstanceOf(Error);
+            expect(error.message).toEqual("Event ID is invalid. Expected format: {did}#key-{integer}");
+        });
     });
 
     describe("#getId", () => {

@@ -12,6 +12,14 @@ export class HcsDidCreateServiceEvent extends HcsDidEvent {
     constructor(id: string, type: ServiceTypes, serviceEndpoint: string) {
         super();
 
+        if (!id || !type || !serviceEndpoint) {
+            throw new Error("Validation failed. Services args are missing");
+        }
+
+        if (!this.isServiceEventIdValid(id)) {
+            throw new Error("Event ID is invalid. Expected format: {did}#service-{integer}");
+        }
+
         this.id = id;
         this.type = type;
         this.serviceEndpoint = serviceEndpoint;
@@ -44,9 +52,6 @@ export class HcsDidCreateServiceEvent extends HcsDidEvent {
     }
 
     static fromJsonTree(tree: any): HcsDidCreateServiceEvent {
-        if (!tree.id || !tree.type || !tree.serviceEndpoint) {
-            throw new Error("Tree data is missing one of the attributes: id, type, serviceEndpoint");
-        }
-        return new HcsDidCreateServiceEvent(tree.id, tree.type, tree.serviceEndpoint);
+        return new HcsDidCreateServiceEvent(tree?.id, tree?.type, tree?.serviceEndpoint);
     }
 }

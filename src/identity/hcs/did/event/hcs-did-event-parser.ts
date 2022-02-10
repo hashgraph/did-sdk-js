@@ -1,4 +1,4 @@
-import { Hashing } from "../../../..";
+import { Hashing } from "../../../../utils/hashing";
 import { DidMethodOperation } from "../../../did-method-operation";
 import { HcsDidDeleteEvent } from "./document/hcs-did-delete-event";
 import { HcsDidEvent } from "./hcs-did-event";

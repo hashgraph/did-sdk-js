@@ -1,7 +1,7 @@
 import { Client, Timestamp, TopicId } from "@hashgraph/sdk";
 import Long from "long";
-import { Validator } from "../../..";
 import { Sleep } from "../../../utils/sleep";
+import { Validator } from "../../../utils/validator";
 import { MessageEnvelope } from "../message-envelope";
 import { MessageListener } from "../message-listener";
 import { HcsDidMessage } from "./hcs-did-message";
