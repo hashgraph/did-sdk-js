@@ -12,6 +12,16 @@ const NETWORK = "testnet";
 const MIRROR_PROVIDER = ["hcs." + NETWORK + ".mirrornode.hedera.com:5600"];
 
 describe("HcsDid", () => {
+    let client;
+
+    beforeAll(async () => {
+        const operatorId = AccountId.fromString(OPERATOR_ID);
+        const operatorKey = PrivateKey.fromString(OPERATOR_KEY);
+        client = Client.forTestnet();
+        client.setMirrorNetwork(MIRROR_PROVIDER);
+        client.setOperator(operatorId, operatorKey);
+    });
+
     describe("#constructor", () => {
         it("throws error because of missing identifier and privateKey", () => {
             expect(() => new HcsDid({})).toThrowError(new Error("identifier and privateKey cannot both be empty"));
@@ -74,16 +84,6 @@ describe("HcsDid", () => {
     });
 
     describe("#register", () => {
-        let client;
-
-        beforeAll(() => {
-            const operatorId = AccountId.fromString(OPERATOR_ID);
-            const operatorKey = PrivateKey.fromString(OPERATOR_KEY);
-            client = Client.forTestnet();
-            client.setMirrorNetwork(MIRROR_PROVIDER);
-            client.setOperator(operatorId, operatorKey);
-        });
-
         it("throws error if DID is already registered", async () => {
             const privateKey = PrivateKey.fromString(OPERATOR_KEY);
             const did = new HcsDid({ privateKey, client });
@@ -158,16 +158,6 @@ describe("HcsDid", () => {
     });
 
     describe("#resolve", () => {
-        let client;
-
-        beforeAll(() => {
-            const operatorId = AccountId.fromString(OPERATOR_ID);
-            const operatorKey = PrivateKey.fromString(OPERATOR_KEY);
-            client = Client.forTestnet();
-            client.setMirrorNetwork(MIRROR_PROVIDER);
-            client.setOperator(operatorId, operatorKey);
-        });
-
         it("throws error about unregistered DID", async () => {
             const privateKey = PrivateKey.generate();
             const did = new HcsDid({ privateKey, client });
@@ -219,17 +209,194 @@ describe("HcsDid", () => {
         });
     });
 
-    describe("Add Update and Revoke Service meta-information", () => {
-        let client;
-
-        beforeAll(async () => {
-            const operatorId = AccountId.fromString(OPERATOR_ID);
-            const operatorKey = PrivateKey.fromString(OPERATOR_KEY);
-            client = Client.forTestnet();
-            client.setMirrorNetwork(MIRROR_PROVIDER);
-            client.setOperator(operatorId, operatorKey);
+    describe("#delete", () => {
+        it("throws error if DID is not registered", async () => {
+            const did = new HcsDid({ privateKey: PrivateKey.fromString(OPERATOR_KEY), client });
+            try {
+                await did.delete();
+            } catch (err) {
+                expect(err).toBeInstanceOf(Error);
+                expect(err.message).toEqual("DID is not registered");
+            }
         });
 
+        it("throws error if instance has no privateKey assigned", async () => {
+            const identifier = "did:hedera:testnet:z6MkgUv5CvjRP6AsvEYqSRN7djB6p4zK9bcMQ93g5yK6Td7N_0.0.29613327";
+            const did = new HcsDid({ identifier, client });
+            try {
+                await did.delete();
+            } catch (err) {
+                expect(err).toBeInstanceOf(Error);
+                expect(err.message).toEqual("privateKey is missing");
+            }
+        });
+
+        it("throws error if instance has no client assigned", async () => {
+            const identifier = "did:hedera:testnet:z6MkgUv5CvjRP6AsvEYqSRN7djB6p4zK9bcMQ93g5yK6Td7N_0.0.29613327";
+            const did = new HcsDid({ identifier, privateKey: PrivateKey.fromString(OPERATOR_KEY) });
+            try {
+                await did.delete();
+            } catch (err) {
+                expect(err).toBeInstanceOf(Error);
+                expect(err.message).toEqual("Client configuration is missing");
+            }
+        });
+
+        it("deletes the DID document", async () => {
+            const didPrivateKey = PrivateKey.generate();
+            const did = new HcsDid({ privateKey: didPrivateKey, client });
+
+            await did.register();
+
+            let didJSON = (await did.resolve()).toJsonTree();
+            expect(didJSON).toEqual({
+                "@context": "https://www.w3.org/ns/did/v1",
+                assertionMethod: [`${did.getIdentifier()}#did-root-key`],
+                authentication: [`${did.getIdentifier()}#did-root-key`],
+                id: did.getIdentifier(),
+                verificationMethod: [
+                    {
+                        controller: did.getIdentifier(),
+                        id: `${did.getIdentifier()}#did-root-key`,
+                        publicKeyMultibase: Hashing.multibase.encode(didPrivateKey.publicKey.toBytes()),
+                        type: "Ed25519VerificationKey2018",
+                    },
+                ],
+            });
+
+            await did.delete();
+
+            didJSON = (await did.resolve()).toJsonTree();
+            expect(didJSON).toEqual({
+                "@context": "https://www.w3.org/ns/did/v1",
+                assertionMethod: [],
+                authentication: [],
+                id: did.getIdentifier(),
+                verificationMethod: [],
+            });
+
+            let messages = await readTopicMessages(did.getTopicId(), client);
+            expect(messages.length).toEqual(2);
+        });
+    });
+
+    describe("#changeOwner", () => {
+        const docIdentifier = "did:hedera:testnet:z6MkgUv5CvjRP6AsvEYqSRN7djB6p4zK9bcMQ93g5yK6Td7N_0.0.99999999";
+        const newOwnerIdentifier = "did:hedera:testnet:z6MkgUv5CvjRP6AsvEYqSRN7djB6p4zK9bcMQ93g5yK6Td7N_0.0.29613327";
+
+        it("throws error that DID is not registered", async () => {
+            const didPrivateKey = PrivateKey.generate();
+            const did = new HcsDid({ privateKey: didPrivateKey, client: client });
+
+            try {
+                await did.changeOwner({
+                    id: docIdentifier,
+                    controller: newOwnerIdentifier,
+                    newPrivateKey: PrivateKey.generate(),
+                });
+            } catch (err) {
+                expect(err).toBeInstanceOf(Error);
+                expect(err.message).toEqual("DID is not registered");
+            }
+        });
+
+        it("throws error that privateKey is missing", async () => {
+            const did = new HcsDid({
+                identifier: docIdentifier,
+                client: client,
+            });
+
+            try {
+                await did.changeOwner({
+                    id: docIdentifier,
+                    controller: newOwnerIdentifier,
+                    newPrivateKey: PrivateKey.generate(),
+                });
+            } catch (err) {
+                expect(err).toBeInstanceOf(Error);
+                expect(err.message).toEqual("privateKey is missing");
+            }
+        });
+
+        it("throws error that Client configuration is missing", async () => {
+            const didPrivateKey = PrivateKey.generate();
+            const did = new HcsDid({
+                identifier: docIdentifier,
+                privateKey: didPrivateKey,
+            });
+
+            try {
+                await did.changeOwner({
+                    id: docIdentifier,
+                    controller: newOwnerIdentifier,
+                    newPrivateKey: PrivateKey.generate(),
+                });
+            } catch (err) {
+                expect(err).toBeInstanceOf(Error);
+                expect(err.message).toEqual("Client configuration is missing");
+            }
+        });
+
+        it("throws error that newPrivateKey is missing", async () => {
+            const didPrivateKey = PrivateKey.generate();
+            const did = new HcsDid({
+                identifier: docIdentifier,
+                privateKey: didPrivateKey,
+                client: client,
+            });
+
+            try {
+                await did.changeOwner({
+                    id: docIdentifier,
+                    controller: newOwnerIdentifier,
+                    newPrivateKey: null,
+                });
+            } catch (err) {
+                expect(err).toBeInstanceOf(Error);
+                expect(err.message).toEqual("newPrivateKey is missing");
+            }
+        });
+
+        it("changes the owner of the document", async () => {
+            const didPrivateKey = PrivateKey.generate();
+            const newDidPrivateKey = PrivateKey.generate();
+            const did = new HcsDid({
+                privateKey: didPrivateKey,
+                client: client,
+            });
+
+            await did.register();
+
+            await did.changeOwner({
+                id: did.getIdentifier(),
+                controller: newOwnerIdentifier,
+                newPrivateKey: newDidPrivateKey,
+            });
+
+            const doc = (await did.resolve()).toJsonTree();
+
+            expect(doc).toEqual({
+                "@context": "https://www.w3.org/ns/did/v1",
+                assertionMethod: [`${did.getIdentifier()}#did-root-key`],
+                authentication: [`${did.getIdentifier()}#did-root-key`],
+                controller: newOwnerIdentifier,
+                id: did.getIdentifier(),
+                verificationMethod: [
+                    {
+                        controller: newOwnerIdentifier,
+                        id: `${did.getIdentifier()}#did-root-key`,
+                        publicKeyMultibase: Hashing.multibase.encode(newDidPrivateKey.publicKey.toBytes()),
+                        type: "Ed25519VerificationKey2018",
+                    },
+                ],
+            });
+
+            let messages = await readTopicMessages(did.getTopicId(), client);
+            expect(messages.length).toEqual(2);
+        });
+    });
+
+    describe("Add Update and Revoke Service meta-information", () => {
         it("throws error if privatekey is missing", async () => {
             const identifier = "did:hedera:testnet:z6MkgUv5CvjRP6AsvEYqSRN7djB6p4zK9bcMQ93g5yK6Td7N_0.0.29613327";
             const did = new HcsDid({ identifier });
@@ -460,16 +627,6 @@ describe("HcsDid", () => {
     });
 
     describe("Add Update and Revoke VerificationMethod meta-information", () => {
-        let client;
-
-        beforeAll(async () => {
-            const operatorId = AccountId.fromString(OPERATOR_ID);
-            const operatorKey = PrivateKey.fromString(OPERATOR_KEY);
-            client = Client.forTestnet();
-            client.setMirrorNetwork(MIRROR_PROVIDER);
-            client.setOperator(operatorId, operatorKey);
-        });
-
         it("throws error if privatekey is missing", async () => {
             const identifier = "did:hedera:testnet:z6MkgUv5CvjRP6AsvEYqSRN7djB6p4zK9bcMQ93g5yK6Td7N_0.0.29613327";
             const did = new HcsDid({ identifier });
@@ -670,16 +827,6 @@ describe("HcsDid", () => {
     });
 
     describe("Add Update and Revoke VerificationMethod Relationship meta-information", () => {
-        let client;
-
-        beforeAll(async () => {
-            const operatorId = AccountId.fromString(OPERATOR_ID);
-            const operatorKey = PrivateKey.fromString(OPERATOR_KEY);
-            client = Client.forTestnet();
-            client.setMirrorNetwork(MIRROR_PROVIDER);
-            client.setOperator(operatorId, operatorKey);
-        });
-
         it("throws error if privatekey is missing", async () => {
             const identifier = "did:hedera:testnet:z6MkgUv5CvjRP6AsvEYqSRN7djB6p4zK9bcMQ93g5yK6Td7N_0.0.29613327";
             const did = new HcsDid({ identifier });
@@ -762,6 +909,7 @@ describe("HcsDid", () => {
             // DIDOwner and VerificationMethod event
             expect(did.getMessages().length).toEqual(2);
         });
+
         it("publish an update VerificationRelationship message and verify DID Document", async () => {
             const privateKey = PrivateKey.fromString(OPERATOR_KEY);
             const did = new HcsDid({ privateKey, client });
