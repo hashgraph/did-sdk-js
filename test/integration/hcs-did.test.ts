@@ -402,7 +402,7 @@ describe("HcsDid", () => {
             const did = new HcsDid({ identifier });
 
             try {
-                await did.addService(undefined);
+                await did.addService({ id: null, type: null, serviceEndpoint: null });
             } catch (err) {
                 expect(err).toBeInstanceOf(Error);
                 expect(err.message).toEqual("privateKey is missing");
@@ -414,7 +414,7 @@ describe("HcsDid", () => {
             const did = new HcsDid({ privateKey });
 
             try {
-                await did.addService(undefined);
+                await did.addService({ id: null, type: null, serviceEndpoint: null });
             } catch (err) {
                 expect(err).toBeInstanceOf(Error);
                 expect(err.message).toEqual("Client configuration is missing");
@@ -426,7 +426,7 @@ describe("HcsDid", () => {
             const did = new HcsDid({ privateKey, client });
 
             try {
-                await did.addService(undefined);
+                await did.addService({ id: null, type: null, serviceEndpoint: null });
             } catch (err) {
                 expect(err).toBeInstanceOf(Error);
                 expect(err.message).toEqual("Validation failed. Services args are missing");
@@ -446,7 +446,7 @@ describe("HcsDid", () => {
                 });
             } catch (err) {
                 expect(err).toBeInstanceOf(Error);
-                expect(err.message).toEqual("Event ID is invalid. Expected format: {did}#{key|service}-{integer}");
+                expect(err.message).toEqual("Event ID is invalid. Expected format: {did}#service-{integer}");
             }
         });
 
@@ -632,7 +632,7 @@ describe("HcsDid", () => {
             const did = new HcsDid({ identifier });
 
             try {
-                await did.addVerificationMethod(undefined);
+                await did.addVerificationMethod({ id: null, type: null, controller: null, publicKey: null });
             } catch (err) {
                 expect(err).toBeInstanceOf(Error);
                 expect(err.message).toEqual("privateKey is missing");
@@ -644,7 +644,7 @@ describe("HcsDid", () => {
             const did = new HcsDid({ privateKey });
 
             try {
-                await did.addVerificationMethod(undefined);
+                await did.addVerificationMethod({ id: null, type: null, controller: null, publicKey: null });
             } catch (err) {
                 expect(err).toBeInstanceOf(Error);
                 expect(err.message).toEqual("Client configuration is missing");
@@ -656,7 +656,7 @@ describe("HcsDid", () => {
             const did = new HcsDid({ privateKey, client });
 
             try {
-                await did.addVerificationMethod(undefined);
+                await did.addVerificationMethod({ id: null, type: null, controller: null, publicKey: null });
             } catch (err) {
                 expect(err).toBeInstanceOf(Error);
                 expect(err.message).toEqual("Validation failed. Verification Method args are missing");
@@ -832,7 +832,13 @@ describe("HcsDid", () => {
             const did = new HcsDid({ identifier });
 
             try {
-                await did.addVerificationMethod(undefined);
+                await did.addVerificationRelationship({
+                    id: null,
+                    relationshipType: null,
+                    type: null,
+                    controller: null,
+                    publicKey: null,
+                });
             } catch (err) {
                 expect(err).toBeInstanceOf(Error);
                 expect(err.message).toEqual("privateKey is missing");
@@ -844,7 +850,13 @@ describe("HcsDid", () => {
             const did = new HcsDid({ privateKey });
 
             try {
-                await did.addVerificationMethod(undefined);
+                await did.addVerificationRelationship({
+                    id: null,
+                    relationshipType: null,
+                    type: null,
+                    controller: null,
+                    publicKey: null,
+                });
             } catch (err) {
                 expect(err).toBeInstanceOf(Error);
                 expect(err.message).toEqual("Client configuration is missing");
@@ -856,7 +868,13 @@ describe("HcsDid", () => {
             const did = new HcsDid({ privateKey, client });
 
             try {
-                await did.addVerificationRelationship(undefined);
+                await did.addVerificationRelationship({
+                    id: null,
+                    relationshipType: null,
+                    type: null,
+                    controller: null,
+                    publicKey: null,
+                });
             } catch (err) {
                 expect(err).toBeInstanceOf(Error);
                 expect(err.message).toEqual("Verification Relationship args are missing");
