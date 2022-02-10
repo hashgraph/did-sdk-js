@@ -12,6 +12,42 @@ describe("HcsDidRevokeVerificationRelationshipEvent", () => {
         it("targets verificationMethod", () => {
             expect(event.targetName).toEqual(HcsDidEventTargetName.VERIFICATION_RELATIONSHIP);
         });
+
+        it("throws error if id is null", () => {
+            let error = null;
+            try {
+                new HcsDidRevokeVerificationRelationshipEvent(null, "authentication");
+            } catch (err) {
+                error = err;
+            }
+
+            expect(error).toBeInstanceOf(Error);
+            expect(error.message).toEqual("Validation failed. Verification Relationship args are missing");
+        });
+
+        it("throws error if relationshipType is null", () => {
+            let error = null;
+            try {
+                new HcsDidRevokeVerificationRelationshipEvent(identifier + "#key-1", null);
+            } catch (err) {
+                error = err;
+            }
+
+            expect(error).toBeInstanceOf(Error);
+            expect(error.message).toEqual("Validation failed. Verification Relationship args are missing");
+        });
+
+        it("throws error if id is not valid", () => {
+            let error = null;
+            try {
+                new HcsDidRevokeVerificationRelationshipEvent(identifier, "authentication");
+            } catch (err) {
+                error = err;
+            }
+
+            expect(error).toBeInstanceOf(Error);
+            expect(error.message).toEqual("Event ID is invalid. Expected format: {did}#key-{integer}");
+        });
     });
 
     describe("#getId", () => {

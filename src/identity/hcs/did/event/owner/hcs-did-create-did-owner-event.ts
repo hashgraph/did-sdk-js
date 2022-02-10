@@ -13,11 +13,16 @@ export class HcsDidCreateDidOwnerEvent extends HcsDidEvent {
     protected controller: string;
     protected publicKey: PublicKey;
 
-    /**
-     * TODO: I guess controller param is not necessary and can be derived from the publicKey, right?
-     */
     constructor(id: string, controller: string, publicKey: PublicKey) {
         super();
+
+        if (!id || !controller || !publicKey) {
+            throw new Error("Validation failed. DID Owner args are missing");
+        }
+
+        if (!this.isOwnerEventIdValid(id)) {
+            throw new Error("Event ID is invalid. Expected format: {did}#did-root-key");
+        }
 
         this.id = id;
         this.controller = controller;
@@ -60,11 +65,7 @@ export class HcsDidCreateDidOwnerEvent extends HcsDidEvent {
     }
 
     static fromJsonTree(tree: any): HcsDidCreateDidOwnerEvent {
-        if (!tree.id || !tree.controller || !tree.publicKeyMultibase) {
-            throw new Error("Tree data is missing one of the attributes: id, controller, publicKeyMultibase");
-        }
-
-        const publicKey = PublicKey.fromBytes(Hashing.multibase.decode(tree.publicKeyMultibase));
-        return new HcsDidCreateDidOwnerEvent(tree.id, tree.controller, publicKey);
+        const publicKey = PublicKey.fromBytes(Hashing.multibase.decode(tree?.publicKeyMultibase));
+        return new HcsDidCreateDidOwnerEvent(tree?.id, tree?.controller, publicKey);
     }
 }
