@@ -17,7 +17,7 @@ describe("HcsDid", () => {
             expect(() => new HcsDid({})).toThrowError(new Error("identifier and privateKey cannot both be empty"));
         });
 
-        it("successfuly builds HcsDid with private key only", () => {
+        it("successfully builds HcsDid with private key only", () => {
             const privateKey = PrivateKey.generate();
             const did = new HcsDid({ privateKey });
 
@@ -28,7 +28,7 @@ describe("HcsDid", () => {
             expect(did.getNetwork()).toEqual(undefined);
         });
 
-        it("successfuly builds HcsDid with identifier only", () => {
+        it("successfully builds HcsDid with identifier only", () => {
             const identifier = "did:hedera:testnet:z6MkgUv5CvjRP6AsvEYqSRN7djB6p4zK9bcMQ93g5yK6Td7N_0.0.29613327";
             const did = new HcsDid({ identifier });
 
@@ -39,7 +39,7 @@ describe("HcsDid", () => {
             expect(did.getNetwork()).toEqual("testnet");
         });
 
-        it("throws error if passed identifer is invalid", () => {
+        it("throws error if passed identifier is invalid", () => {
             [
                 null,
                 "invalidDid1",
@@ -128,7 +128,7 @@ describe("HcsDid", () => {
             expect(did.getClient()).toEqual(client);
             expect(did.getNetwork()).toEqual("testnet");
 
-            const messages = await readtTopicMessages(did.getTopicId(), client);
+            const messages = await readTopicMessages(did.getTopicId(), client);
 
             expect(messages.length).toEqual(1);
         });
@@ -140,19 +140,19 @@ describe("HcsDid", () => {
             await did.register();
             const topicId = did.getTopicId();
 
-            let messages = await readtTopicMessages(did.getTopicId(), client);
+            let messages = await readTopicMessages(did.getTopicId(), client);
             expect(messages.length).toEqual(1);
 
             await did.delete();
             expect(did.getTopicId()).toEqual(topicId);
 
-            messages = await readtTopicMessages(did.getTopicId(), client);
+            messages = await readTopicMessages(did.getTopicId(), client);
             expect(messages.length).toEqual(2);
 
             await did.register();
             expect(did.getTopicId()).toEqual(topicId);
 
-            messages = await readtTopicMessages(did.getTopicId(), client);
+            messages = await readTopicMessages(did.getTopicId(), client);
             expect(messages.length).toEqual(3);
         });
     });
@@ -266,7 +266,7 @@ describe("HcsDid", () => {
             }
         });
 
-        it("thorws error if event id is not valid", async () => {
+        it("throws error if event id is not valid", async () => {
             const privateKey = PrivateKey.fromString(OPERATOR_KEY);
             const did = new HcsDid({ privateKey, client });
 
@@ -866,7 +866,7 @@ describe("HcsDid", () => {
  * Test Helpers
  */
 
-async function readtTopicMessages(topicId, client, timeout = null) {
+async function readTopicMessages(topicId, client, timeout = null) {
     const messages = [];
 
     new TopicMessageQuery()
