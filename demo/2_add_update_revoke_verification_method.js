@@ -10,7 +10,7 @@ async function main() {
     const client = Client.forTestnet();
     client.setOperator(OPERATOR_ID, privateKey);
 
-    const newVerificaitonDid = "did:hedera:testnet:z6Mkkcn1EDXc5vzpmvnQeCKpEswyrnQG7qq59k92gFRm1EGk_0.0.29617801#key-1";
+    const newVerificationDid = "did:hedera:testnet:z6Mkkcn1EDXc5vzpmvnQeCKpEswyrnQG7qq59k92gFRm1EGk_0.0.29617801#key-1";
     const publicKey = HcsDid.stringToPublicKey("z6Mkkcn1EDXc5vzpmvnQeCKpEswyrnQG7qq59k92gFRm1EGk");
     const updatePublicKey = HcsDid.stringToPublicKey("z6MkhHbhBBLdKGiGnHPvrrH9GL7rgw6egpZiLgvQ9n7pHt1P");
 
@@ -18,8 +18,8 @@ async function main() {
      * Add Verification Method
      */
     let did = new HcsDid({ identifier: TEST_DID_STR, privateKey: privateKey, client: client });
-    did = await did.addVerificaitonMethod({
-        id: newVerificaitonDid,
+    did = await did.addVerificationMethod({
+        id: newVerificationDid,
         type: "Ed25519VerificationKey2018",
         controller: did.getIdentifier(),
         publicKey,
@@ -35,8 +35,8 @@ async function main() {
      * Update Verification Method
      * ID must be same as ADD Verification Method Event to update it
      */
-    did = await did.updateVerificaitonMethod({
-        id: newVerificaitonDid,
+    did = await did.updateVerificationMethod({
+        id: newVerificationDid,
         type: "Ed25519VerificationKey2018",
         controller: did.getIdentifier(),
         publicKey: updatePublicKey,
@@ -51,8 +51,8 @@ async function main() {
     /**
      * Revoke Verification Method
      */
-    did = await did.revokeVerificaitonMethod({
-        id: newVerificaitonDid,
+    did = await did.revokeVerificationMethod({
+        id: newVerificationDid,
     });
 
     console.log("\n");
