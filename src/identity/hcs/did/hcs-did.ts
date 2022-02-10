@@ -102,7 +102,7 @@ export class HcsDid {
             this.identifier,
             this.privateKey.publicKey
         );
-        await this.submitTransaciton(DidMethodOperation.CREATE, event, this.privateKey);
+        await this.submitTransaction(DidMethodOperation.CREATE, event, this.privateKey);
 
         return this;
     }
@@ -124,7 +124,7 @@ export class HcsDid {
          * TODO: how messages are going to be signed from now on?
          */
 
-        await this.submitTransaciton(
+        await this.submitTransaction(
             DidMethodOperation.UPDATE,
             new HcsDidUpdateDidOwnerEvent(args.id, args.controller, args.publicKey),
             this.privateKey
@@ -141,7 +141,7 @@ export class HcsDid {
             throw new Error("Client configuration is missing");
         }
 
-        await this.submitTransaciton(DidMethodOperation.DELETE, new HcsDidDeleteEvent(), this.privateKey);
+        await this.submitTransaction(DidMethodOperation.DELETE, new HcsDidDeleteEvent(), this.privateKey);
         return this;
     }
 
@@ -189,7 +189,7 @@ export class HcsDid {
             throw new Error("Event ID is invalid. Expected format: {did}#{key|service}-{integer}");
         }
         const event = new HcsDidCreateServiceEvent(args.id, args.type, args.serviceEndpoint);
-        await this.submitTransaciton(DidMethodOperation.CREATE, event, this.privateKey);
+        await this.submitTransaction(DidMethodOperation.CREATE, event, this.privateKey);
 
         return this;
     }
@@ -209,7 +209,7 @@ export class HcsDid {
             throw new Error("Event ID is invalid. Expected format: {did}#{key|service}-{integer}");
         }
         const event = new HcsDidUpdateServiceEvent(args.id, args.type, args.serviceEndpoint);
-        await this.submitTransaciton(DidMethodOperation.UPDATE, event, this.privateKey);
+        await this.submitTransaction(DidMethodOperation.UPDATE, event, this.privateKey);
         return this;
     }
 
@@ -227,7 +227,7 @@ export class HcsDid {
             throw new Error("Event ID is invalid. Expected format: {did}#{key|service}-{integer}");
         }
         const event = new HcsDidRevokeServiceEvent(args.id);
-        await this.submitTransaciton(DidMethodOperation.REVOKE, event, this.privateKey);
+        await this.submitTransaction(DidMethodOperation.REVOKE, event, this.privateKey);
         return this;
     }
 
@@ -236,7 +236,7 @@ export class HcsDid {
      * @param args
      * @returns this
      */
-    public async addVerificaitonMethod(args: {
+    public async addVerificationMethod(args: {
         id: string;
         type: VerificationMethodSupportedKeyType;
         controller: string;
@@ -252,7 +252,7 @@ export class HcsDid {
         }
 
         const event = new HcsDidCreateVerificationMethodEvent(args.id, args.type, args.controller, args.publicKey);
-        await this.submitTransaciton(DidMethodOperation.CREATE, event, this.privateKey);
+        await this.submitTransaction(DidMethodOperation.CREATE, event, this.privateKey);
 
         return this;
     }
@@ -262,7 +262,7 @@ export class HcsDid {
      * @param args
      * @returns this
      */
-    public async updateVerificaitonMethod(args: {
+    public async updateVerificationMethod(args: {
         id: string;
         type: VerificationMethodSupportedKeyType;
         controller: string;
@@ -278,7 +278,7 @@ export class HcsDid {
         }
 
         const event = new HcsDidUpdateVerificationMethodEvent(args.id, args.type, args.controller, args.publicKey);
-        await this.submitTransaciton(DidMethodOperation.UPDATE, event, this.privateKey);
+        await this.submitTransaction(DidMethodOperation.UPDATE, event, this.privateKey);
 
         return this;
     }
@@ -288,7 +288,7 @@ export class HcsDid {
      * @param args
      * @returns this
      */
-    public async revokeVerificaitonMethod(args: { id: string }) {
+    public async revokeVerificationMethod(args: { id: string }) {
         this.validateClientConfig();
         if (!args || !args.id) {
             throw new Error("Validation failed. Verification Method args are missing");
@@ -299,7 +299,7 @@ export class HcsDid {
         }
 
         const event = new HcsDidRevokeVerificationMethodEvent(args.id);
-        await this.submitTransaciton(DidMethodOperation.REVOKE, event, this.privateKey);
+        await this.submitTransaction(DidMethodOperation.REVOKE, event, this.privateKey);
 
         return this;
     }
@@ -309,7 +309,7 @@ export class HcsDid {
      * @param args
      * @returns this
      */
-    public async addVerificaitonRelationship(args: {
+    public async addVerificationRelationship(args: {
         id: string;
         relationshipType: VerificationRelationshipType;
         type: VerificationRelationshipSupportedKeyType;
@@ -332,7 +332,7 @@ export class HcsDid {
             args.controller,
             args.publicKey
         );
-        await this.submitTransaciton(DidMethodOperation.CREATE, event, this.privateKey);
+        await this.submitTransaction(DidMethodOperation.CREATE, event, this.privateKey);
 
         return this;
     }
@@ -342,7 +342,7 @@ export class HcsDid {
      * @param args
      * @returns this
      */
-    public async updateVerificaitonRelationship(args: {
+    public async updateVerificationRelationship(args: {
         id: string;
         relationshipType: VerificationRelationshipType;
         type: VerificationRelationshipSupportedKeyType;
@@ -364,7 +364,7 @@ export class HcsDid {
             args.controller,
             args.publicKey
         );
-        await this.submitTransaciton(DidMethodOperation.UPDATE, event, this.privateKey);
+        await this.submitTransaction(DidMethodOperation.UPDATE, event, this.privateKey);
         return this;
     }
 
@@ -373,7 +373,7 @@ export class HcsDid {
      * @param args
      * @returns this
      */
-    public async revokeVerificaitonRelationship(args: { id: string; relationshipType: VerificationRelationshipType }) {
+    public async revokeVerificationRelationship(args: { id: string; relationshipType: VerificationRelationshipType }) {
         this.validateClientConfig();
         if (!args || !args.id) {
             throw new Error("Verification Relationship args are missing");
@@ -383,7 +383,7 @@ export class HcsDid {
             throw new Error("Event ID is invalid. Expected format: {did}#{key|service}-{integer}");
         }
         const event = new HcsDidRevokeVerificationRelationshipEvent(args.id, args.relationshipType);
-        await this.submitTransaciton(DidMethodOperation.REVOKE, event, this.privateKey);
+        await this.submitTransaction(DidMethodOperation.REVOKE, event, this.privateKey);
         return this;
     }
 
@@ -496,13 +496,13 @@ export class HcsDid {
     }
 
     private isEventIdValid(eventId: string) {
-        const [identifer, id] = eventId.split("#");
+        const [identifier, id] = eventId.split("#");
 
-        if (!identifer || !id) {
+        if (!identifier || !id) {
             return false;
         }
 
-        HcsDid.parseIdentifier(identifer);
+        HcsDid.parseIdentifier(identifier);
 
         if (!/^(key|service)\-[0-9]{1,}$/.test(id)) {
             return false;
@@ -522,13 +522,13 @@ export class HcsDid {
     }
 
     /**
-     * Submit Message Transaciton to Hashgraph
+     * Submit Message Transaction to Hashgraph
      * @param didMethodOperation
      * @param event
      * @param privateKey
      * @returns this
      */
-    private async submitTransaciton(
+    private async submitTransaction(
         didMethodOperation: DidMethodOperation,
         event: HcsDidEvent,
         privateKey: PrivateKey
@@ -548,7 +548,7 @@ export class HcsDid {
                 .onMessageConfirmed((msg) => {
                     console.log("Message Published");
                     console.log(
-                        `Explor on dragonglass: https://testnet.dragonglass.me/hedera/topics/${this.getTopicId()}`
+                        `Explore on DragonGlass: https://testnet.dragonglass.me/hedera/topics/${this.getTopicId()}`
                     );
                     resolve(msg);
                 })
