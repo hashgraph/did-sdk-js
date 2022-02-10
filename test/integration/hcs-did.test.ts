@@ -90,24 +90,28 @@ describe("HcsDid", () => {
 
             await did.register();
 
+            let error = null;
             try {
                 await did.register();
             } catch (err) {
-                expect(err).toBeInstanceOf(Error);
-                expect(err.message).toEqual("DID is already registered");
+                error = err;
             }
+            expect(error).toBeInstanceOf(Error);
+            expect(error.message).toEqual("DID is already registered");
         });
 
         it("throws error if client configuration is missing", async () => {
             const privateKey = PrivateKey.generate();
             const did = new HcsDid({ privateKey });
 
+            let error = null;
             try {
                 await did.register();
             } catch (err) {
-                expect(err).toBeInstanceOf(Error);
-                expect(err.message).toEqual("Client configuration is missing");
+                error = err;
             }
+            expect(error).toBeInstanceOf(Error);
+            expect(error.message).toEqual("Client configuration is missing");
         });
 
         it("creates new DID by registering a topic and submitting first message", async () => {
@@ -162,25 +166,28 @@ describe("HcsDid", () => {
             const privateKey = PrivateKey.generate();
             const did = new HcsDid({ privateKey, client });
 
+            let error = null;
             try {
                 await did.resolve();
             } catch (err) {
-                expect(err).toBeInstanceOf(Error);
-
-                expect(err.message).toEqual("DID is not registered");
+                error = err;
             }
+            expect(error).toBeInstanceOf(Error);
+            expect(error.message).toEqual("DID is not registered");
         });
 
         it("throws error about missing Client parameter", async () => {
             const identifier = "did:hedera:testnet:z6MkgUv5CvjRP6AsvEYqSRN7djB6p4zK9bcMQ93g5yK6Td7N_0.0.29613327";
             const did = new HcsDid({ identifier });
 
+            let error = null;
             try {
                 await did.resolve();
             } catch (err) {
-                expect(err).toBeInstanceOf(Error);
-                expect(err.message).toEqual("Client configuration is missing");
+                error = err;
             }
+            expect(error).toBeInstanceOf(Error);
+            expect(error.message).toEqual("Client configuration is missing");
         });
 
         it("successfuly resolves just registered DID", async () => {
@@ -212,34 +219,40 @@ describe("HcsDid", () => {
     describe("#delete", () => {
         it("throws error if DID is not registered", async () => {
             const did = new HcsDid({ privateKey: PrivateKey.fromString(OPERATOR_KEY), client });
+            let error = null;
             try {
                 await did.delete();
             } catch (err) {
-                expect(err).toBeInstanceOf(Error);
-                expect(err.message).toEqual("DID is not registered");
+                error = err;
             }
+            expect(error).toBeInstanceOf(Error);
+            expect(error.message).toEqual("DID is not registered");
         });
 
         it("throws error if instance has no privateKey assigned", async () => {
             const identifier = "did:hedera:testnet:z6MkgUv5CvjRP6AsvEYqSRN7djB6p4zK9bcMQ93g5yK6Td7N_0.0.29613327";
             const did = new HcsDid({ identifier, client });
+            let error = null;
             try {
                 await did.delete();
             } catch (err) {
-                expect(err).toBeInstanceOf(Error);
-                expect(err.message).toEqual("privateKey is missing");
+                error = err;
             }
+            expect(error).toBeInstanceOf(Error);
+            expect(error.message).toEqual("privateKey is missing");
         });
 
         it("throws error if instance has no client assigned", async () => {
             const identifier = "did:hedera:testnet:z6MkgUv5CvjRP6AsvEYqSRN7djB6p4zK9bcMQ93g5yK6Td7N_0.0.29613327";
             const did = new HcsDid({ identifier, privateKey: PrivateKey.fromString(OPERATOR_KEY) });
+            let error = null;
             try {
                 await did.delete();
             } catch (err) {
-                expect(err).toBeInstanceOf(Error);
-                expect(err.message).toEqual("Client configuration is missing");
+                error = err;
             }
+            expect(error).toBeInstanceOf(Error);
+            expect(error.message).toEqual("Client configuration is missing");
         });
 
         it("deletes the DID document", async () => {
@@ -288,6 +301,7 @@ describe("HcsDid", () => {
             const didPrivateKey = PrivateKey.generate();
             const did = new HcsDid({ privateKey: didPrivateKey, client: client });
 
+            let error = null;
             try {
                 await did.changeOwner({
                     id: docIdentifier,
@@ -295,9 +309,10 @@ describe("HcsDid", () => {
                     newPrivateKey: PrivateKey.generate(),
                 });
             } catch (err) {
-                expect(err).toBeInstanceOf(Error);
-                expect(err.message).toEqual("DID is not registered");
+                error = err;
             }
+            expect(error).toBeInstanceOf(Error);
+            expect(error.message).toEqual("DID is not registered");
         });
 
         it("throws error that privateKey is missing", async () => {
@@ -306,6 +321,7 @@ describe("HcsDid", () => {
                 client: client,
             });
 
+            let error = null;
             try {
                 await did.changeOwner({
                     id: docIdentifier,
@@ -313,9 +329,10 @@ describe("HcsDid", () => {
                     newPrivateKey: PrivateKey.generate(),
                 });
             } catch (err) {
-                expect(err).toBeInstanceOf(Error);
-                expect(err.message).toEqual("privateKey is missing");
+                error = err;
             }
+            expect(error).toBeInstanceOf(Error);
+            expect(error.message).toEqual("privateKey is missing");
         });
 
         it("throws error that Client configuration is missing", async () => {
@@ -325,6 +342,7 @@ describe("HcsDid", () => {
                 privateKey: didPrivateKey,
             });
 
+            let error = null;
             try {
                 await did.changeOwner({
                     id: docIdentifier,
@@ -332,9 +350,10 @@ describe("HcsDid", () => {
                     newPrivateKey: PrivateKey.generate(),
                 });
             } catch (err) {
-                expect(err).toBeInstanceOf(Error);
-                expect(err.message).toEqual("Client configuration is missing");
+                error = err;
             }
+            expect(error).toBeInstanceOf(Error);
+            expect(error.message).toEqual("Client configuration is missing");
         });
 
         it("throws error that newPrivateKey is missing", async () => {
@@ -345,6 +364,7 @@ describe("HcsDid", () => {
                 client: client,
             });
 
+            let error = null;
             try {
                 await did.changeOwner({
                     id: docIdentifier,
@@ -352,9 +372,10 @@ describe("HcsDid", () => {
                     newPrivateKey: null,
                 });
             } catch (err) {
-                expect(err).toBeInstanceOf(Error);
-                expect(err.message).toEqual("newPrivateKey is missing");
+                error = err;
             }
+            expect(error).toBeInstanceOf(Error);
+            expect(error.message).toEqual("newPrivateKey is missing");
         });
 
         it("changes the owner of the document", async () => {
@@ -401,42 +422,49 @@ describe("HcsDid", () => {
             const identifier = "did:hedera:testnet:z6MkgUv5CvjRP6AsvEYqSRN7djB6p4zK9bcMQ93g5yK6Td7N_0.0.29613327";
             const did = new HcsDid({ identifier });
 
+            let error = null;
             try {
                 await did.addService({ id: null, type: null, serviceEndpoint: null });
             } catch (err) {
-                expect(err).toBeInstanceOf(Error);
-                expect(err.message).toEqual("privateKey is missing");
+                error = err;
             }
+            expect(error).toBeInstanceOf(Error);
+            expect(error.message).toEqual("privateKey is missing");
         });
 
         it("throws error if client configuration is missing", async () => {
             const privateKey = PrivateKey.generate();
             const did = new HcsDid({ privateKey });
 
+            let error = null;
             try {
                 await did.addService({ id: null, type: null, serviceEndpoint: null });
             } catch (err) {
-                expect(err).toBeInstanceOf(Error);
-                expect(err.message).toEqual("Client configuration is missing");
+                error = err;
             }
+            expect(error).toBeInstanceOf(Error);
+            expect(error.message).toEqual("Client configuration is missing");
         });
 
         it("throws error if Service arguments are missing", async () => {
             const privateKey = PrivateKey.generate();
             const did = new HcsDid({ privateKey, client });
 
+            let error = null;
             try {
                 await did.addService({ id: null, type: null, serviceEndpoint: null });
             } catch (err) {
-                expect(err).toBeInstanceOf(Error);
-                expect(err.message).toEqual("Validation failed. Services args are missing");
+                error = err;
             }
+            expect(error).toBeInstanceOf(Error);
+            expect(error.message).toEqual("Validation failed. Services args are missing");
         });
 
         it("throws error if event id is not valid", async () => {
             const privateKey = PrivateKey.fromString(OPERATOR_KEY);
             const did = new HcsDid({ privateKey, client });
 
+            let error = null;
             try {
                 await did.register();
                 await did.addService({
@@ -445,9 +473,10 @@ describe("HcsDid", () => {
                     serviceEndpoint: "https://example.com/vcs",
                 });
             } catch (err) {
-                expect(err).toBeInstanceOf(Error);
-                expect(err.message).toEqual("Event ID is invalid. Expected format: {did}#service-{integer}");
+                error = err;
             }
+            expect(error).toBeInstanceOf(Error);
+            expect(error.message).toEqual("Event ID is invalid. Expected format: {did}#service-{integer}");
         });
 
         it("publish a new Service message and verify DID Document", async () => {
@@ -631,36 +660,42 @@ describe("HcsDid", () => {
             const identifier = "did:hedera:testnet:z6MkgUv5CvjRP6AsvEYqSRN7djB6p4zK9bcMQ93g5yK6Td7N_0.0.29613327";
             const did = new HcsDid({ identifier });
 
+            let error = null;
             try {
                 await did.addVerificationMethod({ id: null, type: null, controller: null, publicKey: null });
             } catch (err) {
-                expect(err).toBeInstanceOf(Error);
-                expect(err.message).toEqual("privateKey is missing");
+                error = err;
             }
+            expect(error).toBeInstanceOf(Error);
+            expect(error.message).toEqual("privateKey is missing");
         });
 
         it("throws error if client configuration is missing", async () => {
             const privateKey = PrivateKey.generate();
             const did = new HcsDid({ privateKey });
 
+            let error = null;
             try {
                 await did.addVerificationMethod({ id: null, type: null, controller: null, publicKey: null });
             } catch (err) {
-                expect(err).toBeInstanceOf(Error);
-                expect(err.message).toEqual("Client configuration is missing");
+                error = err;
             }
+            expect(error).toBeInstanceOf(Error);
+            expect(error.message).toEqual("Client configuration is missing");
         });
 
         it("throws error if Verification Method arguments are missing", async () => {
             const privateKey = PrivateKey.generate();
             const did = new HcsDid({ privateKey, client });
 
+            let error = null;
             try {
                 await did.addVerificationMethod({ id: null, type: null, controller: null, publicKey: null });
             } catch (err) {
-                expect(err).toBeInstanceOf(Error);
-                expect(err.message).toEqual("Validation failed. Verification Method args are missing");
+                error = err;
             }
+            expect(error).toBeInstanceOf(Error);
+            expect(error.message).toEqual("Validation failed. Verification Method args are missing");
         });
 
         it("publish a new VerificationMethod message and verify DID Document", async () => {
@@ -831,6 +866,7 @@ describe("HcsDid", () => {
             const identifier = "did:hedera:testnet:z6MkgUv5CvjRP6AsvEYqSRN7djB6p4zK9bcMQ93g5yK6Td7N_0.0.29613327";
             const did = new HcsDid({ identifier });
 
+            let error = null;
             try {
                 await did.addVerificationRelationship({
                     id: null,
@@ -840,15 +876,17 @@ describe("HcsDid", () => {
                     publicKey: null,
                 });
             } catch (err) {
-                expect(err).toBeInstanceOf(Error);
-                expect(err.message).toEqual("privateKey is missing");
+                error = err;
             }
+            expect(error).toBeInstanceOf(Error);
+            expect(error.message).toEqual("privateKey is missing");
         });
 
         it("throws error if client configuration is missing", async () => {
             const privateKey = PrivateKey.generate();
             const did = new HcsDid({ privateKey });
 
+            let error = null;
             try {
                 await did.addVerificationRelationship({
                     id: null,
@@ -858,15 +896,17 @@ describe("HcsDid", () => {
                     publicKey: null,
                 });
             } catch (err) {
-                expect(err).toBeInstanceOf(Error);
-                expect(err.message).toEqual("Client configuration is missing");
+                error = err;
             }
+            expect(error).toBeInstanceOf(Error);
+            expect(error.message).toEqual("Client configuration is missing");
         });
 
         it("throws error if Verification Relationship arguments are missing", async () => {
             const privateKey = PrivateKey.generate();
             const did = new HcsDid({ privateKey, client });
 
+            let error = null;
             try {
                 await did.addVerificationRelationship({
                     id: null,
@@ -876,9 +916,10 @@ describe("HcsDid", () => {
                     publicKey: null,
                 });
             } catch (err) {
-                expect(err).toBeInstanceOf(Error);
-                expect(err.message).toEqual("Verification Relationship args are missing");
+                error = err;
             }
+            expect(error).toBeInstanceOf(Error);
+            expect(error.message).toEqual("Validation failed. Verification Relationship args are missing");
         });
 
         it("publish a new VerificationRelationship message and verify DID Document", async () => {
