@@ -73,13 +73,7 @@ export class HcsDid {
      */
 
     public async register() {
-        if (!this.privateKey) {
-            throw new Error("privateKey is missing");
-        }
-
-        if (!this.client) {
-            throw new Error("Client configuration is missing");
-        }
+        this.validateClientConfig();
 
         if (this.identifier) {
             await this.resolve();
@@ -124,13 +118,7 @@ export class HcsDid {
             throw new Error("DID is not registered");
         }
 
-        if (!this.privateKey) {
-            throw new Error("privateKey is missing");
-        }
-
-        if (!this.client) {
-            throw new Error("Client configuration is missing");
-        }
+        this.validateClientConfig();
 
         if (!args.newPrivateKey) {
             throw new Error("newPrivateKey is missing");
@@ -173,13 +161,7 @@ export class HcsDid {
             throw new Error("DID is not registered");
         }
 
-        if (!this.privateKey) {
-            throw new Error("privateKey is missing");
-        }
-
-        if (!this.client) {
-            throw new Error("Client configuration is missing");
-        }
+        this.validateClientConfig();
 
         await this.submitTransaction(DidMethodOperation.DELETE, new HcsDidDeleteEvent(), this.privateKey);
         return this;
@@ -222,12 +204,6 @@ export class HcsDid {
     public async addService(args: { id: string; type: ServiceTypes; serviceEndpoint: string }) {
         this.validateClientConfig();
 
-        if (!args || !args.id || !args.type || !args.serviceEndpoint) {
-            throw new Error("Validation failed. Services args are missing");
-        }
-        if (!this.isEventIdValid(args.id)) {
-            throw new Error("Event ID is invalid. Expected format: {did}#{key|service}-{integer}");
-        }
         const event = new HcsDidCreateServiceEvent(args.id, args.type, args.serviceEndpoint);
         await this.submitTransaction(DidMethodOperation.CREATE, event, this.privateKey);
 
@@ -242,14 +218,9 @@ export class HcsDid {
     public async updateService(args: { id: string; type: ServiceTypes; serviceEndpoint: string }) {
         this.validateClientConfig();
 
-        if (!args || !args.id || !args.type || !args.serviceEndpoint) {
-            throw new Error("Validation failed. Services args are missing");
-        }
-        if (!this.isEventIdValid(args.id)) {
-            throw new Error("Event ID is invalid. Expected format: {did}#{key|service}-{integer}");
-        }
         const event = new HcsDidUpdateServiceEvent(args.id, args.type, args.serviceEndpoint);
         await this.submitTransaction(DidMethodOperation.UPDATE, event, this.privateKey);
+
         return this;
     }
 
@@ -260,14 +231,10 @@ export class HcsDid {
      */
     public async revokeService(args: { id: string }) {
         this.validateClientConfig();
-        if (!args || !args.id) {
-            throw new Error("Validation failed. Services args are missing");
-        }
-        if (!this.isEventIdValid(args.id)) {
-            throw new Error("Event ID is invalid. Expected format: {did}#{key|service}-{integer}");
-        }
+
         const event = new HcsDidRevokeServiceEvent(args.id);
         await this.submitTransaction(DidMethodOperation.REVOKE, event, this.privateKey);
+
         return this;
     }
 
@@ -283,13 +250,6 @@ export class HcsDid {
         publicKey: PublicKey;
     }) {
         this.validateClientConfig();
-        if (!args || !args.id || !args.type || !args.controller || !args.publicKey) {
-            throw new Error("Validation failed. Verification Method args are missing");
-        }
-
-        if (!this.isEventIdValid(args.id)) {
-            throw new Error("Event ID is invalid. Expected format: {did}#{key|service}-{integer}");
-        }
 
         const event = new HcsDidCreateVerificationMethodEvent(args.id, args.type, args.controller, args.publicKey);
         await this.submitTransaction(DidMethodOperation.CREATE, event, this.privateKey);
@@ -309,13 +269,6 @@ export class HcsDid {
         publicKey: PublicKey;
     }) {
         this.validateClientConfig();
-        if (!args || !args.id || !args.type || !args.controller || !args.publicKey) {
-            throw new Error("Validation failed. Verification Method args are missing");
-        }
-
-        if (!this.isEventIdValid(args.id)) {
-            throw new Error("Event ID is invalid. Expected format: {did}#{key|service}-{integer}");
-        }
 
         const event = new HcsDidUpdateVerificationMethodEvent(args.id, args.type, args.controller, args.publicKey);
         await this.submitTransaction(DidMethodOperation.UPDATE, event, this.privateKey);
@@ -330,13 +283,6 @@ export class HcsDid {
      */
     public async revokeVerificationMethod(args: { id: string }) {
         this.validateClientConfig();
-        if (!args || !args.id) {
-            throw new Error("Validation failed. Verification Method args are missing");
-        }
-
-        if (!this.isEventIdValid(args.id)) {
-            throw new Error("Event ID is invalid. Expected format: {did}#{key|service}-{integer}");
-        }
 
         const event = new HcsDidRevokeVerificationMethodEvent(args.id);
         await this.submitTransaction(DidMethodOperation.REVOKE, event, this.privateKey);
@@ -357,13 +303,6 @@ export class HcsDid {
         publicKey: PublicKey;
     }) {
         this.validateClientConfig();
-        if (!args || !args.id || !args.relationshipType || !args.type || !args.controller || !args.publicKey) {
-            throw new Error("Verification Relationship args are missing");
-        }
-
-        if (!this.isEventIdValid(args.id)) {
-            throw new Error("Event ID is invalid. Expected format: {did}#{key|service}-{integer}");
-        }
 
         const event = new HcsDidCreateVerificationRelationshipEvent(
             args.id,
@@ -390,13 +329,7 @@ export class HcsDid {
         publicKey: PublicKey;
     }) {
         this.validateClientConfig();
-        if (!args || !args.id || !args.relationshipType || !args.type || !args.controller || !args.publicKey) {
-            throw new Error("Verification Relationship args are missing");
-        }
 
-        if (!this.isEventIdValid(args.id)) {
-            throw new Error("Event ID is invalid. Expected format: {did}#{key|service}-{integer}");
-        }
         const event = new HcsDidUpdateVerificationRelationshipEvent(
             args.id,
             args.relationshipType,
@@ -405,6 +338,7 @@ export class HcsDid {
             args.publicKey
         );
         await this.submitTransaction(DidMethodOperation.UPDATE, event, this.privateKey);
+
         return this;
     }
 
@@ -415,15 +349,10 @@ export class HcsDid {
      */
     public async revokeVerificationRelationship(args: { id: string; relationshipType: VerificationRelationshipType }) {
         this.validateClientConfig();
-        if (!args || !args.id) {
-            throw new Error("Verification Relationship args are missing");
-        }
 
-        if (!this.isEventIdValid(args.id)) {
-            throw new Error("Event ID is invalid. Expected format: {did}#{key|service}-{integer}");
-        }
         const event = new HcsDidRevokeVerificationRelationshipEvent(args.id, args.relationshipType);
         await this.submitTransaction(DidMethodOperation.REVOKE, event, this.privateKey);
+
         return this;
     }
 
@@ -496,7 +425,7 @@ export class HcsDid {
         return ret;
     }
 
-    private static parseIdentifier(identifier: string): [string, TopicId, string] {
+    public static parseIdentifier(identifier: string): [string, TopicId, string] {
         const [didPart, topicIdPart] = identifier.split(DidSyntax.DID_TOPIC_SEPARATOR);
 
         if (!topicIdPart) {
@@ -533,22 +462,6 @@ export class HcsDid {
         } catch (e) {
             throw new Error("DID string is invalid. " + e.message);
         }
-    }
-
-    private isEventIdValid(eventId: string) {
-        const [identifier, id] = eventId.split("#");
-
-        if (!identifier || !id) {
-            return false;
-        }
-
-        HcsDid.parseIdentifier(identifier);
-
-        if (!/^(key|service)\-[0-9]{1,}$/.test(id)) {
-            return false;
-        }
-
-        return true;
     }
 
     private validateClientConfig() {

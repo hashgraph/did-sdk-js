@@ -17,6 +17,86 @@ describe("HcsDidUpdateVerificationMethodEvent", () => {
         it("targets verificationMethod", () => {
             expect(event.targetName).toEqual(HcsDidEventTargetName.VERIFICATION_METHOD);
         });
+
+        it("throws error if id is null", () => {
+            let error = null;
+            try {
+                new HcsDidUpdateVerificationMethodEvent(
+                    null,
+                    "Ed25519VerificationKey2018",
+                    identifier,
+                    privateKey.publicKey
+                );
+            } catch (err) {
+                error = err;
+            }
+
+            expect(error).toBeInstanceOf(Error);
+            expect(error.message).toEqual("Validation failed. Verification Method args are missing");
+        });
+
+        it("throws error if type is null", () => {
+            let error = null;
+            try {
+                new HcsDidUpdateVerificationMethodEvent(identifier + "#key-1", null, identifier, privateKey.publicKey);
+            } catch (err) {
+                error = err;
+            }
+
+            expect(error).toBeInstanceOf(Error);
+            expect(error.message).toEqual("Validation failed. Verification Method args are missing");
+        });
+
+        it("throws error if controller is null", () => {
+            let error = null;
+            try {
+                new HcsDidUpdateVerificationMethodEvent(
+                    identifier + "#key-1",
+                    "Ed25519VerificationKey2018",
+                    null,
+                    privateKey.publicKey
+                );
+            } catch (err) {
+                error = err;
+            }
+
+            expect(error).toBeInstanceOf(Error);
+            expect(error.message).toEqual("Validation failed. Verification Method args are missing");
+        });
+
+        it("throws error publicKey id is null", () => {
+            let error = null;
+            try {
+                new HcsDidUpdateVerificationMethodEvent(
+                    identifier + "#key-1",
+                    "Ed25519VerificationKey2018",
+                    identifier,
+                    null
+                );
+            } catch (err) {
+                error = err;
+            }
+
+            expect(error).toBeInstanceOf(Error);
+            expect(error.message).toEqual("Validation failed. Verification Method args are missing");
+        });
+
+        it("throws error if id is not valid", () => {
+            let error = null;
+            try {
+                new HcsDidUpdateVerificationMethodEvent(
+                    identifier,
+                    "Ed25519VerificationKey2018",
+                    identifier,
+                    privateKey.publicKey
+                );
+            } catch (err) {
+                error = err;
+            }
+
+            expect(error).toBeInstanceOf(Error);
+            expect(error.message).toEqual("Event ID is invalid. Expected format: {did}#key-{integer}");
+        });
     });
 
     describe("#getId", () => {
