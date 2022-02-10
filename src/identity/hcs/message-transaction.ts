@@ -2,7 +2,7 @@ import { Client, Timestamp, TopicId, TopicMessageSubmitTransaction, Transaction,
 import moment from "moment";
 import { ArraysUtils } from "../../utils/arrays-utils";
 import { Validator } from "../../utils/validator";
-import { Encrypter, Message, Signer } from "./message";
+import { Message, Signer } from "./message";
 import { MessageEnvelope } from "./message-envelope";
 import { MessageListener } from "./message-listener";
 
@@ -46,21 +46,6 @@ export abstract class MessageTransaction<T extends Message> {
             throw new Error("Invalid arguments");
         }
     }
-
-    /**
-     * Method that constructs a message envelope with a message of type T.
-     *
-     * @return The message envelope with a message inside ready to sign.
-     */
-    protected abstract buildMessage(): MessageEnvelope<T>;
-
-    /**
-     * Provides an instance of a message encrypter.
-     *
-     * @param encryptionFunction Encryption function used to encrypt single message property.
-     * @return The message encrypter instance.
-     */
-    protected abstract provideMessageEncrypter(encryptionFunction: Encrypter<string>): (input: T) => T;
 
     /**
      * Provides a {@link MessageListener} instance specific to the submitted message type.
@@ -143,7 +128,7 @@ export abstract class MessageTransaction<T extends Message> {
             return this.validate(v);
         });
 
-        const envelope = !this.message ? this.buildMessage() : this.message;
+        const envelope = this.message;
 
         const messageContent = !envelope.getSignature()
             ? envelope.sign(this.signer)
