@@ -173,7 +173,7 @@ const privateKey = PrivateKey.fromString(PRIVATE_KEY_STR);
 const client = Client.forTestnet();
 client.setOperator(OPERATOR_ID, privateKey);
 
-const newVerificaitonDid = "did:hedera:testnet:z6Mkkcn1EDXc5vzpmvnQeCKpEswyrnQG7qq59k92gFRm1EGk_0.0.29617801#key-1";
+const newVerificationDid = "did:hedera:testnet:z6Mkkcn1EDXc5vzpmvnQeCKpEswyrnQG7qq59k92gFRm1EGk_0.0.29617801#key-1";
 const publicKey = HcsDid.stringToPublicKey("z6Mkkcn1EDXc5vzpmvnQeCKpEswyrnQG7qq59k92gFRm1EGk");
 const updatePublicKey = HcsDid.stringToPublicKey("z6MkhHbhBBLdKGiGnHPvrrH9GL7rgw6egpZiLgvQ9n7pHt1P");
 
@@ -181,8 +181,8 @@ const updatePublicKey = HcsDid.stringToPublicKey("z6MkhHbhBBLdKGiGnHPvrrH9GL7rgw
 * Add Verification Method
 */
 let did = new HcsDid({ identifier: TEST_DID_STR, privateKey: privateKey, client: client });
-did = await did.addVerificaitonMethod({
-    id: newVerificaitonDid,
+did = await did.addVerificationMethod({
+    id: newVerificationDid,
     type: "Ed25519VerificationKey2018",
     controller: did.getIdentifier(),
     publicKey,
@@ -198,8 +198,8 @@ console.log(JSON.stringify(didDocument));
 * Update Verification Method
 * ID must be same as ADD Verification Method Event to update it
 */
-did = await did.updateVerificaitonMethod({
-    id: newVerificaitonDid,
+did = await did.updateVerificationMethod({
+    id: newVerificationDid,
     type: "Ed25519VerificationKey2018",
     controller: did.getIdentifier(),
     publicKey: updatePublicKey,
@@ -214,8 +214,8 @@ console.log(JSON.stringify(didDocument));
 /**
 * Revoke Verification Method
 */
-did = await did.revokeVerificaitonMethod({
-    id: newVerificaitonDid,
+did = await did.revokeVerificationMethod({
+    id: newVerificationDid,
 });
 
 console.log("\n");
@@ -244,7 +244,7 @@ const privateKey = PrivateKey.fromString(PRIVATE_KEY_STR);
 const client = Client.forTestnet();
 client.setOperator(OPERATOR_ID, privateKey);
 
-const newVerificaitonDid = "did:hedera:testnet:z6Mkkcn1EDXc5vzpmvnQeCKpEswyrnQG7qq59k92gFRm1EGk_0.0.29617801#key-1";
+const newVerificationDid = "did:hedera:testnet:z6Mkkcn1EDXc5vzpmvnQeCKpEswyrnQG7qq59k92gFRm1EGk_0.0.29617801#key-1";
 const publicKey = HcsDid.stringToPublicKey("z6Mkkcn1EDXc5vzpmvnQeCKpEswyrnQG7qq59k92gFRm1EGk");
 const updatePublicKey = HcsDid.stringToPublicKey("z6MkhHbhBBLdKGiGnHPvrrH9GL7rgw6egpZiLgvQ9n7pHt1P");
 
@@ -252,8 +252,8 @@ const updatePublicKey = HcsDid.stringToPublicKey("z6MkhHbhBBLdKGiGnHPvrrH9GL7rgw
 * Add VerificationRelationship - authentication
 */
 let did = new HcsDid({ identifier: TEST_DID_STR, privateKey: privateKey, client: client });
-did = await did.addVerificaitonRelationship({
-    id: newVerificaitonDid,
+did = await did.addVerificationRelationship({
+    id: newVerificationDid,
     relationshipType: "authentication",
     type: "Ed25519VerificationKey2018",
     controller: did.getIdentifier(),
@@ -270,8 +270,8 @@ console.log(JSON.stringify(didDocument));
 * Update VerificationRelationship - authentication
 * ID & relationshipType must be same as ADD Service Event to update it
 */
-did = await did.updateVerificaitonRelationship({
-    id: newVerificaitonDid,
+did = await did.updateVerificationRelationship({
+    id: newVerificationDid,
     relationshipType: "authentication",
     type: "Ed25519VerificationKey2018",
     controller: did.getIdentifier(),
@@ -288,8 +288,8 @@ console.log(JSON.stringify(didDocument));
 * Revoke Service
 * ID & relationshipType must be same as ADD Service Event to update it
 */
-did = await did.revokeVerificaitonRelationship({
-    id: newVerificaitonDid,
+did = await did.revokeVerificationRelationship({
+    id: newVerificationDid,
     relationshipType: "authentication",
 });
 
