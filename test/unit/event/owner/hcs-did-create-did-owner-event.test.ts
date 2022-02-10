@@ -12,6 +12,54 @@ describe("HcsDidCreateDidOwnerEvent", () => {
         it("targets DIDOwner", () => {
             expect(event.targetName).toEqual(HcsDidEventTargetName.DID_OWNER);
         });
+
+        it("throws error if id is null", () => {
+            let error = null;
+            try {
+                new HcsDidCreateDidOwnerEvent(null, identifier, privateKey.publicKey);
+            } catch (err) {
+                error = err;
+            }
+
+            expect(error).toBeInstanceOf(Error);
+            expect(error.message).toEqual("Validation failed. DID Owner args are missing");
+        });
+
+        it("throws error if controller is null", () => {
+            let error = null;
+            try {
+                new HcsDidCreateDidOwnerEvent(identifier + "#did-root-key", null, privateKey.publicKey);
+            } catch (err) {
+                error = err;
+            }
+
+            expect(error).toBeInstanceOf(Error);
+            expect(error.message).toEqual("Validation failed. DID Owner args are missing");
+        });
+
+        it("throws error if publicKey is null", () => {
+            let error = null;
+            try {
+                new HcsDidCreateDidOwnerEvent(identifier + "#did-root-key", identifier, null);
+            } catch (err) {
+                error = err;
+            }
+
+            expect(error).toBeInstanceOf(Error);
+            expect(error.message).toEqual("Validation failed. DID Owner args are missing");
+        });
+
+        it("throws error if id is not valid", () => {
+            let error = null;
+            try {
+                new HcsDidCreateDidOwnerEvent(identifier, identifier, privateKey.publicKey);
+            } catch (err) {
+                error = err;
+            }
+
+            expect(error).toBeInstanceOf(Error);
+            expect(error.message).toEqual("Event ID is invalid. Expected format: {did}#did-root-key");
+        });
     });
 
     describe("#getId", () => {

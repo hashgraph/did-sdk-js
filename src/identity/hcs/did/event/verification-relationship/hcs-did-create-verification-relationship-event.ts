@@ -1,5 +1,5 @@
 import { PublicKey } from "@hashgraph/sdk";
-import { Hashing } from "../../../../..";
+import { Hashing } from "../../../../../utils/hashing";
 import { HcsDidEvent } from "../hcs-did-event";
 import { HcsDidEventTargetName } from "../hcs-did-event-target-name";
 import { VerificationRelationshipSupportedKeyType, VerificationRelationshipType } from "./types";
@@ -21,6 +21,14 @@ export class HcsDidCreateVerificationRelationshipEvent extends HcsDidEvent {
         publicKey: PublicKey
     ) {
         super();
+
+        if (!id || !relationshipType || !type || !controller || !publicKey) {
+            throw new Error("Validation failed. Verification Relationship args are missing");
+        }
+
+        if (!this.isKeyEventIdValid(id)) {
+            throw new Error("Event ID is invalid. Expected format: {did}#key-{integer}");
+        }
 
         this.id = id;
         this.type = type;
@@ -70,18 +78,12 @@ export class HcsDidCreateVerificationRelationshipEvent extends HcsDidEvent {
     }
 
     static fromJsonTree(tree: any): HcsDidCreateVerificationRelationshipEvent {
-        if (!tree.id || !tree.relationshipType || !tree.type || !tree.controller || !tree.publicKeyMultibase) {
-            throw new Error(
-                "Tree data is missing one of the attributes: id, relationshipType, type, controller, publicKeyMultibase"
-            );
-        }
-
-        const publicKey = PublicKey.fromBytes(Hashing.multibase.decode(tree.publicKeyMultibase));
+        const publicKey = PublicKey.fromBytes(Hashing.multibase.decode(tree?.publicKeyMultibase));
         return new HcsDidCreateVerificationRelationshipEvent(
-            tree.id,
-            tree.relationshipType,
-            tree.type,
-            tree.controller,
+            tree?.id,
+            tree?.relationshipType,
+            tree?.type,
+            tree?.controller,
             publicKey
         );
     }
