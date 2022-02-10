@@ -48,25 +48,5 @@ describe("HcsDidTransaction", () => {
         });
 
         //TODO: mock dependencies and test submitTransaction
-
-        // it("", async () => {
-        //     const submitTransaction = await new Promise((resolve, reject) => {
-        //         transaction
-        //             .signMessage((msg) => privateKey.sign(msg))
-        //             .buildAndSignTransaction((tx) => tx.setMaxTransactionFee(HcsDid.TRANSACTION_FEE))
-        //             .onError((err) => {
-        //                 console.error(err);
-        //                 reject(err);
-        //             })
-        //             .onMessageConfirmed((msg) => {
-        //                 console.log("Message Published");
-        //                 console.log(
-        //                     `Explore on DragonGlass: https://testnet.dragonglass.me/hedera/topics/${this.getTopicId()}`
-        //                 );
-        //                 resolve(msg);
-        //             })
-        //             .execute(client);
-        //     });
-        // });
     });
 });
