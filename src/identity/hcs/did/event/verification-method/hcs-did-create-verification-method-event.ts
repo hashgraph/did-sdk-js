@@ -1,5 +1,5 @@
 import { PublicKey } from "@hashgraph/sdk";
-import { Hashing } from "../../../../..";
+import { Hashing } from "../../../../../utils/hashing";
 import { HcsDidEvent } from "../hcs-did-event";
 import { HcsDidEventTargetName } from "../hcs-did-event-target-name";
 import { VerificationMethodSupportedKeyType } from "./types";
