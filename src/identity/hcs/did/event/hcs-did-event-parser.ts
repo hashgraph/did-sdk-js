@@ -43,10 +43,10 @@ export class HcsDidEventParser {
 
         try {
             const tree = JSON.parse(Hashing.base64.decode(eventBase64));
-            const eventsByOpration = EVENT_NAME_TO_CLASS[operation];
-            const eventTargetName = Object.keys(eventsByOpration).find((etn) => !!tree[etn]);
+            const eventsByOperation = EVENT_NAME_TO_CLASS[operation];
+            const eventTargetName = Object.keys(eventsByOperation).find((etn) => !!tree[etn]);
 
-            return eventsByOpration[eventTargetName].fromJsonTree(tree[eventTargetName]);
+            return eventsByOperation[eventTargetName].fromJsonTree(tree[eventTargetName]);
         } catch {
             return null;
         }

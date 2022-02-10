@@ -16,8 +16,8 @@ import { HcsDidRevokeVerificationRelationshipEvent } from "./hcs/did/event/verif
 import { HcsDidUpdateVerificationRelationshipEvent } from "./hcs/did/event/verification-relationship/hcs-did-update-verification-relationship-event";
 
 export class DidDocument {
-    private id: string;
-    private context: string;
+    private readonly id: string;
+    private readonly context: string;
 
     private controller: any;
     private services: Map<string, any> = new Map();
@@ -263,7 +263,7 @@ export class DidDocument {
                 if (this.verificationRelationships[type]) {
                     if (!this.verificationRelationships[type].includes(event.getId())) {
                         console.warn(
-                            `Update VerificationRelationship event: veritificationRelationship with ID: ${event.getId()} was not found in the document.  Event will be ignored...`
+                            `Update VerificationRelationship event: verificationRelationship with ID: ${event.getId()} was not found in the document.  Event will be ignored...`
                         );
                         return;
                     }
