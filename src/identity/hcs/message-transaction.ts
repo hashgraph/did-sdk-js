@@ -12,7 +12,7 @@ export abstract class MessageTransaction<T extends Message> {
     protected topicId: TopicId;
     protected message: MessageEnvelope<T>;
 
-    private buildTransactionFunction: (input: TopicMessageSubmitTransaction) => Transaction;
+    private buildTransactionFunction: (input: TopicMessageSubmitTransaction) => Promise<Transaction>;
     private receiver: (input: MessageEnvelope<T>) => void;
     private errorHandler: (input: Error) => void;
     private executed: boolean;
@@ -111,7 +111,7 @@ export abstract class MessageTransaction<T extends Message> {
      * @return This transaction instance.
      */
     public buildAndSignTransaction(
-        builderFunction: (input: TopicMessageSubmitTransaction) => Transaction
+        builderFunction: (input: TopicMessageSubmitTransaction) => Promise<Transaction>
     ): MessageTransaction<T> {
         this.buildTransactionFunction = builderFunction;
         return this;
@@ -166,7 +166,9 @@ export abstract class MessageTransaction<T extends Message> {
         let transactionId;
 
         try {
-            const response = await this.buildTransactionFunction(tx).execute(client);
+            const response = await (await this.buildTransactionFunction(tx)).execute(client);
+            await response.getReceipt(client);
+
             transactionId = response.transactionId;
             this.executed = true;
         } catch (e) {

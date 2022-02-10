@@ -12,6 +12,30 @@ describe("HcsDidRevokeServiceEvent", () => {
         it("targets Service", () => {
             expect(event.targetName).toEqual(HcsDidEventTargetName.SERVICE);
         });
+
+        it("throws error if id is null", () => {
+            let error = null;
+            try {
+                new HcsDidRevokeServiceEvent(null);
+            } catch (err) {
+                error = err;
+            }
+
+            expect(error).toBeInstanceOf(Error);
+            expect(error.message).toEqual("Validation failed. Services args are missing");
+        });
+
+        it("throws error if id is not valid", () => {
+            let error = null;
+            try {
+                new HcsDidRevokeServiceEvent(identifier);
+            } catch (err) {
+                error = err;
+            }
+
+            expect(error).toBeInstanceOf(Error);
+            expect(error.message).toEqual("Event ID is invalid. Expected format: {did}#service-{integer}");
+        });
     });
 
     describe("#getId", () => {

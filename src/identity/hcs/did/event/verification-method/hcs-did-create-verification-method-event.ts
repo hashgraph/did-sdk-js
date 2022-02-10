@@ -1,5 +1,5 @@
 import { PublicKey } from "@hashgraph/sdk";
-import { Hashing } from "../../../../..";
+import { Hashing } from "../../../../../utils/hashing";
 import { HcsDidEvent } from "../hcs-did-event";
 import { HcsDidEventTargetName } from "../hcs-did-event-target-name";
 import { VerificationMethodSupportedKeyType } from "./types";
@@ -14,6 +14,14 @@ export class HcsDidCreateVerificationMethodEvent extends HcsDidEvent {
 
     constructor(id: string, type: VerificationMethodSupportedKeyType, controller: string, publicKey: PublicKey) {
         super();
+
+        if (!id || !type || !controller || !publicKey) {
+            throw new Error("Validation failed. Verification Method args are missing");
+        }
+
+        if (!this.isKeyEventIdValid(id)) {
+            throw new Error("Event ID is invalid. Expected format: {did}#key-{integer}");
+        }
 
         this.id = id;
         this.type = type;
@@ -57,11 +65,7 @@ export class HcsDidCreateVerificationMethodEvent extends HcsDidEvent {
     }
 
     static fromJsonTree(tree: any): HcsDidCreateVerificationMethodEvent {
-        if (!tree.id || !tree.type || !tree.controller || !tree.publicKeyMultibase) {
-            throw new Error("Tree data is missing one of the attributes: id, type, controller, publicKeyMultibase");
-        }
-
-        const publicKey = PublicKey.fromBytes(Hashing.multibase.decode(tree.publicKeyMultibase));
-        return new HcsDidCreateVerificationMethodEvent(tree.id, tree.type, tree.controller, publicKey);
+        const publicKey = PublicKey.fromBytes(Hashing.multibase.decode(tree?.publicKeyMultibase));
+        return new HcsDidCreateVerificationMethodEvent(tree?.id, tree?.type, tree?.controller, publicKey);
     }
 }

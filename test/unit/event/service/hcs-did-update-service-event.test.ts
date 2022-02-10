@@ -16,6 +16,54 @@ describe("HcsDidUpdateServiceEvent", () => {
         it("targets Service", () => {
             expect(event.targetName).toEqual(HcsDidEventTargetName.SERVICE);
         });
+
+        it("throws error if id is null", () => {
+            let error = null;
+            try {
+                new HcsDidUpdateServiceEvent(null, "DIDCommMessaging", "https://vc.test.service.com");
+            } catch (err) {
+                error = err;
+            }
+
+            expect(error).toBeInstanceOf(Error);
+            expect(error.message).toEqual("Validation failed. Services args are missing");
+        });
+
+        it("throws error if type is null", () => {
+            let error = null;
+            try {
+                new HcsDidUpdateServiceEvent(identifier + "#service-1", null, "https://vc.test.service.com");
+            } catch (err) {
+                error = err;
+            }
+
+            expect(error).toBeInstanceOf(Error);
+            expect(error.message).toEqual("Validation failed. Services args are missing");
+        });
+
+        it("throws error if serviceEndpoint is null", () => {
+            let error = null;
+            try {
+                new HcsDidUpdateServiceEvent(identifier + "#service-1", "DIDCommMessaging", null);
+            } catch (err) {
+                error = err;
+            }
+
+            expect(error).toBeInstanceOf(Error);
+            expect(error.message).toEqual("Validation failed. Services args are missing");
+        });
+
+        it("throws error if id is not valid", () => {
+            let error = null;
+            try {
+                new HcsDidUpdateServiceEvent(identifier, "DIDCommMessaging", "https://vc.test.service.com");
+            } catch (err) {
+                error = err;
+            }
+
+            expect(error).toBeInstanceOf(Error);
+            expect(error.message).toEqual("Event ID is invalid. Expected format: {did}#service-{integer}");
+        });
     });
 
     describe("#getId", () => {

@@ -18,6 +18,114 @@ describe("HcsDidUpdateVerificationRelationshipEvent", () => {
         it("targets verificationMethod", () => {
             expect(event.targetName).toEqual(HcsDidEventTargetName.VERIFICATION_RELATIONSHIP);
         });
+
+        it("throws error if id is null", () => {
+            let error = null;
+            try {
+                new HcsDidUpdateVerificationRelationshipEvent(
+                    null,
+                    "authentication",
+                    "Ed25519VerificationKey2018",
+                    identifier,
+                    privateKey.publicKey
+                );
+            } catch (err) {
+                error = err;
+            }
+
+            expect(error).toBeInstanceOf(Error);
+            expect(error.message).toEqual("Validation failed. Verification Relationship args are missing");
+        });
+
+        it("throws error if relationshipType is null", () => {
+            let error = null;
+            try {
+                new HcsDidUpdateVerificationRelationshipEvent(
+                    identifier + "#key-1",
+                    null,
+                    "Ed25519VerificationKey2018",
+                    identifier,
+                    privateKey.publicKey
+                );
+            } catch (err) {
+                error = err;
+            }
+
+            expect(error).toBeInstanceOf(Error);
+            expect(error.message).toEqual("Validation failed. Verification Relationship args are missing");
+        });
+
+        it("throws error if type is null", () => {
+            let error = null;
+            try {
+                new HcsDidUpdateVerificationRelationshipEvent(
+                    identifier + "#key-1",
+                    "authentication",
+                    null,
+                    identifier,
+                    privateKey.publicKey
+                );
+            } catch (err) {
+                error = err;
+            }
+
+            expect(error).toBeInstanceOf(Error);
+            expect(error.message).toEqual("Validation failed. Verification Relationship args are missing");
+        });
+
+        it("throws error if controller is null", () => {
+            let error = null;
+            try {
+                new HcsDidUpdateVerificationRelationshipEvent(
+                    identifier + "#key-1",
+                    "authentication",
+                    "Ed25519VerificationKey2018",
+                    null,
+                    privateKey.publicKey
+                );
+            } catch (err) {
+                error = err;
+            }
+
+            expect(error).toBeInstanceOf(Error);
+            expect(error.message).toEqual("Validation failed. Verification Relationship args are missing");
+        });
+
+        it("throws error if publicKey is null", () => {
+            let error = null;
+            try {
+                new HcsDidUpdateVerificationRelationshipEvent(
+                    identifier + "#key-1",
+                    "authentication",
+                    "Ed25519VerificationKey2018",
+                    identifier,
+                    null
+                );
+            } catch (err) {
+                error = err;
+            }
+
+            expect(error).toBeInstanceOf(Error);
+            expect(error.message).toEqual("Validation failed. Verification Relationship args are missing");
+        });
+
+        it("throws error if id is not valid", () => {
+            let error = null;
+            try {
+                new HcsDidUpdateVerificationRelationshipEvent(
+                    identifier,
+                    "authentication",
+                    "Ed25519VerificationKey2018",
+                    identifier,
+                    privateKey.publicKey
+                );
+            } catch (err) {
+                error = err;
+            }
+
+            expect(error).toBeInstanceOf(Error);
+            expect(error.message).toEqual("Event ID is invalid. Expected format: {did}#key-{integer}");
+        });
     });
 
     describe("#getId", () => {

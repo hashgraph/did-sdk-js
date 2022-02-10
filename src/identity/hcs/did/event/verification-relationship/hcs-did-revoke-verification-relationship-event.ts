@@ -11,6 +11,14 @@ export class HcsDidRevokeVerificationRelationshipEvent extends HcsDidEvent {
     constructor(id: string, relationshipType: VerificationRelationshipType) {
         super();
 
+        if (!id || !relationshipType) {
+            throw new Error("Validation failed. Verification Relationship args are missing");
+        }
+
+        if (!this.isKeyEventIdValid(id)) {
+            throw new Error("Event ID is invalid. Expected format: {did}#key-{integer}");
+        }
+
         this.id = id;
         this.relationshipType = relationshipType;
     }
@@ -37,9 +45,6 @@ export class HcsDidRevokeVerificationRelationshipEvent extends HcsDidEvent {
     }
 
     static fromJsonTree(tree: any): HcsDidRevokeVerificationRelationshipEvent {
-        if (!tree.id || !tree.relationshipType) {
-            throw new Error("Tree data is missing one of the attributes: id, relationshipType");
-        }
-        return new HcsDidRevokeVerificationRelationshipEvent(tree.id, tree.relationshipType);
+        return new HcsDidRevokeVerificationRelationshipEvent(tree?.id, tree?.relationshipType);
     }
 }

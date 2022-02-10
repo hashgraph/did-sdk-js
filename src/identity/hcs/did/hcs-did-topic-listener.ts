@@ -1,7 +1,6 @@
 import { TopicId, TopicMessage } from "@hashgraph/sdk";
 import { MessageEnvelope } from "../message-envelope";
 import { MessageListener } from "../message-listener";
-import { HcsDid } from "./hcs-did";
 import { HcsDidMessage } from "./hcs-did-message";
 
 /**
@@ -38,11 +37,11 @@ export class HcsDidTopicListener extends MessageListener<HcsDidMessage> {
                 return false;
             }
 
-            const key = HcsDid.parsePublicKeyFromIdentifier(message.getDid());
-            if (!envelope.isSignatureValid(key)) {
-                this.reportInvalidMessage(response, "Signature validation failed");
-                return false;
-            }
+            // const key = HcsDid.parsePublicKeyFromIdentifier(message.getDid());
+            // if (!envelope.isSignatureValid(key)) {
+            //     this.reportInvalidMessage(response, "Signature validation failed");
+            //     return false;
+            // }
 
             if (!message.isValid(this.topicId)) {
                 this.reportInvalidMessage(response, "Message content validation failed.");
