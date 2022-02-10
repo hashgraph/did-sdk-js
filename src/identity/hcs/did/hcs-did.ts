@@ -152,9 +152,8 @@ export class HcsDid {
             .freezeWith(this.client);
 
         const signTx = await (await transaction.sign(this.privateKey)).sign(args.newPrivateKey);
-        await signTx.execute(this.client);
-        // const txResponse = await signTx.execute(this.client);
-        // await txResponse.getReceipt(this.client);
+        const txResponse = await signTx.execute(this.client);
+        await txResponse.getReceipt(this.client);
 
         this.privateKey = args.newPrivateKey;
 
@@ -204,7 +203,7 @@ export class HcsDid {
                     resolve(this.document);
                 })
                 .onError((err) => {
-                    console.log(err);
+                    // console.error(err);
                     reject(err);
                 })
                 .execute(this.client);
@@ -590,7 +589,7 @@ export class HcsDid {
                         .sign(this.privateKey);
                 })
                 .onError((err) => {
-                    console.error(err);
+                    // console.error(err);
                     reject(err);
                 })
                 .onMessageConfirmed((msg) => {
