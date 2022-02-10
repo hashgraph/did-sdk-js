@@ -407,6 +407,56 @@ describe("HcsDid", () => {
 
             expect(did.getMessages().length).toEqual(3);
         });
+
+        it("revoke and re-add Service with same service-ID and verify DID Document", async () => {
+            const privateKey = PrivateKey.fromString(OPERATOR_KEY);
+            const did = new HcsDid({ privateKey, client });
+
+            await did.register();
+            await did.addService({
+                id: did.getIdentifier() + "#service-1",
+                type: "LinkedDomains",
+                serviceEndpoint: "https://example.com/vcs",
+            });
+            await did.revokeService({
+                id: did.getIdentifier() + "#service-1",
+            });
+
+            await did.addService({
+                id: did.getIdentifier() + "#service-1",
+                type: "LinkedDomains",
+                serviceEndpoint: "https://meeco.me/vijay",
+            });
+
+            console.log(`https://testnet.dragonglass.me/hedera/topics/${did.getTopicId().toString()}`);
+
+            const didDoc = await did.resolve();
+            const didDocument = didDoc.toJsonTree();
+
+            expect(didDocument).toEqual({
+                "@context": "https://www.w3.org/ns/did/v1",
+                assertionMethod: [`${did.getIdentifier()}#did-root-key`],
+                authentication: [`${did.getIdentifier()}#did-root-key`],
+                id: did.getIdentifier(),
+                verificationMethod: [
+                    {
+                        controller: did.getIdentifier(),
+                        id: `${did.getIdentifier()}#did-root-key`,
+                        publicKeyMultibase: Hashing.multibase.encode(privateKey.publicKey.toBytes()),
+                        type: "Ed25519VerificationKey2018",
+                    },
+                ],
+                service: [
+                    {
+                        id: `${did.getIdentifier()}#service-1`,
+                        serviceEndpoint: "https://meeco.me/vijay",
+                        type: "LinkedDomains",
+                    },
+                ],
+            });
+
+            expect(did.getMessages().length).toEqual(4);
+        });
     });
 
     describe("Add Update and Revoke VerificationMethod meta-information", () => {
