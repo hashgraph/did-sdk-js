@@ -1,4 +1,13 @@
-import { Client, Hbar, PrivateKey, PublicKey, Timestamp, TopicCreateTransaction, TopicId } from "@hashgraph/sdk";
+import {
+    Client,
+    Hbar,
+    PrivateKey,
+    PublicKey,
+    Timestamp,
+    TopicCreateTransaction,
+    TopicId,
+    TopicUpdateTransaction,
+} from "@hashgraph/sdk";
 import {
     DidDocument,
     DidMethodOperation,
@@ -84,9 +93,12 @@ export class HcsDid {
              */
             const topicCreateTransaction = new TopicCreateTransaction()
                 .setMaxTransactionFee(HcsDid.TRANSACTION_FEE)
-                .setAdminKey(this.privateKey.publicKey);
+                .setAdminKey(this.privateKey.publicKey)
+                .setSubmitKey(this.privateKey.publicKey)
+                .freezeWith(this.client);
 
-            const txId = await topicCreateTransaction.execute(this.client);
+            const sigTx = await topicCreateTransaction.sign(this.privateKey);
+            const txId = await sigTx.execute(this.client);
             const topicId = (await txId.getReceipt(this.client)).topicId;
 
             this.topicId = topicId;
@@ -107,7 +119,11 @@ export class HcsDid {
         return this;
     }
 
-    public async changeOwner(args: { id: string; controller: string; publicKey: PublicKey }) {
+    public async changeOwner(args: { id: string; controller: string; newPrivateKey: PrivateKey }) {
+        if (!this.identifier) {
+            throw new Error("DID is not registered");
+        }
+
         if (!this.privateKey) {
             throw new Error("privateKey is missing");
         }
@@ -116,23 +132,48 @@ export class HcsDid {
             throw new Error("Client configuration is missing");
         }
 
-        /**
-         * There should probably some more checks on new owner information
-         */
-        /**
-         * TODO: how do we transfer control of the topic to this new user?
-         * TODO: how messages are going to be signed from now on?
-         */
+        if (!args.newPrivateKey) {
+            throw new Error("newPrivateKey is missing");
+        }
 
+        await this.resolve();
+
+        if (!this.document.hasOwner()) {
+            throw new Error("DID is not registered or was recently deleted. DID has to be registered first.");
+        }
+
+        /**
+         * Change owner of the topic
+         */
+        const transaction = await new TopicUpdateTransaction()
+            .setTopicId(this.topicId)
+            .setAdminKey(args.newPrivateKey.publicKey)
+            .setSubmitKey(args.newPrivateKey.publicKey)
+            .freezeWith(this.client);
+
+        const signTx = await (await transaction.sign(this.privateKey)).sign(args.newPrivateKey);
+        await signTx.execute(this.client);
+        // const txResponse = await signTx.execute(this.client);
+        // await txResponse.getReceipt(this.client);
+
+        this.privateKey = args.newPrivateKey;
+
+        /**
+         * Send ownership change message to the topic
+         */
         await this.submitTransaction(
             DidMethodOperation.UPDATE,
-            new HcsDidUpdateDidOwnerEvent(args.id, args.controller, args.publicKey),
+            new HcsDidUpdateDidOwnerEvent(args.id + "#did-root-key", args.controller, args.newPrivateKey.publicKey),
             this.privateKey
         );
         return this;
     }
 
     public async delete() {
+        if (!this.identifier) {
+            throw new Error("DID is not registered");
+        }
+
         if (!this.privateKey) {
             throw new Error("privateKey is missing");
         }
@@ -539,8 +580,15 @@ export class HcsDid {
 
         return new Promise((resolve, reject) => {
             transaction
-                .signMessage((msg) => privateKey.sign(msg))
-                .buildAndSignTransaction((tx) => tx.setMaxTransactionFee(HcsDid.TRANSACTION_FEE))
+                .signMessage((msg) => {
+                    return privateKey.sign(msg);
+                })
+                .buildAndSignTransaction((tx) => {
+                    return tx
+                        .setMaxTransactionFee(HcsDid.TRANSACTION_FEE)
+                        .freezeWith(this.client)
+                        .sign(this.privateKey);
+                })
                 .onError((err) => {
                     console.error(err);
                     reject(err);
