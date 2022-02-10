@@ -1,13 +1,12 @@
 import { Client, Hbar, PrivateKey, TopicId } from "@hashgraph/sdk";
 import {
+    DidMethodOperation,
     Hashing,
     HcsDid,
-    HcsDidMessage,
-    DidMethodOperation,
     HcsDidCreateDidOwnerEvent,
-    MessageEnvelope,
+    HcsDidMessage,
     HcsDidTransaction,
-    HcsDidTopicListener,
+    MessageEnvelope,
 } from "../../dist";
 
 describe("HcsDidTransaction", () => {

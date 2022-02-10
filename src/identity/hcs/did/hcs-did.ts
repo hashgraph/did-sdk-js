@@ -1,18 +1,23 @@
-import { Client, Hbar, PrivateKey, PublicKey, Timestamp, TopicCreateTransaction, TopicId } from "@hashgraph/sdk";
 import {
-    DidDocument,
-    DidMethodOperation,
-    Hashing,
-    HcsDidCreateDidOwnerEvent,
-    HcsDidCreateServiceEvent,
-    HcsDidMessage,
-    HcsDidTransaction,
-    HcsDidUpdateDidOwnerEvent,
-    MessageEnvelope,
-} from "../../..";
+    Client,
+    Hbar,
+    PrivateKey,
+    PublicKey,
+    Timestamp,
+    TopicCreateTransaction,
+    TopicId,
+    TopicUpdateTransaction,
+} from "@hashgraph/sdk";
+import { Hashing } from "../../../utils/hashing";
+import { DidDocument } from "../../did-document";
+import { DidMethodOperation } from "../../did-method-operation";
 import { DidSyntax } from "../../did-syntax";
+import { MessageEnvelope } from "../message-envelope";
 import { HcsDidDeleteEvent } from "./event/document/hcs-did-delete-event";
 import { HcsDidEvent } from "./event/hcs-did-event";
+import { HcsDidCreateDidOwnerEvent } from "./event/owner/hcs-did-create-did-owner-event";
+import { HcsDidUpdateDidOwnerEvent } from "./event/owner/hcs-did-update-did-owner-event";
+import { HcsDidCreateServiceEvent } from "./event/service/hcs-did-create-service-event";
 import { HcsDidRevokeServiceEvent } from "./event/service/hcs-did-revoke-service-event";
 import { HcsDidUpdateServiceEvent } from "./event/service/hcs-did-update-service-event";
 import { ServiceTypes } from "./event/service/types";
@@ -28,6 +33,8 @@ import {
     VerificationRelationshipType,
 } from "./event/verification-relationship/types";
 import { HcsDidEventMessageResolver } from "./hcs-did-event-message-resolver";
+import { HcsDidMessage } from "./hcs-did-message";
+import { HcsDidTransaction } from "./hcs-did-transaction";
 
 export class HcsDid {
     public static DID_METHOD = DidSyntax.Method.HEDERA_HCS;
@@ -64,13 +71,7 @@ export class HcsDid {
      */
 
     public async register() {
-        if (!this.privateKey) {
-            throw new Error("privateKey is missing");
-        }
-
-        if (!this.client) {
-            throw new Error("Client configuration is missing");
-        }
+        this.validateClientConfig();
 
         if (this.identifier) {
             await this.resolve();
@@ -84,9 +85,12 @@ export class HcsDid {
              */
             const topicCreateTransaction = new TopicCreateTransaction()
                 .setMaxTransactionFee(HcsDid.TRANSACTION_FEE)
-                .setAdminKey(this.privateKey.publicKey);
+                .setAdminKey(this.privateKey.publicKey)
+                .setSubmitKey(this.privateKey.publicKey)
+                .freezeWith(this.client);
 
-            const txId = await topicCreateTransaction.execute(this.client);
+            const sigTx = await topicCreateTransaction.sign(this.privateKey);
+            const txId = await sigTx.execute(this.client);
             const topicId = (await txId.getReceipt(this.client)).topicId;
 
             this.topicId = topicId;
@@ -107,39 +111,55 @@ export class HcsDid {
         return this;
     }
 
-    public async changeOwner(args: { id: string; controller: string; publicKey: PublicKey }) {
-        if (!this.privateKey) {
-            throw new Error("privateKey is missing");
+    public async changeOwner(args: { id: string; controller: string; newPrivateKey: PrivateKey }) {
+        if (!this.identifier) {
+            throw new Error("DID is not registered");
         }
 
-        if (!this.client) {
-            throw new Error("Client configuration is missing");
+        this.validateClientConfig();
+
+        if (!args.newPrivateKey) {
+            throw new Error("newPrivateKey is missing");
+        }
+
+        await this.resolve();
+
+        if (!this.document.hasOwner()) {
+            throw new Error("DID is not registered or was recently deleted. DID has to be registered first.");
         }
 
         /**
-         * There should probably some more checks on new owner information
+         * Change owner of the topic
          */
-        /**
-         * TODO: how do we transfer control of the topic to this new user?
-         * TODO: how messages are going to be signed from now on?
-         */
+        const transaction = await new TopicUpdateTransaction()
+            .setTopicId(this.topicId)
+            .setAdminKey(args.newPrivateKey.publicKey)
+            .setSubmitKey(args.newPrivateKey.publicKey)
+            .freezeWith(this.client);
 
+        const signTx = await (await transaction.sign(this.privateKey)).sign(args.newPrivateKey);
+        const txResponse = await signTx.execute(this.client);
+        await txResponse.getReceipt(this.client);
+
+        this.privateKey = args.newPrivateKey;
+
+        /**
+         * Send ownership change message to the topic
+         */
         await this.submitTransaction(
             DidMethodOperation.UPDATE,
-            new HcsDidUpdateDidOwnerEvent(args.id, args.controller, args.publicKey),
+            new HcsDidUpdateDidOwnerEvent(args.id + "#did-root-key", args.controller, args.newPrivateKey.publicKey),
             this.privateKey
         );
         return this;
     }
 
     public async delete() {
-        if (!this.privateKey) {
-            throw new Error("privateKey is missing");
+        if (!this.identifier) {
+            throw new Error("DID is not registered");
         }
 
-        if (!this.client) {
-            throw new Error("Client configuration is missing");
-        }
+        this.validateClientConfig();
 
         await this.submitTransaction(DidMethodOperation.DELETE, new HcsDidDeleteEvent(), this.privateKey);
         return this;
@@ -163,7 +183,7 @@ export class HcsDid {
                     resolve(this.document);
                 })
                 .onError((err) => {
-                    console.log(err);
+                    // console.error(err);
                     reject(err);
                 })
                 .execute(this.client);
@@ -182,12 +202,6 @@ export class HcsDid {
     public async addService(args: { id: string; type: ServiceTypes; serviceEndpoint: string }) {
         this.validateClientConfig();
 
-        if (!args || !args.id || !args.type || !args.serviceEndpoint) {
-            throw new Error("Validation failed. Services args are missing");
-        }
-        if (!this.isEventIdValid(args.id)) {
-            throw new Error("Event ID is invalid. Expected format: {did}#{key|service}-{integer}");
-        }
         const event = new HcsDidCreateServiceEvent(args.id, args.type, args.serviceEndpoint);
         await this.submitTransaction(DidMethodOperation.CREATE, event, this.privateKey);
 
@@ -202,14 +216,9 @@ export class HcsDid {
     public async updateService(args: { id: string; type: ServiceTypes; serviceEndpoint: string }) {
         this.validateClientConfig();
 
-        if (!args || !args.id || !args.type || !args.serviceEndpoint) {
-            throw new Error("Validation failed. Services args are missing");
-        }
-        if (!this.isEventIdValid(args.id)) {
-            throw new Error("Event ID is invalid. Expected format: {did}#{key|service}-{integer}");
-        }
         const event = new HcsDidUpdateServiceEvent(args.id, args.type, args.serviceEndpoint);
         await this.submitTransaction(DidMethodOperation.UPDATE, event, this.privateKey);
+
         return this;
     }
 
@@ -220,14 +229,10 @@ export class HcsDid {
      */
     public async revokeService(args: { id: string }) {
         this.validateClientConfig();
-        if (!args || !args.id) {
-            throw new Error("Validation failed. Services args are missing");
-        }
-        if (!this.isEventIdValid(args.id)) {
-            throw new Error("Event ID is invalid. Expected format: {did}#{key|service}-{integer}");
-        }
+
         const event = new HcsDidRevokeServiceEvent(args.id);
         await this.submitTransaction(DidMethodOperation.REVOKE, event, this.privateKey);
+
         return this;
     }
 
@@ -243,13 +248,6 @@ export class HcsDid {
         publicKey: PublicKey;
     }) {
         this.validateClientConfig();
-        if (!args || !args.id || !args.type || !args.controller || !args.publicKey) {
-            throw new Error("Validation failed. Verification Method args are missing");
-        }
-
-        if (!this.isEventIdValid(args.id)) {
-            throw new Error("Event ID is invalid. Expected format: {did}#{key|service}-{integer}");
-        }
 
         const event = new HcsDidCreateVerificationMethodEvent(args.id, args.type, args.controller, args.publicKey);
         await this.submitTransaction(DidMethodOperation.CREATE, event, this.privateKey);
@@ -269,13 +267,6 @@ export class HcsDid {
         publicKey: PublicKey;
     }) {
         this.validateClientConfig();
-        if (!args || !args.id || !args.type || !args.controller || !args.publicKey) {
-            throw new Error("Validation failed. Verification Method args are missing");
-        }
-
-        if (!this.isEventIdValid(args.id)) {
-            throw new Error("Event ID is invalid. Expected format: {did}#{key|service}-{integer}");
-        }
 
         const event = new HcsDidUpdateVerificationMethodEvent(args.id, args.type, args.controller, args.publicKey);
         await this.submitTransaction(DidMethodOperation.UPDATE, event, this.privateKey);
@@ -290,13 +281,6 @@ export class HcsDid {
      */
     public async revokeVerificationMethod(args: { id: string }) {
         this.validateClientConfig();
-        if (!args || !args.id) {
-            throw new Error("Validation failed. Verification Method args are missing");
-        }
-
-        if (!this.isEventIdValid(args.id)) {
-            throw new Error("Event ID is invalid. Expected format: {did}#{key|service}-{integer}");
-        }
 
         const event = new HcsDidRevokeVerificationMethodEvent(args.id);
         await this.submitTransaction(DidMethodOperation.REVOKE, event, this.privateKey);
@@ -317,13 +301,6 @@ export class HcsDid {
         publicKey: PublicKey;
     }) {
         this.validateClientConfig();
-        if (!args || !args.id || !args.relationshipType || !args.type || !args.controller || !args.publicKey) {
-            throw new Error("Verification Relationship args are missing");
-        }
-
-        if (!this.isEventIdValid(args.id)) {
-            throw new Error("Event ID is invalid. Expected format: {did}#{key|service}-{integer}");
-        }
 
         const event = new HcsDidCreateVerificationRelationshipEvent(
             args.id,
@@ -350,13 +327,7 @@ export class HcsDid {
         publicKey: PublicKey;
     }) {
         this.validateClientConfig();
-        if (!args || !args.id || !args.relationshipType || !args.type || !args.controller || !args.publicKey) {
-            throw new Error("Verification Relationship args are missing");
-        }
 
-        if (!this.isEventIdValid(args.id)) {
-            throw new Error("Event ID is invalid. Expected format: {did}#{key|service}-{integer}");
-        }
         const event = new HcsDidUpdateVerificationRelationshipEvent(
             args.id,
             args.relationshipType,
@@ -365,6 +336,7 @@ export class HcsDid {
             args.publicKey
         );
         await this.submitTransaction(DidMethodOperation.UPDATE, event, this.privateKey);
+
         return this;
     }
 
@@ -375,15 +347,10 @@ export class HcsDid {
      */
     public async revokeVerificationRelationship(args: { id: string; relationshipType: VerificationRelationshipType }) {
         this.validateClientConfig();
-        if (!args || !args.id) {
-            throw new Error("Verification Relationship args are missing");
-        }
 
-        if (!this.isEventIdValid(args.id)) {
-            throw new Error("Event ID is invalid. Expected format: {did}#{key|service}-{integer}");
-        }
         const event = new HcsDidRevokeVerificationRelationshipEvent(args.id, args.relationshipType);
         await this.submitTransaction(DidMethodOperation.REVOKE, event, this.privateKey);
+
         return this;
     }
 
@@ -456,7 +423,7 @@ export class HcsDid {
         return ret;
     }
 
-    private static parseIdentifier(identifier: string): [string, TopicId, string] {
+    public static parseIdentifier(identifier: string): [string, TopicId, string] {
         const [didPart, topicIdPart] = identifier.split(DidSyntax.DID_TOPIC_SEPARATOR);
 
         if (!topicIdPart) {
@@ -495,22 +462,6 @@ export class HcsDid {
         }
     }
 
-    private isEventIdValid(eventId: string) {
-        const [identifier, id] = eventId.split("#");
-
-        if (!identifier || !id) {
-            return false;
-        }
-
-        HcsDid.parseIdentifier(identifier);
-
-        if (!/^(key|service)\-[0-9]{1,}$/.test(id)) {
-            return false;
-        }
-
-        return true;
-    }
-
     private validateClientConfig() {
         if (!this.privateKey) {
             throw new Error("privateKey is missing");
@@ -539,10 +490,17 @@ export class HcsDid {
 
         return new Promise((resolve, reject) => {
             transaction
-                .signMessage((msg) => privateKey.sign(msg))
-                .buildAndSignTransaction((tx) => tx.setMaxTransactionFee(HcsDid.TRANSACTION_FEE))
+                .signMessage((msg) => {
+                    return privateKey.sign(msg);
+                })
+                .buildAndSignTransaction((tx) => {
+                    return tx
+                        .setMaxTransactionFee(HcsDid.TRANSACTION_FEE)
+                        .freezeWith(this.client)
+                        .sign(this.privateKey);
+                })
                 .onError((err) => {
-                    console.error(err);
+                    // console.error(err);
                     reject(err);
                 })
                 .onMessageConfirmed((msg) => {
