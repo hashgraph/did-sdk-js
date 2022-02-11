@@ -22,67 +22,6 @@ describe("HcsDid", () => {
         client.setOperator(operatorId, operatorKey);
     });
 
-    describe("#constructor", () => {
-        it("throws error because of missing identifier and privateKey", () => {
-            expect(() => new HcsDid({})).toThrowError(new Error("identifier and privateKey cannot both be empty"));
-        });
-
-        it("successfully builds HcsDid with private key only", () => {
-            const privateKey = PrivateKey.generate();
-            const did = new HcsDid({ privateKey });
-
-            expect(did.getIdentifier()).toEqual(undefined);
-            expect(did.getPrivateKey()).toEqual(privateKey);
-            expect(did.getClient()).toEqual(undefined);
-            expect(did.getTopicId()).toEqual(undefined);
-            expect(did.getNetwork()).toEqual(undefined);
-        });
-
-        it("successfully builds HcsDid with identifier only", () => {
-            const identifier = "did:hedera:testnet:z6MkgUv5CvjRP6AsvEYqSRN7djB6p4zK9bcMQ93g5yK6Td7N_0.0.29613327";
-            const did = new HcsDid({ identifier });
-
-            expect(did.getIdentifier()).toEqual(identifier);
-            expect(did.getPrivateKey()).toEqual(undefined);
-            expect(did.getClient()).toEqual(undefined);
-            expect(did.getTopicId().toString()).toEqual("0.0.29613327");
-            expect(did.getNetwork()).toEqual("testnet");
-        });
-
-        it("throws error if passed identifier is invalid", () => {
-            [
-                null,
-                "invalidDid1",
-                "did:invalid",
-                "did:invalidMethod:8LjUL78kFVnWV9rFnNCTE5bZdRmjm2obqJwS892jVLak_0.0.24352",
-                "did:hedera:invalidNetwork:8LjUL78kFVnWV9rFnNCTE5bZdRmjm2obqJwS892jVLak_0.0.24352",
-                "did:hedera:testnet:invalidAddress_0.0.24352_1.5.23462345",
-                "did:hedera:testnet_1.5.23462345",
-                "did:hedera:testnet:z6Mk8LjUL78kFVnWV9rFnNCTE5bZdRmjm2obqJwS892jVLak:unknown:parameter=1_missing",
-                "did:hedera:testnet:z6Mk8LjUL78kFVnWV9rFnNCTE5bZdRmjm2obqJwS892jVLak_0.0.1=1",
-                "did:hedera:testnet:z6Mk8LjUL78kFVnWV9rFnNCTE5bZdRmjm2obqJwS892jVLak:hedera:testnet:fid",
-                "did:hedera:testnet:z6Mk8LjUL78kFVnWV9rFnNCTE5bZdRmjm2obqJwS892jVLak:unknownPart_0.0.1",
-                "did:notHedera:testnet:z6Mk8LjUL78kFVnWV9rFnNCTE5bZdRmjm2obqJwS892jVLak_0.0.1",
-            ].forEach((identifier) => {
-                expect(() => {
-                    new HcsDid({ identifier });
-                }).toThrowError();
-            });
-        });
-
-        it("accepts client parameter", () => {
-            const client = Client.forTestnet();
-            const identifier = "did:hedera:testnet:z6MkgUv5CvjRP6AsvEYqSRN7djB6p4zK9bcMQ93g5yK6Td7N_0.0.29613327";
-            const did = new HcsDid({ identifier, client });
-
-            expect(did.getIdentifier()).toEqual(identifier);
-            expect(did.getPrivateKey()).toEqual(undefined);
-            expect(did.getClient()).toEqual(client);
-            expect(did.getTopicId().toString()).toEqual("0.0.29613327");
-            expect(did.getNetwork()).toEqual("testnet");
-        });
-    });
-
     describe("#register", () => {
         it("throws error if DID is already registered", async () => {
             const privateKey = PrivateKey.fromString(OPERATOR_KEY);
