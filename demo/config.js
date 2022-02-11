@@ -8,10 +8,10 @@ module.exports = {
     /**
      * Account private key
      */
-    PRIVATE_KEY_STR: "xxx",
-    MAX_TRANSACTION_FEE: new Hbar(2),
+    OPERATOR_KEY: "302e...",
+
     /**
-     * Demo flows 2,3 and 4 use already created DID that should be set as TEST_DID_STR
+     * Fix Transaction Fee
      */
-    TEST_DID_STR: "xxx",
+    MAX_TRANSACTION_FEE: new Hbar(2),
 };

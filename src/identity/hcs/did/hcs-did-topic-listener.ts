@@ -37,12 +37,6 @@ export class HcsDidTopicListener extends MessageListener<HcsDidMessage> {
                 return false;
             }
 
-            // const key = HcsDid.parsePublicKeyFromIdentifier(message.getDid());
-            // if (!envelope.isSignatureValid(key)) {
-            //     this.reportInvalidMessage(response, "Signature validation failed");
-            //     return false;
-            // }
-
             if (!message.isValid(this.topicId)) {
                 this.reportInvalidMessage(response, "Message content validation failed.");
                 return false;
