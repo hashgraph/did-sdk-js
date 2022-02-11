@@ -1,0 +1,30 @@
+sequenceDiagram
+Title: DID Registration
+  autonumber
+  participant App as Application
+  participant SDK as DID JS SDK
+  participant HSDK as Hashgraph JS SDK
+  participant HCS as Hededera Consensus Service
+  participant HMN as Hedera Mirro Node
+
+
+alt register a DID
+App ->> HSDK: Build Client (Set account that will pay for transaction)
+App ->> HSDK: Generate DID Private Key (DPK)
+App ->> SDK: Register DID with DPK
+SDK ->> HSDK: Build Topic Create Transaction <br> By setting Transaction Fees <br> AmdinKey, SubmitKey <br> singed by DPK
+SDK ->> HSDK: Execute above transaction with Client <br> (responsible for transaction payment)
+HSDK ->> HCS: Create Private Topic
+HCS ->> HMN: Propogate Topic
+SDK ->> HSDK: Request Receipt for Transaction
+HSDK --> SDK: send reecipt with Topic ID
+SDK ->> SDK: Build did identifier with topic id
+SDK ->> SDK: create DID owner Event <br> with identiefier
+SDK ->> HSDK: Build DID owner Event Transaction  <br> signed with DPK
+SDK ->> HSDK: Execute above transaction with Client <br> (responsible for transaction payment)
+HSDK ->> HCS: Submit message to Topic
+HCS ->> HMN: Propogate Message <br> to Topic
+SDK ->> App: Send DID Identifier <br> e.g. (did:hedera:testnet:z6Mk.._0.0.2..)
+end
+
+
