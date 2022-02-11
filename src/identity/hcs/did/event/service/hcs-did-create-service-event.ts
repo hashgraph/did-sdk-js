@@ -37,6 +37,14 @@ export class HcsDidCreateServiceEvent extends HcsDidEvent {
         return this.serviceEndpoint;
     }
 
+    public getServiceDef() {
+        return {
+            id: this.getId(),
+            type: this.getType(),
+            serviceEndpoint: this.getServiceEndpoint(),
+        };
+    }
+
     public toJsonTree() {
         return {
             [this.targetName]: {
