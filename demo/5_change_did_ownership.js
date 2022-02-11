@@ -49,7 +49,6 @@ async function main() {
      * Change ownership
      */
     await registeredDid.changeOwner({
-        id: registeredDid.getIdentifier(),
         controller: newOwnerIdentifier,
         newPrivateKey: newOwnerDidPrivateKey,
     });
