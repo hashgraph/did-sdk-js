@@ -243,7 +243,6 @@ describe("HcsDid", () => {
             let error = null;
             try {
                 await did.changeOwner({
-                    id: docIdentifier,
                     controller: newOwnerIdentifier,
                     newPrivateKey: PrivateKey.generate(),
                 });
@@ -263,7 +262,6 @@ describe("HcsDid", () => {
             let error = null;
             try {
                 await did.changeOwner({
-                    id: docIdentifier,
                     controller: newOwnerIdentifier,
                     newPrivateKey: PrivateKey.generate(),
                 });
@@ -284,7 +282,6 @@ describe("HcsDid", () => {
             let error = null;
             try {
                 await did.changeOwner({
-                    id: docIdentifier,
                     controller: newOwnerIdentifier,
                     newPrivateKey: PrivateKey.generate(),
                 });
@@ -306,7 +303,6 @@ describe("HcsDid", () => {
             let error = null;
             try {
                 await did.changeOwner({
-                    id: docIdentifier,
                     controller: newOwnerIdentifier,
                     newPrivateKey: null,
                 });
@@ -328,7 +324,6 @@ describe("HcsDid", () => {
             await did.register();
 
             await did.changeOwner({
-                id: did.getIdentifier(),
                 controller: newOwnerIdentifier,
                 newPrivateKey: newDidPrivateKey,
             });

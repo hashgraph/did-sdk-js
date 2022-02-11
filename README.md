@@ -161,7 +161,6 @@ const newOwnerIdentifier = "did:hedera:testnet:z6MkgUv5CvjRP6AsvEYqSRN7djB6p4zK9
 * Change ownership
 */
 await registeredDid.changeOwner({
-    id: registeredDid.getIdentifier(),
     controller: newOwnerIdentifier,
     newPrivateKey: newOwnerDidPrivateKey,
 });
