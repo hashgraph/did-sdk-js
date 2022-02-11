@@ -61,6 +61,15 @@ export class HcsDidCreateVerificationRelationshipEvent extends HcsDidEvent {
         return Hashing.multibase.encode(this.getPublicKey().toBytes());
     }
 
+    public getVerificationMethodDef() {
+        return {
+            id: this.getId(),
+            type: this.getType(),
+            controller: this.getController(),
+            publicKeyMultibase: this.getPublicKeyMultibase(),
+        };
+    }
+
     public toJsonTree() {
         return {
             [this.targetName]: {
