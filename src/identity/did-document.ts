@@ -128,10 +128,7 @@ export class DidDocument {
                     this.processDeleteMessage(msg);
                     return;
                 default:
-                    /**
-                     * TODO: for debugging - later we should probably try to ignore such messages
-                     */
-                    throw new Error("Not supported operation detected!");
+                    console.warn(`Operation ${msg.getOperation()} is not supported. Event will be ignored...`);
             }
         });
     }
@@ -145,25 +142,14 @@ export class DidDocument {
                     console.warn(`DID owner is already registered: ${this.controller}. Event will be ignored...`);
                     return;
                 }
-
-                this.controller = {
-                    id: event.getId(),
-                    type: (event as HcsDidCreateDidOwnerEvent).getType(),
-                    controller: (event as HcsDidCreateDidOwnerEvent).getController(),
-                    publicKeyMultibase: (event as HcsDidCreateDidOwnerEvent).getPublicKeyMultibase(),
-                };
+                this.controller = (event as HcsDidCreateDidOwnerEvent).getOwnerDef();
                 return;
             case HcsDidEventTargetName.SERVICE:
                 if (this.services.has(event.getId())) {
                     console.warn(`Duplicate create Service event ID: ${event.getId()}. Event will be ignored...`);
                     return;
                 }
-
-                this.services.set(event.getId(), {
-                    id: event.getId(),
-                    type: (event as HcsDidCreateServiceEvent).getType(),
-                    serviceEndpoint: (event as HcsDidCreateServiceEvent).getServiceEndpoint(),
-                });
+                this.services.set(event.getId(), (event as HcsDidCreateServiceEvent).getServiceDef());
                 return;
             case HcsDidEventTargetName.VERIFICATION_METHOD:
                 if (this.verificationMethods.has(event.getId())) {
@@ -173,12 +159,10 @@ export class DidDocument {
                     return;
                 }
 
-                this.verificationMethods.set(event.getId(), {
-                    id: event.getId(),
-                    type: (event as HcsDidCreateVerificationMethodEvent).getType(),
-                    controller: (event as HcsDidCreateVerificationMethodEvent).getController(),
-                    publicKeyMultibase: (event as HcsDidCreateVerificationMethodEvent).getPublicKeyMultibase(),
-                });
+                this.verificationMethods.set(
+                    event.getId(),
+                    (event as HcsDidCreateVerificationMethodEvent).getVerificationMethodDef()
+                );
                 return;
             case HcsDidEventTargetName.VERIFICATION_RELATIONSHIP:
                 const type = (event as HcsDidCreateVerificationRelationshipEvent).getRelationshipType();
@@ -194,14 +178,10 @@ export class DidDocument {
                     this.verificationRelationships[type].push(event.getId());
 
                     if (!this.verificationMethods.has(event.getId())) {
-                        this.verificationMethods.set(event.getId(), {
-                            id: event.getId(),
-                            type: (event as HcsDidCreateVerificationRelationshipEvent).getType(),
-                            controller: (event as HcsDidCreateVerificationRelationshipEvent).getController(),
-                            publicKeyMultibase: (
-                                event as HcsDidCreateVerificationRelationshipEvent
-                            ).getPublicKeyMultibase(),
-                        });
+                        this.verificationMethods.set(
+                            event.getId(),
+                            (event as HcsDidCreateVerificationRelationshipEvent).getVerificationMethodDef()
+                        );
                     }
                 } else {
                     console.warn(
@@ -219,12 +199,7 @@ export class DidDocument {
 
         switch (event.targetName) {
             case HcsDidEventTargetName.DID_OWNER:
-                this.controller = {
-                    id: event.getId(),
-                    type: (event as HcsDidUpdateDidOwnerEvent).getType(),
-                    controller: (event as HcsDidUpdateDidOwnerEvent).getController(),
-                    publicKeyMultibase: (event as HcsDidUpdateDidOwnerEvent).getPublicKeyMultibase(),
-                };
+                this.controller = (event as HcsDidUpdateDidOwnerEvent).getOwnerDef();
                 return;
             case HcsDidEventTargetName.SERVICE:
                 if (!this.services.has(event.getId())) {
@@ -233,11 +208,7 @@ export class DidDocument {
                     );
                     return;
                 }
-                this.services.set(event.getId(), {
-                    id: event.getId(),
-                    type: (event as HcsDidUpdateServiceEvent).getType(),
-                    serviceEndpoint: (event as HcsDidUpdateServiceEvent).getServiceEndpoint(),
-                });
+                this.services.set(event.getId(), (event as HcsDidUpdateServiceEvent).getServiceDef());
                 return;
             case HcsDidEventTargetName.VERIFICATION_METHOD:
                 if (!this.verificationMethods.has(event.getId())) {
@@ -247,12 +218,10 @@ export class DidDocument {
                     return;
                 }
 
-                this.verificationMethods.set(event.getId(), {
-                    id: event.getId(),
-                    type: (event as HcsDidUpdateVerificationMethodEvent).getType(),
-                    controller: (event as HcsDidUpdateVerificationMethodEvent).getController(),
-                    publicKeyMultibase: (event as HcsDidUpdateVerificationMethodEvent).getPublicKeyMultibase(),
-                });
+                this.verificationMethods.set(
+                    event.getId(),
+                    (event as HcsDidUpdateVerificationMethodEvent).getVerificationMethodDef()
+                );
                 return;
             case HcsDidEventTargetName.VERIFICATION_RELATIONSHIP:
                 const type = (event as HcsDidUpdateVerificationRelationshipEvent).getRelationshipType();
@@ -265,14 +234,10 @@ export class DidDocument {
                         return;
                     }
 
-                    this.verificationMethods.set(event.getId(), {
-                        id: event.getId(),
-                        type: (event as HcsDidUpdateVerificationRelationshipEvent).getType(),
-                        controller: (event as HcsDidUpdateVerificationRelationshipEvent).getController(),
-                        publicKeyMultibase: (
-                            event as HcsDidUpdateVerificationRelationshipEvent
-                        ).getPublicKeyMultibase(),
-                    });
+                    this.verificationMethods.set(
+                        event.getId(),
+                        (event as HcsDidUpdateVerificationRelationshipEvent).getVerificationMethodDef()
+                    );
                 } else {
                     console.warn(
                         `Update verificationRelationship event with type ${type} is not supported. Event will be ignored...`
