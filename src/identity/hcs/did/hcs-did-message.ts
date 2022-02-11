@@ -1,15 +1,21 @@
-import { TopicId } from "@hashgraph/sdk";
+import { Timestamp, TopicId } from "@hashgraph/sdk";
+import Long from "long";
+import { TimestampUtils } from "../../../utils/timestamp-utils";
 import { DidMethodOperation } from "../../did-method-operation";
 import { DidParser } from "../../did-parser";
-import { Message } from "../message";
 import { HcsDidEvent } from "./event/hcs-did-event";
 import { HcsDidEventParser } from "./event/hcs-did-event-parser";
 import { HcsDid } from "./hcs-did";
 
+export type Signer<T> = (message: T) => T;
+
 /**
  * The DID document message submitted to appnet's DID Topic.
  */
-export class HcsDidMessage extends Message {
+export class HcsDidMessage {
+    private static serialVersionUID = Long.fromInt(1);
+
+    protected timestamp: Timestamp;
     protected operation: DidMethodOperation;
     protected did: string;
     protected event: HcsDidEvent;
@@ -22,11 +28,14 @@ export class HcsDidMessage extends Message {
      * @param event             The DID Event.
      */
     constructor(operation: DidMethodOperation, did: string, event: HcsDidEvent) {
-        super();
-
+        this.timestamp = TimestampUtils.now();
         this.operation = operation;
         this.did = did;
         this.event = event;
+    }
+
+    public getTimestamp(): Timestamp {
+        return this.timestamp;
     }
 
     public getOperation(): DidMethodOperation {
@@ -75,7 +84,7 @@ export class HcsDidMessage extends Message {
     }
 
     public toJsonTree(): any {
-        const result: any = super.toJsonTree();
+        const result: any = { timestamp: TimestampUtils.toJSON(this.timestamp) };
         result.operation = this.operation;
         result.did = this.did;
         result.event = this.getEventBase64();
@@ -92,7 +101,7 @@ export class HcsDidMessage extends Message {
             result.did = tree.did;
             result.event = event;
         }
-        result = super.fromJsonTree(tree, result) as HcsDidMessage;
+        result.timestamp = TimestampUtils.fromJson(tree.timestamp);
         return result;
     }
 
@@ -100,7 +109,7 @@ export class HcsDidMessage extends Message {
         return JSON.stringify(this.toJsonTree());
     }
 
-    public static fromJson(json: string): Message {
-        return Message.fromJsonTree(JSON.parse(json));
+    public static fromJson(json: string): HcsDidMessage {
+        return HcsDidMessage.fromJsonTree(JSON.parse(json));
     }
 }
