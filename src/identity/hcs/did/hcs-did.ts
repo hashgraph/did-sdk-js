@@ -452,7 +452,7 @@ export class HcsDid {
 
             const didIdString = didParts.shift();
 
-            if (didIdString.length < 32 || didParts.shift()) {
+            if (didIdString.length < 48 || didParts.shift()) {
                 throw new Error("DID string is invalid.");
             }
 
