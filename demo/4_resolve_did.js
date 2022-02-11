@@ -1,6 +1,5 @@
 const { Client } = require("@hashgraph/sdk");
-const { HcsDid, HcsDidResolver } = require("../dist");
-const { TEST_DID_STR } = require("./config");
+const { HcsDid } = require("../dist");
 
 async function main() {
     /**
@@ -9,9 +8,14 @@ async function main() {
     const client = Client.forTestnet();
 
     /**
+     * CHANGE IT. use values from step 1: registered DID console output
+     */
+    const existingDIDIdentifier = "did:hedera:testnet:z6MkvD6JAfMyP6pgQoYxfE9rubgwLD9Hmz8rQh1FAxvbW8XB_0.0.29656526";
+
+    /**
      * Build DID instance
      */
-    const did = new HcsDid({ identifier: TEST_DID_STR, client: client });
+    const did = new HcsDid({ identifier: existingDIDIdentifier, client: client });
 
     /**
      * Resolve DID
