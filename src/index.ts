@@ -22,10 +22,7 @@ import { HcsDidMessage } from "./identity/hcs/did/hcs-did-message";
 import { HcsDidTopicListener } from "./identity/hcs/did/hcs-did-topic-listener";
 import { HcsDidTransaction } from "./identity/hcs/did/hcs-did-transaction";
 import { JsonClass } from "./identity/hcs/json-class";
-import { Message } from "./identity/hcs/message";
 import { MessageEnvelope } from "./identity/hcs/message-envelope";
-import { MessageListener } from "./identity/hcs/message-listener";
-import { MessageTransaction } from "./identity/hcs/message-transaction";
 import { SerializableMirrorConsensusResponse } from "./identity/hcs/serializable-mirror-consensus-response";
 import { ArraysUtils } from "./utils/arrays-utils";
 import { Ed25519PubCodec } from "./utils/ed25519PubCodec";
@@ -61,10 +58,7 @@ export {
     HcsDidUpdateVerificationMethodEvent,
     HcsDidUpdateVerificationRelationshipEvent,
     JsonClass,
-    Message,
     MessageEnvelope,
-    MessageListener,
-    MessageTransaction,
     SerializableMirrorConsensusResponse,
     TimestampUtils,
     Validator,

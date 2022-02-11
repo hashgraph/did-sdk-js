@@ -1,18 +1,18 @@
 import { PublicKey, Timestamp, TopicMessage } from "@hashgraph/sdk";
 import { Base64 } from "js-base64";
 import Long from "long";
+import { HcsDidMessage } from "../..";
 import { ArraysUtils } from "../../utils/arrays-utils";
 import { JsonClass } from "./json-class";
-import { Message } from "./message";
 import { SerializableMirrorConsensusResponse } from "./serializable-mirror-consensus-response";
 
-export type PublicKeyProvider<T extends Message> = (evn: MessageEnvelope<T>) => PublicKey;
+export type PublicKeyProvider<T extends HcsDidMessage> = (evn: MessageEnvelope<T>) => PublicKey;
 export type SignFunction = (message: Uint8Array) => Uint8Array;
 
 /**
  * The envelope for Hedera identity messages sent to HCS DID or VC topics.
  */
-export class MessageEnvelope<T extends Message> {
+export class MessageEnvelope<T extends HcsDidMessage> {
     private static MESSAGE_KEY = "message";
     private static SIGNATURE_KEY = "signature";
 
@@ -98,7 +98,7 @@ export class MessageEnvelope<T extends Message> {
      * @param messageClass Class type of the message inside envelope.
      * @return The {@link MessageEnvelope}.
      */
-    public static fromMirrorResponse<U extends Message>(
+    public static fromMirrorResponse<U extends HcsDidMessage>(
         response: TopicMessage,
         messageClass: JsonClass<U>
     ): MessageEnvelope<U> {
@@ -118,7 +118,7 @@ export class MessageEnvelope<T extends Message> {
      * @param messageClass Class of the message inside envelope.
      * @return The {@link MessageEnvelope}.
      */
-    public static fromJson<U extends Message>(json: string, messageClass: JsonClass<U>): MessageEnvelope<U> {
+    public static fromJson<U extends HcsDidMessage>(json: string, messageClass: JsonClass<U>): MessageEnvelope<U> {
         const result = new MessageEnvelope<U>();
         const root = JSON.parse(json);
         result.signature = root[MessageEnvelope.SIGNATURE_KEY];
