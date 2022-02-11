@@ -210,10 +210,7 @@ export class DidDocument {
                 }
                 return;
             default:
-                /**
-                 * TODO: for debugging - later we should probably try to ignore such messages
-                 */
-                throw new Error("Not supported event detected!");
+                console.warn(`Create ${event.targetName} operation is not supported. Event will be ignored...`);
         }
     }
 
@@ -283,10 +280,7 @@ export class DidDocument {
                 }
                 return;
             default:
-                /**
-                 * TODO: for debugging - later we should probably try to ignore such messages
-                 */
-                throw new Error("Not supported event detected!");
+                console.warn(`Update ${event.targetName} operation is not supported. Event will be ignored...`);
         }
     }
 
@@ -348,10 +342,7 @@ export class DidDocument {
                 }
                 return;
             default:
-                /**
-                 * TODO: for debugging - later we should probably try to ignore such messages
-                 */
-                throw new Error("Not supported event detected!");
+                console.warn(`Revoke ${event.targetName} operation is not supported. Event will be ignored...`);
         }
     }
 
@@ -368,10 +359,7 @@ export class DidDocument {
                 );
                 return;
             default:
-                /**
-                 * TODO: for debugging - later we should probably try to ignore such messages
-                 */
-                throw new Error("Not supported event detected!");
+                console.warn(`Delete ${event.targetName} operation is not supported. Event will be ignored...`);
         }
     }
 }
