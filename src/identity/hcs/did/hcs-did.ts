@@ -111,7 +111,7 @@ export class HcsDid {
         return this;
     }
 
-    public async changeOwner(args: { id: string; controller: string; newPrivateKey: PrivateKey }) {
+    public async changeOwner(args: { controller: string; newPrivateKey: PrivateKey }) {
         if (!this.identifier) {
             throw new Error("DID is not registered");
         }
@@ -148,7 +148,11 @@ export class HcsDid {
          */
         await this.submitTransaction(
             DidMethodOperation.UPDATE,
-            new HcsDidUpdateDidOwnerEvent(args.id + "#did-root-key", args.controller, args.newPrivateKey.publicKey),
+            new HcsDidUpdateDidOwnerEvent(
+                this.getIdentifier() + "#did-root-key",
+                args.controller,
+                args.newPrivateKey.publicKey
+            ),
             this.privateKey
         );
         return this;
