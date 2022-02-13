@@ -49,6 +49,15 @@ export class HcsDidCreateDidOwnerEvent extends HcsDidEvent {
         return Hashing.multibase.encode(this.getPublicKey().toBytes());
     }
 
+    public getOwnerDef() {
+        return {
+            id: this.getId(),
+            type: this.getType(),
+            controller: this.getController(),
+            publicKeyMultibase: this.getPublicKeyMultibase(),
+        };
+    }
+
     public toJsonTree() {
         return {
             [this.targetName]: {

@@ -46,6 +46,13 @@ Sample demo step by step javascript example are available at [Demo Folder][demo-
 - OPERATOR_ID=0.0.xxxx
 - OPERATOR_KEY=302...
 
+After running first step of the demo flow use printed out values to complete the <b>`config.js`</b> configuration file.
+
+- DID_IDENTIFIER=did:hedera:testnet:..._0.0.xxx
+- DID_PRIVATE_KEY=302...
+
+That's it! You are set to execute other demo flows.
+
 ## DID Generation & Registration
 
 ```javascript
@@ -154,7 +161,6 @@ const newOwnerIdentifier = "did:hedera:testnet:z6MkgUv5CvjRP6AsvEYqSRN7djB6p4zK9
 * Change ownership
 */
 await registeredDid.changeOwner({
-    id: registeredDid.getIdentifier(),
     controller: newOwnerIdentifier,
     newPrivateKey: newOwnerDidPrivateKey,
 });

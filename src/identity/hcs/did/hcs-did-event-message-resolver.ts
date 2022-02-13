@@ -3,7 +3,6 @@ import Long from "long";
 import { Sleep } from "../../../utils/sleep";
 import { Validator } from "../../../utils/validator";
 import { MessageEnvelope } from "../message-envelope";
-import { MessageListener } from "../message-listener";
 import { HcsDidMessage } from "./hcs-did-message";
 import { HcsDidTopicListener } from "./hcs-did-topic-listener";
 
@@ -23,7 +22,7 @@ export class HcsDidEventMessageResolver {
     private resultsHandler: (input: HcsDidMessage[]) => void;
     private errorHandler: (input: Error) => void;
     private existingSignatures: string[];
-    private readonly listener: MessageListener<HcsDidMessage>;
+    private readonly listener: HcsDidTopicListener;
     private noMoreMessagesTimeout: Long;
 
     /**
