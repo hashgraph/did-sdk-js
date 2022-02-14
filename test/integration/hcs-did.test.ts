@@ -136,7 +136,7 @@ describe("HcsDid", () => {
             await did.register();
 
             const didDoc = await did.resolve();
-            const didDocument = didDoc.toJsonTree();
+            const didDocument = didDoc.toJsonTree().didDocument;
 
             expect(didDocument).toEqual({
                 "@context": "https://www.w3.org/ns/did/v1",
@@ -200,7 +200,7 @@ describe("HcsDid", () => {
 
             await did.register();
 
-            let didJSON = (await did.resolve()).toJsonTree();
+            let didJSON = (await did.resolve()).toJsonTree().didDocument;
             expect(didJSON).toEqual({
                 "@context": "https://www.w3.org/ns/did/v1",
                 assertionMethod: [`${did.getIdentifier()}#did-root-key`],
@@ -218,7 +218,7 @@ describe("HcsDid", () => {
 
             await did.delete();
 
-            didJSON = (await did.resolve()).toJsonTree();
+            didJSON = (await did.resolve()).toJsonTree().didDocument;
             expect(didJSON).toEqual({
                 "@context": "https://www.w3.org/ns/did/v1",
                 assertionMethod: [],
@@ -328,7 +328,7 @@ describe("HcsDid", () => {
                 newPrivateKey: newDidPrivateKey,
             });
 
-            const doc = (await did.resolve()).toJsonTree();
+            const doc = (await did.resolve()).toJsonTree().didDocument;
 
             expect(doc).toEqual({
                 "@context": "https://www.w3.org/ns/did/v1",
@@ -427,7 +427,7 @@ describe("HcsDid", () => {
             console.log(`https://testnet.dragonglass.me/hedera/topics/${did.getTopicId().toString()}`);
 
             const didDoc = await did.resolve();
-            const didDocument = didDoc.toJsonTree();
+            const didDocument = didDoc.toJsonTree().didDocument;
 
             expect(didDocument).toEqual({
                 "@context": "https://www.w3.org/ns/did/v1",
@@ -474,7 +474,7 @@ describe("HcsDid", () => {
             console.log(`https://testnet.dragonglass.me/hedera/topics/${did.getTopicId().toString()}`);
 
             const didDoc = await did.resolve();
-            const didDocument = didDoc.toJsonTree();
+            const didDocument = didDoc.toJsonTree().didDocument;
 
             expect(didDocument).toEqual({
                 "@context": "https://www.w3.org/ns/did/v1",
@@ -518,7 +518,7 @@ describe("HcsDid", () => {
             console.log(`https://testnet.dragonglass.me/hedera/topics/${did.getTopicId().toString()}`);
 
             const didDoc = await did.resolve();
-            const didDocument = didDoc.toJsonTree();
+            const didDocument = didDoc.toJsonTree().didDocument;
 
             expect(didDocument).toEqual({
                 "@context": "https://www.w3.org/ns/did/v1",
@@ -561,7 +561,7 @@ describe("HcsDid", () => {
             console.log(`https://testnet.dragonglass.me/hedera/topics/${did.getTopicId().toString()}`);
 
             const didDoc = await did.resolve();
-            const didDocument = didDoc.toJsonTree();
+            const didDocument = didDoc.toJsonTree().didDocument;
 
             expect(didDocument).toEqual({
                 "@context": "https://www.w3.org/ns/did/v1",
@@ -658,7 +658,7 @@ describe("HcsDid", () => {
             console.log(`https://testnet.dragonglass.me/hedera/topics/${did.getTopicId().toString()}`);
 
             const didDoc = await did.resolve();
-            const didDocument = didDoc.toJsonTree();
+            const didDocument = didDoc.toJsonTree().didDocument;
 
             expect(didDocument).toEqual({
                 "@context": "https://www.w3.org/ns/did/v1",
@@ -718,7 +718,7 @@ describe("HcsDid", () => {
             console.log(`https://testnet.dragonglass.me/hedera/topics/${did.getTopicId().toString()}`);
 
             const didDoc = await did.resolve();
-            const didDocument = didDoc.toJsonTree();
+            const didDocument = didDoc.toJsonTree().didDocument;
 
             expect(didDocument).toEqual({
                 "@context": "https://www.w3.org/ns/did/v1",
@@ -773,7 +773,7 @@ describe("HcsDid", () => {
             console.log(`https://testnet.dragonglass.me/hedera/topics/${did.getTopicId().toString()}`);
 
             const didDoc = await did.resolve();
-            const didDocument = didDoc.toJsonTree();
+            const didDocument = didDoc.toJsonTree().didDocument;
 
             expect(didDocument).toEqual({
                 "@context": "https://www.w3.org/ns/did/v1",
@@ -876,7 +876,7 @@ describe("HcsDid", () => {
             });
 
             const didDoc = await did.resolve();
-            const didDocument = didDoc.toJsonTree();
+            const didDocument = didDoc.toJsonTree().didDocument;
 
             expect(didDocument).toEqual({
                 "@context": "https://www.w3.org/ns/did/v1",
@@ -930,7 +930,7 @@ describe("HcsDid", () => {
             });
 
             const didDoc = await did.resolve();
-            const didDocument = didDoc.toJsonTree();
+            const didDocument = didDoc.toJsonTree().didDocument;
 
             expect(didDocument).toEqual({
                 "@context": "https://www.w3.org/ns/did/v1",
@@ -980,7 +980,7 @@ describe("HcsDid", () => {
             });
 
             const didDoc = await did.resolve();
-            const didDocument = didDoc.toJsonTree();
+            const didDocument = didDoc.toJsonTree().didDocument;
 
             expect(didDocument).toEqual({
                 "@context": "https://www.w3.org/ns/did/v1",
