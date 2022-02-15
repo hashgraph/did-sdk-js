@@ -24,24 +24,16 @@ describe("DidDocument", () => {
             const doc = new DidDocument(identifier, []);
 
             expect(doc.toJsonTree()).toEqual({
-                "@context": "https://w3id.org/did-resolution/v1",
-                didDocument: {
-                    "@context": "https://www.w3.org/ns/did/v1",
-                    assertionMethod: [],
-                    authentication: [],
-                    id: identifier,
-                    verificationMethod: [],
-                },
-                didResolutionMetadata: {
-                    contentType: "application/did+ld+json",
-                },
-                didDocumentMetadata: {
-                    created: undefined,
-                    deactivated: false,
-                    updated: undefined,
-                    versionId: undefined,
-                },
+                "@context": "https://www.w3.org/ns/did/v1",
+                assertionMethod: [],
+                authentication: [],
+                id: identifier,
+                verificationMethod: [],
             });
+            expect(doc.getCreated()).toBeNull();
+            expect(doc.getUpdated()).toBeNull();
+            expect(doc.getDeactivated()).toEqual(false);
+            expect(doc.getVersionId()).toBeNull();
         });
 
         it("ignores events til first create DIDOwner event", () => {
@@ -72,38 +64,30 @@ describe("DidDocument", () => {
             ]);
 
             expect(doc.toJsonTree()).toEqual({
-                "@context": "https://w3id.org/did-resolution/v1",
-                didDocument: {
-                    "@context": "https://www.w3.org/ns/did/v1",
-                    id: identifier,
-                    assertionMethod: [`${identifier}#did-root-key`],
-                    authentication: [`${identifier}#did-root-key`],
-                    service: [
-                        {
-                            id: `${identifier}#service-2`,
-                            serviceEndpoint: "https://test2.identity.com",
-                            type: "LinkedDomains",
-                        },
-                    ],
-                    verificationMethod: [
-                        {
-                            controller: identifier,
-                            id: `${identifier}#did-root-key`,
-                            publicKeyMultibase: "z6MkogVzoGJMVVLhaz82cA5jZQKAAqUghhCrpzkSDFDwxfJa",
-                            type: "Ed25519VerificationKey2018",
-                        },
-                    ],
-                },
-                didResolutionMetadata: {
-                    contentType: "application/did+ld+json",
-                },
-                didDocumentMetadata: {
-                    created: expect.anything(),
-                    deactivated: false,
-                    updated: expect.anything(),
-                    versionId: expect.anything(),
-                },
+                "@context": "https://www.w3.org/ns/did/v1",
+                id: identifier,
+                assertionMethod: [`${identifier}#did-root-key`],
+                authentication: [`${identifier}#did-root-key`],
+                service: [
+                    {
+                        id: `${identifier}#service-2`,
+                        serviceEndpoint: "https://test2.identity.com",
+                        type: "LinkedDomains",
+                    },
+                ],
+                verificationMethod: [
+                    {
+                        controller: identifier,
+                        id: `${identifier}#did-root-key`,
+                        publicKeyMultibase: "z6MkogVzoGJMVVLhaz82cA5jZQKAAqUghhCrpzkSDFDwxfJa",
+                        type: "Ed25519VerificationKey2018",
+                    },
+                ],
             });
+            expect(doc.getCreated()).toBeTruthy();
+            expect(doc.getUpdated()).toBeTruthy();
+            expect(doc.getDeactivated()).toEqual(false);
+            expect(doc.getVersionId()).toBeTruthy();
         });
 
         it("handles create DIDOwner event", () => {
@@ -117,31 +101,23 @@ describe("DidDocument", () => {
             const doc = new DidDocument(identifier, messages);
 
             expect(doc.toJsonTree()).toEqual({
-                "@context": "https://w3id.org/did-resolution/v1",
-                didDocument: {
-                    "@context": "https://www.w3.org/ns/did/v1",
-                    assertionMethod: [`${identifier}#did-root-key`],
-                    authentication: [`${identifier}#did-root-key`],
-                    id: identifier,
-                    verificationMethod: [
-                        {
-                            controller: identifier,
-                            id: `${identifier}#did-root-key`,
-                            publicKeyMultibase: "z6MkogVzoGJMVVLhaz82cA5jZQKAAqUghhCrpzkSDFDwxfJa",
-                            type: "Ed25519VerificationKey2018",
-                        },
-                    ],
-                },
-                didResolutionMetadata: {
-                    contentType: "application/did+ld+json",
-                },
-                didDocumentMetadata: {
-                    created: expect.anything(),
-                    deactivated: false,
-                    updated: expect.anything(),
-                    versionId: expect.anything(),
-                },
+                "@context": "https://www.w3.org/ns/did/v1",
+                assertionMethod: [`${identifier}#did-root-key`],
+                authentication: [`${identifier}#did-root-key`],
+                id: identifier,
+                verificationMethod: [
+                    {
+                        controller: identifier,
+                        id: `${identifier}#did-root-key`,
+                        publicKeyMultibase: "z6MkogVzoGJMVVLhaz82cA5jZQKAAqUghhCrpzkSDFDwxfJa",
+                        type: "Ed25519VerificationKey2018",
+                    },
+                ],
             });
+            expect(doc.getCreated()).toBeTruthy();
+            expect(doc.getUpdated()).toBeTruthy();
+            expect(doc.getDeactivated()).toEqual(false);
+            expect(doc.getVersionId()).toBeTruthy();
         });
 
         it("handes DID delete event", () => {
@@ -156,24 +132,16 @@ describe("DidDocument", () => {
             const doc = new DidDocument(identifier, messages);
 
             expect(doc.toJsonTree()).toEqual({
-                "@context": "https://w3id.org/did-resolution/v1",
-                didDocument: {
-                    "@context": "https://www.w3.org/ns/did/v1",
-                    assertionMethod: [],
-                    authentication: [],
-                    id: identifier,
-                    verificationMethod: [],
-                },
-                didResolutionMetadata: {
-                    contentType: "application/did+ld+json",
-                },
-                didDocumentMetadata: {
-                    created: undefined,
-                    deactivated: true,
-                    updated: undefined,
-                    versionId: undefined,
-                },
+                "@context": "https://www.w3.org/ns/did/v1",
+                assertionMethod: [],
+                authentication: [],
+                id: identifier,
+                verificationMethod: [],
             });
+            expect(doc.getCreated()).toBeNull();
+            expect(doc.getUpdated()).toBeNull();
+            expect(doc.getDeactivated()).toEqual(true);
+            expect(doc.getVersionId()).toBeNull();
         });
 
         it("handes change DID owner event", () => {
@@ -212,39 +180,31 @@ describe("DidDocument", () => {
             const doc = new DidDocument(identifier, messages);
 
             expect(doc.toJsonTree()).toEqual({
-                "@context": "https://w3id.org/did-resolution/v1",
-                didDocument: {
-                    "@context": "https://www.w3.org/ns/did/v1",
-                    assertionMethod: [`${otherOwnerIdentifier}#did-root-key`],
-                    authentication: [`${otherOwnerIdentifier}#did-root-key`],
-                    capabilityDelegation: [`${identifier}#key-2`],
-                    controller: otherOwnerIdentifier,
-                    id: identifier,
-                    verificationMethod: [
-                        {
-                            controller: otherOwnerIdentifier,
-                            id: `${otherOwnerIdentifier}#did-root-key`,
-                            publicKeyMultibase: Hashing.multibase.encode(otherOwnerKey.publicKey.toBytes()),
-                            type: "Ed25519VerificationKey2018",
-                        },
-                        {
-                            controller: identifier,
-                            id: `${identifier}#key-2`,
-                            publicKeyMultibase: Hashing.multibase.encode(key2.publicKey.toBytes()),
-                            type: "Ed25519VerificationKey2018",
-                        },
-                    ],
-                },
-                didResolutionMetadata: {
-                    contentType: "application/did+ld+json",
-                },
-                didDocumentMetadata: {
-                    created: expect.anything(),
-                    deactivated: false,
-                    updated: expect.anything(),
-                    versionId: expect.anything(),
-                },
+                "@context": "https://www.w3.org/ns/did/v1",
+                assertionMethod: [`${otherOwnerIdentifier}#did-root-key`],
+                authentication: [`${otherOwnerIdentifier}#did-root-key`],
+                capabilityDelegation: [`${identifier}#key-2`],
+                controller: otherOwnerIdentifier,
+                id: identifier,
+                verificationMethod: [
+                    {
+                        controller: otherOwnerIdentifier,
+                        id: `${otherOwnerIdentifier}#did-root-key`,
+                        publicKeyMultibase: Hashing.multibase.encode(otherOwnerKey.publicKey.toBytes()),
+                        type: "Ed25519VerificationKey2018",
+                    },
+                    {
+                        controller: identifier,
+                        id: `${identifier}#key-2`,
+                        publicKeyMultibase: Hashing.multibase.encode(key2.publicKey.toBytes()),
+                        type: "Ed25519VerificationKey2018",
+                    },
+                ],
             });
+            expect(doc.getCreated()).toBeTruthy();
+            expect(doc.getUpdated()).toBeTruthy();
+            expect(doc.getDeactivated()).toEqual(false);
+            expect(doc.getVersionId()).toBeTruthy();
         });
 
         it("successfuly handles add service, verificationMethod and verificationRelationship events", () => {
@@ -291,51 +251,43 @@ describe("DidDocument", () => {
             const doc = new DidDocument(identifier, messages);
 
             expect(doc.toJsonTree()).toEqual({
-                "@context": "https://w3id.org/did-resolution/v1",
-                didDocument: {
-                    "@context": "https://www.w3.org/ns/did/v1",
-                    assertionMethod: [`${identifier}#did-root-key`],
-                    authentication: [`${identifier}#did-root-key`],
-                    capabilityDelegation: [`${identifier}#key-2`],
-                    id: identifier,
-                    service: [
-                        {
-                            id: `${identifier}#service-1`,
-                            serviceEndpoint: "https://test.identity.com",
-                            type: "LinkedDomains",
-                        },
-                    ],
-                    verificationMethod: [
-                        {
-                            controller: identifier,
-                            id: `${identifier}#did-root-key`,
-                            publicKeyMultibase: "z6MkogVzoGJMVVLhaz82cA5jZQKAAqUghhCrpzkSDFDwxfJa",
-                            type: "Ed25519VerificationKey2018",
-                        },
-                        {
-                            controller: identifier,
-                            id: `${identifier}#key-1`,
-                            publicKeyMultibase: Hashing.multibase.encode(key1.publicKey.toBytes()),
-                            type: "Ed25519VerificationKey2018",
-                        },
-                        {
-                            controller: identifier,
-                            id: `${identifier}#key-2`,
-                            publicKeyMultibase: Hashing.multibase.encode(key2.publicKey.toBytes()),
-                            type: "Ed25519VerificationKey2018",
-                        },
-                    ],
-                },
-                didResolutionMetadata: {
-                    contentType: "application/did+ld+json",
-                },
-                didDocumentMetadata: {
-                    created: expect.anything(),
-                    deactivated: false,
-                    updated: expect.anything(),
-                    versionId: expect.anything(),
-                },
+                "@context": "https://www.w3.org/ns/did/v1",
+                assertionMethod: [`${identifier}#did-root-key`],
+                authentication: [`${identifier}#did-root-key`],
+                capabilityDelegation: [`${identifier}#key-2`],
+                id: identifier,
+                service: [
+                    {
+                        id: `${identifier}#service-1`,
+                        serviceEndpoint: "https://test.identity.com",
+                        type: "LinkedDomains",
+                    },
+                ],
+                verificationMethod: [
+                    {
+                        controller: identifier,
+                        id: `${identifier}#did-root-key`,
+                        publicKeyMultibase: "z6MkogVzoGJMVVLhaz82cA5jZQKAAqUghhCrpzkSDFDwxfJa",
+                        type: "Ed25519VerificationKey2018",
+                    },
+                    {
+                        controller: identifier,
+                        id: `${identifier}#key-1`,
+                        publicKeyMultibase: Hashing.multibase.encode(key1.publicKey.toBytes()),
+                        type: "Ed25519VerificationKey2018",
+                    },
+                    {
+                        controller: identifier,
+                        id: `${identifier}#key-2`,
+                        publicKeyMultibase: Hashing.multibase.encode(key2.publicKey.toBytes()),
+                        type: "Ed25519VerificationKey2018",
+                    },
+                ],
             });
+            expect(doc.getCreated()).toBeTruthy();
+            expect(doc.getUpdated()).toBeTruthy();
+            expect(doc.getDeactivated()).toEqual(false);
+            expect(doc.getVersionId()).toBeTruthy();
         });
 
         it("successfuly handles update service, verificationMethod and verificationRelationship events", () => {
@@ -436,62 +388,54 @@ describe("DidDocument", () => {
             const doc = new DidDocument(identifier, messages);
 
             expect(doc.toJsonTree()).toEqual({
-                "@context": "https://w3id.org/did-resolution/v1",
-                didDocument: {
-                    "@context": "https://www.w3.org/ns/did/v1",
-                    assertionMethod: [`${identifier}#did-root-key`],
-                    authentication: [`${identifier}#did-root-key`, `${identifier}#key-3`],
-                    capabilityDelegation: [`${identifier}#key-2`],
-                    id: identifier,
-                    service: [
-                        {
-                            id: `${identifier}#service-1`,
-                            serviceEndpoint: "https://new.test.identity.com",
-                            type: "LinkedDomains",
-                        },
-                        {
-                            id: `${identifier}#service-2`,
-                            serviceEndpoint: "https://test2.identity.com",
-                            type: "LinkedDomains",
-                        },
-                    ],
-                    verificationMethod: [
-                        {
-                            controller: identifier,
-                            id: `${identifier}#did-root-key`,
-                            publicKeyMultibase: "z6MkogVzoGJMVVLhaz82cA5jZQKAAqUghhCrpzkSDFDwxfJa",
-                            type: "Ed25519VerificationKey2018",
-                        },
-                        {
-                            controller: identifier,
-                            id: `${identifier}#key-1`,
-                            publicKeyMultibase: Hashing.multibase.encode(key4.publicKey.toBytes()),
-                            type: "Ed25519VerificationKey2018",
-                        },
-                        {
-                            controller: identifier,
-                            id: `${identifier}#key-2`,
-                            publicKeyMultibase: Hashing.multibase.encode(key5.publicKey.toBytes()),
-                            type: "Ed25519VerificationKey2018",
-                        },
-                        {
-                            controller: identifier,
-                            id: `${identifier}#key-3`,
-                            publicKeyMultibase: Hashing.multibase.encode(key3.publicKey.toBytes()),
-                            type: "Ed25519VerificationKey2018",
-                        },
-                    ],
-                },
-                didResolutionMetadata: {
-                    contentType: "application/did+ld+json",
-                },
-                didDocumentMetadata: {
-                    created: expect.anything(),
-                    deactivated: false,
-                    updated: expect.anything(),
-                    versionId: expect.anything(),
-                },
+                "@context": "https://www.w3.org/ns/did/v1",
+                assertionMethod: [`${identifier}#did-root-key`],
+                authentication: [`${identifier}#did-root-key`, `${identifier}#key-3`],
+                capabilityDelegation: [`${identifier}#key-2`],
+                id: identifier,
+                service: [
+                    {
+                        id: `${identifier}#service-1`,
+                        serviceEndpoint: "https://new.test.identity.com",
+                        type: "LinkedDomains",
+                    },
+                    {
+                        id: `${identifier}#service-2`,
+                        serviceEndpoint: "https://test2.identity.com",
+                        type: "LinkedDomains",
+                    },
+                ],
+                verificationMethod: [
+                    {
+                        controller: identifier,
+                        id: `${identifier}#did-root-key`,
+                        publicKeyMultibase: "z6MkogVzoGJMVVLhaz82cA5jZQKAAqUghhCrpzkSDFDwxfJa",
+                        type: "Ed25519VerificationKey2018",
+                    },
+                    {
+                        controller: identifier,
+                        id: `${identifier}#key-1`,
+                        publicKeyMultibase: Hashing.multibase.encode(key4.publicKey.toBytes()),
+                        type: "Ed25519VerificationKey2018",
+                    },
+                    {
+                        controller: identifier,
+                        id: `${identifier}#key-2`,
+                        publicKeyMultibase: Hashing.multibase.encode(key5.publicKey.toBytes()),
+                        type: "Ed25519VerificationKey2018",
+                    },
+                    {
+                        controller: identifier,
+                        id: `${identifier}#key-3`,
+                        publicKeyMultibase: Hashing.multibase.encode(key3.publicKey.toBytes()),
+                        type: "Ed25519VerificationKey2018",
+                    },
+                ],
             });
+            expect(doc.getCreated()).toBeTruthy();
+            expect(doc.getUpdated()).toBeTruthy();
+            expect(doc.getDeactivated()).toEqual(false);
+            expect(doc.getVersionId()).toBeTruthy();
         });
 
         it("successfuly handles revoke service, verificationMethod and verificationRelationship events", () => {
@@ -589,44 +533,36 @@ describe("DidDocument", () => {
             const doc = new DidDocument(identifier, messages);
 
             expect(doc.toJsonTree()).toEqual({
-                "@context": "https://w3id.org/did-resolution/v1",
-                didDocument: {
-                    "@context": "https://www.w3.org/ns/did/v1",
-                    assertionMethod: [`${identifier}#did-root-key`],
-                    authentication: [`${identifier}#did-root-key`, `${identifier}#key-3`],
-                    id: identifier,
-                    service: [
-                        {
-                            id: `${identifier}#service-2`,
-                            serviceEndpoint: "https://test2.identity.com",
-                            type: "LinkedDomains",
-                        },
-                    ],
-                    verificationMethod: [
-                        {
-                            controller: identifier,
-                            id: `${identifier}#did-root-key`,
-                            publicKeyMultibase: "z6MkogVzoGJMVVLhaz82cA5jZQKAAqUghhCrpzkSDFDwxfJa",
-                            type: "Ed25519VerificationKey2018",
-                        },
-                        {
-                            controller: identifier,
-                            id: `${identifier}#key-3`,
-                            publicKeyMultibase: Hashing.multibase.encode(key3.publicKey.toBytes()),
-                            type: "Ed25519VerificationKey2018",
-                        },
-                    ],
-                },
-                didResolutionMetadata: {
-                    contentType: "application/did+ld+json",
-                },
-                didDocumentMetadata: {
-                    created: expect.anything(),
-                    deactivated: false,
-                    updated: expect.anything(),
-                    versionId: expect.anything(),
-                },
+                "@context": "https://www.w3.org/ns/did/v1",
+                assertionMethod: [`${identifier}#did-root-key`],
+                authentication: [`${identifier}#did-root-key`, `${identifier}#key-3`],
+                id: identifier,
+                service: [
+                    {
+                        id: `${identifier}#service-2`,
+                        serviceEndpoint: "https://test2.identity.com",
+                        type: "LinkedDomains",
+                    },
+                ],
+                verificationMethod: [
+                    {
+                        controller: identifier,
+                        id: `${identifier}#did-root-key`,
+                        publicKeyMultibase: "z6MkogVzoGJMVVLhaz82cA5jZQKAAqUghhCrpzkSDFDwxfJa",
+                        type: "Ed25519VerificationKey2018",
+                    },
+                    {
+                        controller: identifier,
+                        id: `${identifier}#key-3`,
+                        publicKeyMultibase: Hashing.multibase.encode(key3.publicKey.toBytes()),
+                        type: "Ed25519VerificationKey2018",
+                    },
+                ],
             });
+            expect(doc.getCreated()).toBeTruthy();
+            expect(doc.getUpdated()).toBeTruthy();
+            expect(doc.getDeactivated()).toEqual(false);
+            expect(doc.getVersionId()).toBeTruthy();
         });
     });
 });

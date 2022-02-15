@@ -1,3 +1,4 @@
+import { Timestamp } from "@hashgraph/sdk";
 import {
     DidMethodOperation,
     HcsDidCreateDidOwnerEvent,
@@ -15,37 +16,14 @@ import { HcsDidCreateVerificationRelationshipEvent } from "./hcs/did/event/verif
 import { HcsDidRevokeVerificationRelationshipEvent } from "./hcs/did/event/verification-relationship/hcs-did-revoke-verification-relationship-event";
 import { HcsDidUpdateVerificationRelationshipEvent } from "./hcs/did/event/verification-relationship/hcs-did-update-verification-relationship-event";
 
-export enum DidResolveError {
-    INVALID_DID = "invalidDid",
-    NOT_FOUND = "notFound",
-    REPRESENTATION_NOT_SUPPORTED = "representationNotSupported",
-}
-
 export class DidDocument {
     private readonly id: string;
     private readonly context: string;
 
-    /**
-     * TODO: at the moment error is no where to bet set.
-     * Probably more resolve logic should be moved here so it could be used independently from HcsDid class.
-     * This way error handling could be implemented here too.
-     */
-    private resolutionMetadata: {
-        contentType: string;
-        error?: DidResolveError;
-    } = { contentType: "application/did+ld+json", error: undefined };
-
-    private documentMetadata: {
-        created: string;
-        updated: string;
-        deactivated: boolean;
-        versionId: number;
-    } = {
-        created: undefined,
-        updated: undefined,
-        deactivated: false,
-        versionId: undefined,
-    };
+    private created: Timestamp = null;
+    private updated: Timestamp = null;
+    private versionId: string = null;
+    private deactivated: boolean = false;
 
     private controller: any;
     private services: Map<string, any> = new Map();
@@ -76,6 +54,22 @@ export class DidDocument {
 
     public getId(): string {
         return this.id;
+    }
+
+    public getCreated() {
+        return this.created;
+    }
+
+    public getUpdated() {
+        return this.updated;
+    }
+
+    public getVersionId() {
+        return this.versionId;
+    }
+
+    public getDeactivated() {
+        return this.deactivated;
     }
 
     public toJsonTree(): any {
@@ -124,12 +118,7 @@ export class DidDocument {
             rootObject[DidDocumentJsonProperties.SERVICE] = [...Array.from(this.services.values())];
         }
 
-        return {
-            "@context": "https://w3id.org/did-resolution/v1",
-            didDocument: rootObject,
-            didResolutionMetadata: this.resolutionMetadata,
-            didDocumentMetadata: this.documentMetadata,
-        };
+        return rootObject;
     }
 
     public toJSON(): string {
@@ -137,35 +126,26 @@ export class DidDocument {
     }
 
     private setDocumentActivated(message: HcsDidMessage): void {
-        const date = message.getTimestamp().toDate();
+        const timestamp = message.getTimestamp();
 
-        this.documentMetadata = {
-            ...this.documentMetadata,
-            created: date.toISOString(),
-            updated: date.toISOString(),
-            deactivated: false,
-            versionId: date.getTime(),
-        };
+        this.created = timestamp;
+        this.updated = timestamp;
+        this.deactivated = false;
+        this.versionId = timestamp.toDate().getTime().toString();
     }
 
     private setDocumentDeactivated(): void {
-        this.documentMetadata = {
-            ...this.documentMetadata,
-            created: undefined,
-            updated: undefined,
-            deactivated: true,
-            versionId: undefined,
-        };
+        this.created = null;
+        this.updated = null;
+        this.deactivated = true;
+        this.versionId = null;
     }
 
     private setDocumentUpdated(message: HcsDidMessage): void {
-        const date = message.getTimestamp().toDate();
+        const timestamp = message.getTimestamp();
 
-        this.documentMetadata = {
-            ...this.documentMetadata,
-            updated: date.toISOString(),
-            versionId: date.getTime(),
-        };
+        this.updated = timestamp;
+        this.versionId = timestamp.toDate().getTime().toString();
     }
 
     private processMessages(messages: HcsDidMessage[]): void {

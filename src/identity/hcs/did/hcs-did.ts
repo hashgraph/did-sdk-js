@@ -10,6 +10,7 @@ import {
 } from "@hashgraph/sdk";
 import { Hashing } from "../../../utils/hashing";
 import { DidDocument } from "../../did-document";
+import { DidError, DidErrorCode } from "../../did-error";
 import { DidMethodOperation } from "../../did-method-operation";
 import { DidSyntax } from "../../did-syntax";
 import { MessageEnvelope } from "../message-envelope";
@@ -39,6 +40,7 @@ import { HcsDidTransaction } from "./hcs-did-transaction";
 export class HcsDid {
     public static DID_METHOD = DidSyntax.Method.HEDERA_HCS;
     public static TRANSACTION_FEE = new Hbar(2);
+    public static READ_TOPIC_MESSAGES_TIMEOUT = 5000;
 
     protected client: Client;
     protected privateKey: PrivateKey;
@@ -56,7 +58,7 @@ export class HcsDid {
         this.client = args.client;
 
         if (!this.identifier && !this.privateKey) {
-            throw new Error("identifier and privateKey cannot both be empty");
+            throw new DidError("identifier and privateKey cannot both be empty");
         }
 
         if (this.identifier) {
@@ -77,7 +79,7 @@ export class HcsDid {
             await this.resolve();
 
             if (this.document.hasOwner()) {
-                throw new Error("DID is already registered");
+                throw new DidError("DID is already registered");
             }
         } else {
             /**
@@ -113,19 +115,19 @@ export class HcsDid {
 
     public async changeOwner(args: { controller: string; newPrivateKey: PrivateKey }) {
         if (!this.identifier) {
-            throw new Error("DID is not registered");
+            throw new DidError("DID is not registered");
         }
 
         this.validateClientConfig();
 
         if (!args.newPrivateKey) {
-            throw new Error("newPrivateKey is missing");
+            throw new DidError("newPrivateKey is missing");
         }
 
         await this.resolve();
 
         if (!this.document.hasOwner()) {
-            throw new Error("DID is not registered or was recently deleted. DID has to be registered first.");
+            throw new DidError("DID is not registered or was recently deleted. DID has to be registered first.");
         }
 
         /**
@@ -160,7 +162,7 @@ export class HcsDid {
 
     public async delete() {
         if (!this.identifier) {
-            throw new Error("DID is not registered");
+            throw new DidError("DID is not registered");
         }
 
         this.validateClientConfig();
@@ -171,16 +173,16 @@ export class HcsDid {
 
     public async resolve(): Promise<DidDocument> {
         if (!this.identifier) {
-            throw new Error("DID is not registered");
+            throw new DidError("DID is not registered");
         }
 
         if (!this.client) {
-            throw new Error("Client configuration is missing");
+            throw new DidError("Client configuration is missing");
         }
 
         return new Promise((resolve, reject) => {
             new HcsDidEventMessageResolver(this.topicId)
-                .setTimeout(3000)
+                .setTimeout(HcsDid.READ_TOPIC_MESSAGES_TIMEOUT)
                 .whenFinished((messages) => {
                     this.messages = messages;
                     this.document = new DidDocument(this.identifier, this.messages);
@@ -431,7 +433,7 @@ export class HcsDid {
         const [didPart, topicIdPart] = identifier.split(DidSyntax.DID_TOPIC_SEPARATOR);
 
         if (!topicIdPart) {
-            throw new Error("DID string is invalid: topic ID is missing");
+            throw new DidError("DID string is invalid: topic ID is missing", DidErrorCode.INVALID_DID_STRING);
         }
 
         const topicId = TopicId.fromString(topicIdPart);
@@ -439,40 +441,50 @@ export class HcsDid {
         const didParts = didPart.split(DidSyntax.DID_METHOD_SEPARATOR);
 
         if (didParts.shift() !== DidSyntax.DID_PREFIX) {
-            throw new Error("DID string is invalid: invalid prefix.");
+            throw new DidError("DID string is invalid: invalid prefix.", DidErrorCode.INVALID_DID_STRING);
         }
 
         const methodName = didParts.shift();
         if (DidSyntax.Method.HEDERA_HCS !== methodName) {
-            throw new Error("DID string is invalid: invalid method name: " + methodName);
+            throw new DidError(
+                "DID string is invalid: invalid method name: " + methodName,
+                DidErrorCode.INVALID_DID_STRING
+            );
         }
 
         try {
             const networkName = didParts.shift();
 
             if (networkName != DidSyntax.HEDERA_NETWORK_MAINNET && networkName != DidSyntax.HEDERA_NETWORK_TESTNET) {
-                throw new Error("Invalid Hedera network.");
+                throw new DidError("DID string is invalid. Invalid Hedera network.", DidErrorCode.INVALID_NETWORK);
             }
 
             const didIdString = didParts.shift();
 
             if (didIdString.length < 48 || didParts.shift()) {
-                throw new Error("DID string is invalid.");
+                throw new DidError(
+                    "DID string is invalid. ID holds incorrect format.",
+                    DidErrorCode.INVALID_DID_STRING
+                );
             }
 
             return [networkName, topicId, didIdString];
         } catch (e) {
-            throw new Error("DID string is invalid. " + e.message);
+            if (e instanceof DidError) {
+                throw e;
+            }
+
+            throw new DidError("DID string is invalid. " + e.message, DidErrorCode.INVALID_DID_STRING);
         }
     }
 
     private validateClientConfig() {
         if (!this.privateKey) {
-            throw new Error("privateKey is missing");
+            throw new DidError("privateKey is missing");
         }
 
         if (!this.client) {
-            throw new Error("Client configuration is missing");
+            throw new DidError("Client configuration is missing");
         }
     }
 
