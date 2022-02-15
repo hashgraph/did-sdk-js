@@ -1,5 +1,5 @@
 import { AccountId, Client, PrivateKey, Timestamp, TopicMessageQuery } from "@hashgraph/sdk";
-import { Hashing, HcsDid } from "../../dist";
+import { DidError, Hashing, HcsDid } from "../../dist";
 
 const TOPIC_REGEXP = /^0\.0\.[0-9]{8,}/;
 
@@ -35,7 +35,7 @@ describe("HcsDid", () => {
             } catch (err) {
                 error = err;
             }
-            expect(error).toBeInstanceOf(Error);
+            expect(error).toBeInstanceOf(DidError);
             expect(error.message).toEqual("DID is already registered");
         });
 
@@ -49,7 +49,7 @@ describe("HcsDid", () => {
             } catch (err) {
                 error = err;
             }
-            expect(error).toBeInstanceOf(Error);
+            expect(error).toBeInstanceOf(DidError);
             expect(error.message).toEqual("Client configuration is missing");
         });
 
@@ -111,7 +111,7 @@ describe("HcsDid", () => {
             } catch (err) {
                 error = err;
             }
-            expect(error).toBeInstanceOf(Error);
+            expect(error).toBeInstanceOf(DidError);
             expect(error.message).toEqual("DID is not registered");
         });
 
@@ -125,7 +125,7 @@ describe("HcsDid", () => {
             } catch (err) {
                 error = err;
             }
-            expect(error).toBeInstanceOf(Error);
+            expect(error).toBeInstanceOf(DidError);
             expect(error.message).toEqual("Client configuration is missing");
         });
 
@@ -164,7 +164,7 @@ describe("HcsDid", () => {
             } catch (err) {
                 error = err;
             }
-            expect(error).toBeInstanceOf(Error);
+            expect(error).toBeInstanceOf(DidError);
             expect(error.message).toEqual("DID is not registered");
         });
 
@@ -177,7 +177,7 @@ describe("HcsDid", () => {
             } catch (err) {
                 error = err;
             }
-            expect(error).toBeInstanceOf(Error);
+            expect(error).toBeInstanceOf(DidError);
             expect(error.message).toEqual("privateKey is missing");
         });
 
@@ -190,7 +190,7 @@ describe("HcsDid", () => {
             } catch (err) {
                 error = err;
             }
-            expect(error).toBeInstanceOf(Error);
+            expect(error).toBeInstanceOf(DidError);
             expect(error.message).toEqual("Client configuration is missing");
         });
 
@@ -249,7 +249,7 @@ describe("HcsDid", () => {
             } catch (err) {
                 error = err;
             }
-            expect(error).toBeInstanceOf(Error);
+            expect(error).toBeInstanceOf(DidError);
             expect(error.message).toEqual("DID is not registered");
         });
 
@@ -268,7 +268,7 @@ describe("HcsDid", () => {
             } catch (err) {
                 error = err;
             }
-            expect(error).toBeInstanceOf(Error);
+            expect(error).toBeInstanceOf(DidError);
             expect(error.message).toEqual("privateKey is missing");
         });
 
@@ -288,7 +288,7 @@ describe("HcsDid", () => {
             } catch (err) {
                 error = err;
             }
-            expect(error).toBeInstanceOf(Error);
+            expect(error).toBeInstanceOf(DidError);
             expect(error.message).toEqual("Client configuration is missing");
         });
 
@@ -309,7 +309,7 @@ describe("HcsDid", () => {
             } catch (err) {
                 error = err;
             }
-            expect(error).toBeInstanceOf(Error);
+            expect(error).toBeInstanceOf(DidError);
             expect(error.message).toEqual("newPrivateKey is missing");
         });
 
@@ -362,7 +362,7 @@ describe("HcsDid", () => {
             } catch (err) {
                 error = err;
             }
-            expect(error).toBeInstanceOf(Error);
+            expect(error).toBeInstanceOf(DidError);
             expect(error.message).toEqual("privateKey is missing");
         });
 
@@ -376,7 +376,7 @@ describe("HcsDid", () => {
             } catch (err) {
                 error = err;
             }
-            expect(error).toBeInstanceOf(Error);
+            expect(error).toBeInstanceOf(DidError);
             expect(error.message).toEqual("Client configuration is missing");
         });
 
@@ -390,7 +390,7 @@ describe("HcsDid", () => {
             } catch (err) {
                 error = err;
             }
-            expect(error).toBeInstanceOf(Error);
+            expect(error).toBeInstanceOf(DidError);
             expect(error.message).toEqual("Validation failed. Services args are missing");
         });
 
@@ -409,7 +409,7 @@ describe("HcsDid", () => {
             } catch (err) {
                 error = err;
             }
-            expect(error).toBeInstanceOf(Error);
+            expect(error).toBeInstanceOf(DidError);
             expect(error.message).toEqual("Event ID is invalid. Expected format: {did}#service-{integer}");
         });
 
@@ -600,7 +600,7 @@ describe("HcsDid", () => {
             } catch (err) {
                 error = err;
             }
-            expect(error).toBeInstanceOf(Error);
+            expect(error).toBeInstanceOf(DidError);
             expect(error.message).toEqual("privateKey is missing");
         });
 
@@ -614,7 +614,7 @@ describe("HcsDid", () => {
             } catch (err) {
                 error = err;
             }
-            expect(error).toBeInstanceOf(Error);
+            expect(error).toBeInstanceOf(DidError);
             expect(error.message).toEqual("Client configuration is missing");
         });
 
@@ -628,7 +628,7 @@ describe("HcsDid", () => {
             } catch (err) {
                 error = err;
             }
-            expect(error).toBeInstanceOf(Error);
+            expect(error).toBeInstanceOf(DidError);
             expect(error.message).toEqual("Validation failed. Verification Method args are missing");
         });
 
@@ -812,7 +812,7 @@ describe("HcsDid", () => {
             } catch (err) {
                 error = err;
             }
-            expect(error).toBeInstanceOf(Error);
+            expect(error).toBeInstanceOf(DidError);
             expect(error.message).toEqual("privateKey is missing");
         });
 
@@ -832,7 +832,7 @@ describe("HcsDid", () => {
             } catch (err) {
                 error = err;
             }
-            expect(error).toBeInstanceOf(Error);
+            expect(error).toBeInstanceOf(DidError);
             expect(error.message).toEqual("Client configuration is missing");
         });
 
@@ -852,7 +852,7 @@ describe("HcsDid", () => {
             } catch (err) {
                 error = err;
             }
-            expect(error).toBeInstanceOf(Error);
+            expect(error).toBeInstanceOf(DidError);
             expect(error.message).toEqual("Validation failed. Verification Relationship args are missing");
         });
 

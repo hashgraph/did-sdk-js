@@ -1,3 +1,4 @@
+import { DidError } from "../../../../did-error";
 import { HcsDidEvent } from "../hcs-did-event";
 import { HcsDidEventTargetName } from "../hcs-did-event-target-name";
 
@@ -10,11 +11,11 @@ export class HcsDidRevokeServiceEvent extends HcsDidEvent {
         super();
 
         if (!id) {
-            throw new Error("Validation failed. Services args are missing");
+            throw new DidError("Validation failed. Services args are missing");
         }
 
         if (!this.isServiceEventIdValid(id)) {
-            throw new Error("Event ID is invalid. Expected format: {did}#service-{integer}");
+            throw new DidError("Event ID is invalid. Expected format: {did}#service-{integer}");
         }
 
         this.id = id;
