@@ -60,8 +60,8 @@ export class HederaDidResolver {
             if (!status.deactivated) {
                 documentMeta = {
                     ...documentMeta,
-                    created: didDocument.getCreated().toDate().toISOString(),
-                    updated: didDocument.getUpdated().toDate().toISOString(),
+                    created: didDocument.getCreated()?.toDate()?.toISOString(),
+                    updated: didDocument.getUpdated()?.toDate()?.toISOString(),
                 };
             }
 
