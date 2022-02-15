@@ -1,5 +1,5 @@
 import { PrivateKey } from "@hashgraph/sdk";
-import { Hashing, HcsDidCreateVerificationRelationshipEvent, HcsDidEventTargetName } from "../../../../dist";
+import { DidError, Hashing, HcsDidCreateVerificationRelationshipEvent, HcsDidEventTargetName } from "../../../../dist";
 
 describe("HcsDidCreateVerificationRelationshipEvent", () => {
     const privateKey = PrivateKey.fromString(
@@ -33,7 +33,7 @@ describe("HcsDidCreateVerificationRelationshipEvent", () => {
                 error = err;
             }
 
-            expect(error).toBeInstanceOf(Error);
+            expect(error).toBeInstanceOf(DidError);
             expect(error.message).toEqual("Validation failed. Verification Relationship args are missing");
         });
 
@@ -51,7 +51,7 @@ describe("HcsDidCreateVerificationRelationshipEvent", () => {
                 error = err;
             }
 
-            expect(error).toBeInstanceOf(Error);
+            expect(error).toBeInstanceOf(DidError);
             expect(error.message).toEqual("Validation failed. Verification Relationship args are missing");
         });
 
@@ -69,7 +69,7 @@ describe("HcsDidCreateVerificationRelationshipEvent", () => {
                 error = err;
             }
 
-            expect(error).toBeInstanceOf(Error);
+            expect(error).toBeInstanceOf(DidError);
             expect(error.message).toEqual("Validation failed. Verification Relationship args are missing");
         });
 
@@ -87,7 +87,7 @@ describe("HcsDidCreateVerificationRelationshipEvent", () => {
                 error = err;
             }
 
-            expect(error).toBeInstanceOf(Error);
+            expect(error).toBeInstanceOf(DidError);
             expect(error.message).toEqual("Validation failed. Verification Relationship args are missing");
         });
 
@@ -105,7 +105,7 @@ describe("HcsDidCreateVerificationRelationshipEvent", () => {
                 error = err;
             }
 
-            expect(error).toBeInstanceOf(Error);
+            expect(error).toBeInstanceOf(DidError);
             expect(error.message).toEqual("Validation failed. Verification Relationship args are missing");
         });
 
@@ -123,7 +123,7 @@ describe("HcsDidCreateVerificationRelationshipEvent", () => {
                 error = err;
             }
 
-            expect(error).toBeInstanceOf(Error);
+            expect(error).toBeInstanceOf(DidError);
             expect(error.message).toEqual("Event ID is invalid. Expected format: {did}#key-{integer}");
         });
     });

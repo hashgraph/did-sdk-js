@@ -30,6 +30,10 @@ describe("DidDocument", () => {
                 id: identifier,
                 verificationMethod: [],
             });
+            expect(doc.getCreated()).toBeNull();
+            expect(doc.getUpdated()).toBeNull();
+            expect(doc.getDeactivated()).toEqual(false);
+            expect(doc.getVersionId()).toBeNull();
         });
 
         it("ignores events til first create DIDOwner event", () => {
@@ -80,6 +84,10 @@ describe("DidDocument", () => {
                     },
                 ],
             });
+            expect(doc.getCreated()).toBeTruthy();
+            expect(doc.getUpdated()).toBeTruthy();
+            expect(doc.getDeactivated()).toEqual(false);
+            expect(doc.getVersionId()).toBeTruthy();
         });
 
         it("handles create DIDOwner event", () => {
@@ -106,6 +114,10 @@ describe("DidDocument", () => {
                     },
                 ],
             });
+            expect(doc.getCreated()).toBeTruthy();
+            expect(doc.getUpdated()).toBeTruthy();
+            expect(doc.getDeactivated()).toEqual(false);
+            expect(doc.getVersionId()).toBeTruthy();
         });
 
         it("handes DID delete event", () => {
@@ -126,6 +138,10 @@ describe("DidDocument", () => {
                 id: identifier,
                 verificationMethod: [],
             });
+            expect(doc.getCreated()).toBeNull();
+            expect(doc.getUpdated()).toBeNull();
+            expect(doc.getDeactivated()).toEqual(true);
+            expect(doc.getVersionId()).toBeNull();
         });
 
         it("handes change DID owner event", () => {
@@ -185,6 +201,10 @@ describe("DidDocument", () => {
                     },
                 ],
             });
+            expect(doc.getCreated()).toBeTruthy();
+            expect(doc.getUpdated()).toBeTruthy();
+            expect(doc.getDeactivated()).toEqual(false);
+            expect(doc.getVersionId()).toBeTruthy();
         });
 
         it("successfuly handles add service, verificationMethod and verificationRelationship events", () => {
@@ -264,6 +284,10 @@ describe("DidDocument", () => {
                     },
                 ],
             });
+            expect(doc.getCreated()).toBeTruthy();
+            expect(doc.getUpdated()).toBeTruthy();
+            expect(doc.getDeactivated()).toEqual(false);
+            expect(doc.getVersionId()).toBeTruthy();
         });
 
         it("successfuly handles update service, verificationMethod and verificationRelationship events", () => {
@@ -408,6 +432,10 @@ describe("DidDocument", () => {
                     },
                 ],
             });
+            expect(doc.getCreated()).toBeTruthy();
+            expect(doc.getUpdated()).toBeTruthy();
+            expect(doc.getDeactivated()).toEqual(false);
+            expect(doc.getVersionId()).toBeTruthy();
         });
 
         it("successfuly handles revoke service, verificationMethod and verificationRelationship events", () => {
@@ -531,6 +559,10 @@ describe("DidDocument", () => {
                     },
                 ],
             });
+            expect(doc.getCreated()).toBeTruthy();
+            expect(doc.getUpdated()).toBeTruthy();
+            expect(doc.getDeactivated()).toEqual(false);
+            expect(doc.getVersionId()).toBeTruthy();
         });
     });
 });

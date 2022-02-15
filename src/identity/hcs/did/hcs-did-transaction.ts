@@ -2,6 +2,7 @@ import { Client, Timestamp, TopicId, TopicMessageSubmitTransaction, Transaction,
 import moment from "moment";
 import { ArraysUtils } from "../../../utils/arrays-utils";
 import { Validator } from "../../../utils/validator";
+import { DidError } from "../../did-error";
 import { MessageEnvelope } from "../message-envelope";
 import { HcsDidMessage, Signer } from "./hcs-did-message";
 import { HcsDidTopicListener } from "./hcs-did-topic-listener";
@@ -35,7 +36,7 @@ export class HcsDidTransaction {
             this.message = message;
             this.executed = false;
         } else {
-            throw new Error("Invalid arguments");
+            throw new DidError("Invalid arguments");
         }
     }
 
@@ -60,7 +61,7 @@ export class HcsDidTransaction {
         if (this.errorHandler) {
             this.errorHandler(err);
         } else {
-            throw new Error(err.message);
+            throw new DidError(err.message);
         }
     }
 
@@ -146,7 +147,7 @@ export class HcsDidTransaction {
                         return;
                     }
 
-                    this.handleError(new Error(reason + ": " + ArraysUtils.toString(response.contents)));
+                    this.handleError(new DidError(reason + ": " + ArraysUtils.toString(response.contents)));
                     this.listener.unsubscribe();
                 })
                 .subscribe(client, (msg) => {

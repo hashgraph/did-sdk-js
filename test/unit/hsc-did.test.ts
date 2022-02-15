@@ -1,5 +1,5 @@
 import { Client, PrivateKey } from "@hashgraph/sdk";
-import { HcsDid } from "../../dist";
+import { DidError, HcsDid } from "../../dist";
 
 describe("HcsDid", () => {
     let client;
@@ -9,7 +9,7 @@ describe("HcsDid", () => {
     });
     describe("#constructor", () => {
         it("throws error because of missing identifier and privateKey", () => {
-            expect(() => new HcsDid({})).toThrowError(new Error("identifier and privateKey cannot both be empty"));
+            expect(() => new HcsDid({})).toThrowError(new DidError("identifier and privateKey cannot both be empty"));
         });
 
         it("successfully builds HcsDid with private key only", () => {
@@ -76,7 +76,7 @@ describe("HcsDid", () => {
                 error = err;
             }
 
-            expect(error).toBeInstanceOf(Error);
+            expect(error).toBeInstanceOf(DidError);
             expect(error.message).toEqual("DID string is invalid: topic ID is missing");
         });
 
@@ -88,7 +88,7 @@ describe("HcsDid", () => {
                 error = err;
             }
 
-            expect(error).toBeInstanceOf(Error);
+            expect(error).toBeInstanceOf(DidError);
             expect(error.message).toEqual("DID string is invalid: invalid prefix.");
         });
 
@@ -100,7 +100,7 @@ describe("HcsDid", () => {
                 error = err;
             }
 
-            expect(error).toBeInstanceOf(Error);
+            expect(error).toBeInstanceOf(DidError);
             expect(error.message).toEqual("DID string is invalid: invalid method name: hashgraph");
         });
 
@@ -112,7 +112,7 @@ describe("HcsDid", () => {
                 error = err;
             }
 
-            expect(error).toBeInstanceOf(Error);
+            expect(error).toBeInstanceOf(DidError);
             expect(error.message).toEqual("DID string is invalid. Invalid Hedera network.");
         });
 
@@ -124,8 +124,8 @@ describe("HcsDid", () => {
                 error = err;
             }
 
-            expect(error).toBeInstanceOf(Error);
-            expect(error.message).toEqual("DID string is invalid. DID string is invalid.");
+            expect(error).toBeInstanceOf(DidError);
+            expect(error.message).toEqual("DID string is invalid. ID holds incorrect format.");
         });
 
         it("should get array with NetworkName, topicId and didIdString", () => {
