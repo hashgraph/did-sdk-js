@@ -455,7 +455,11 @@ export class HcsDid {
         try {
             const networkName = didParts.shift();
 
-            if (networkName != DidSyntax.HEDERA_NETWORK_MAINNET && networkName != DidSyntax.HEDERA_NETWORK_TESTNET) {
+            if (
+                networkName != DidSyntax.HEDERA_NETWORK_MAINNET &&
+                networkName != DidSyntax.HEDERA_NETWORK_TESTNET &&
+                networkName != DidSyntax.HEDERA_NETWORK_PREVIEWNET
+            ) {
                 throw new DidError("DID string is invalid. Invalid Hedera network.", DidErrorCode.INVALID_NETWORK);
             }
 

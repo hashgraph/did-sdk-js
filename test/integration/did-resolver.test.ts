@@ -119,7 +119,7 @@ describe("HederaDidResolver", () => {
             await did.delete();
 
             const resolver = new Resolver({
-                ...new HederaDidResolver(client).build(),
+                ...new HederaDidResolver().build(),
             });
 
             let result = await resolver.resolve(did.getIdentifier());
