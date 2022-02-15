@@ -3,6 +3,7 @@ import { Base64 } from "js-base64";
 import Long from "long";
 import { HcsDidMessage } from "../..";
 import { ArraysUtils } from "../../utils/arrays-utils";
+import { DidError } from "../did-error";
 import { JsonClass } from "./json-class";
 import { SerializableMirrorConsensusResponse } from "./serializable-mirror-consensus-response";
 
@@ -44,7 +45,7 @@ export class MessageEnvelope<T extends HcsDidMessage> {
 
             this.message = message;
         } else {
-            throw new Error("Wrong arguments passed to constructor");
+            throw new DidError("Wrong arguments passed to constructor");
         }
     }
 
@@ -56,11 +57,11 @@ export class MessageEnvelope<T extends HcsDidMessage> {
      */
     public sign(signer: SignFunction): Uint8Array {
         if (!signer) {
-            throw new Error("Signing function is not provided.");
+            throw new DidError("Signing function is not provided.");
         }
 
         if (this.signature) {
-            throw new Error("Message is already signed.");
+            throw new DidError("Message is already signed.");
         }
 
         const msgBytes = ArraysUtils.fromString(this.message.toJSON());

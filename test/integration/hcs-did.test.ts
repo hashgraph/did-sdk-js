@@ -1,5 +1,5 @@
 import { AccountId, Client, PrivateKey, Timestamp, TopicMessageQuery } from "@hashgraph/sdk";
-import { Hashing, HcsDid } from "../../dist";
+import { DidError, Hashing, HcsDid } from "../../dist";
 
 const TOPIC_REGEXP = /^0\.0\.[0-9]{8,}/;
 
@@ -35,7 +35,7 @@ describe("HcsDid", () => {
             } catch (err) {
                 error = err;
             }
-            expect(error).toBeInstanceOf(Error);
+            expect(error).toBeInstanceOf(DidError);
             expect(error.message).toEqual("DID is already registered");
         });
 
@@ -49,7 +49,7 @@ describe("HcsDid", () => {
             } catch (err) {
                 error = err;
             }
-            expect(error).toBeInstanceOf(Error);
+            expect(error).toBeInstanceOf(DidError);
             expect(error.message).toEqual("Client configuration is missing");
         });
 
@@ -111,7 +111,7 @@ describe("HcsDid", () => {
             } catch (err) {
                 error = err;
             }
-            expect(error).toBeInstanceOf(Error);
+            expect(error).toBeInstanceOf(DidError);
             expect(error.message).toEqual("DID is not registered");
         });
 
@@ -125,7 +125,7 @@ describe("HcsDid", () => {
             } catch (err) {
                 error = err;
             }
-            expect(error).toBeInstanceOf(Error);
+            expect(error).toBeInstanceOf(DidError);
             expect(error.message).toEqual("Client configuration is missing");
         });
 
@@ -136,7 +136,7 @@ describe("HcsDid", () => {
             await did.register();
 
             const didDoc = await did.resolve();
-            const didDocument = didDoc.toJsonTree().didDocument;
+            const didDocument = didDoc.toJsonTree();
 
             expect(didDocument).toEqual({
                 "@context": "https://www.w3.org/ns/did/v1",
@@ -164,7 +164,7 @@ describe("HcsDid", () => {
             } catch (err) {
                 error = err;
             }
-            expect(error).toBeInstanceOf(Error);
+            expect(error).toBeInstanceOf(DidError);
             expect(error.message).toEqual("DID is not registered");
         });
 
@@ -177,7 +177,7 @@ describe("HcsDid", () => {
             } catch (err) {
                 error = err;
             }
-            expect(error).toBeInstanceOf(Error);
+            expect(error).toBeInstanceOf(DidError);
             expect(error.message).toEqual("privateKey is missing");
         });
 
@@ -190,7 +190,7 @@ describe("HcsDid", () => {
             } catch (err) {
                 error = err;
             }
-            expect(error).toBeInstanceOf(Error);
+            expect(error).toBeInstanceOf(DidError);
             expect(error.message).toEqual("Client configuration is missing");
         });
 
@@ -200,7 +200,7 @@ describe("HcsDid", () => {
 
             await did.register();
 
-            let didJSON = (await did.resolve()).toJsonTree().didDocument;
+            let didJSON = (await did.resolve()).toJsonTree();
             expect(didJSON).toEqual({
                 "@context": "https://www.w3.org/ns/did/v1",
                 assertionMethod: [`${did.getIdentifier()}#did-root-key`],
@@ -218,7 +218,7 @@ describe("HcsDid", () => {
 
             await did.delete();
 
-            didJSON = (await did.resolve()).toJsonTree().didDocument;
+            didJSON = (await did.resolve()).toJsonTree();
             expect(didJSON).toEqual({
                 "@context": "https://www.w3.org/ns/did/v1",
                 assertionMethod: [],
@@ -249,7 +249,7 @@ describe("HcsDid", () => {
             } catch (err) {
                 error = err;
             }
-            expect(error).toBeInstanceOf(Error);
+            expect(error).toBeInstanceOf(DidError);
             expect(error.message).toEqual("DID is not registered");
         });
 
@@ -268,7 +268,7 @@ describe("HcsDid", () => {
             } catch (err) {
                 error = err;
             }
-            expect(error).toBeInstanceOf(Error);
+            expect(error).toBeInstanceOf(DidError);
             expect(error.message).toEqual("privateKey is missing");
         });
 
@@ -288,7 +288,7 @@ describe("HcsDid", () => {
             } catch (err) {
                 error = err;
             }
-            expect(error).toBeInstanceOf(Error);
+            expect(error).toBeInstanceOf(DidError);
             expect(error.message).toEqual("Client configuration is missing");
         });
 
@@ -309,7 +309,7 @@ describe("HcsDid", () => {
             } catch (err) {
                 error = err;
             }
-            expect(error).toBeInstanceOf(Error);
+            expect(error).toBeInstanceOf(DidError);
             expect(error.message).toEqual("newPrivateKey is missing");
         });
 
@@ -328,7 +328,7 @@ describe("HcsDid", () => {
                 newPrivateKey: newDidPrivateKey,
             });
 
-            const doc = (await did.resolve()).toJsonTree().didDocument;
+            const doc = (await did.resolve()).toJsonTree();
 
             expect(doc).toEqual({
                 "@context": "https://www.w3.org/ns/did/v1",
@@ -362,7 +362,7 @@ describe("HcsDid", () => {
             } catch (err) {
                 error = err;
             }
-            expect(error).toBeInstanceOf(Error);
+            expect(error).toBeInstanceOf(DidError);
             expect(error.message).toEqual("privateKey is missing");
         });
 
@@ -376,7 +376,7 @@ describe("HcsDid", () => {
             } catch (err) {
                 error = err;
             }
-            expect(error).toBeInstanceOf(Error);
+            expect(error).toBeInstanceOf(DidError);
             expect(error.message).toEqual("Client configuration is missing");
         });
 
@@ -390,7 +390,7 @@ describe("HcsDid", () => {
             } catch (err) {
                 error = err;
             }
-            expect(error).toBeInstanceOf(Error);
+            expect(error).toBeInstanceOf(DidError);
             expect(error.message).toEqual("Validation failed. Services args are missing");
         });
 
@@ -409,7 +409,7 @@ describe("HcsDid", () => {
             } catch (err) {
                 error = err;
             }
-            expect(error).toBeInstanceOf(Error);
+            expect(error).toBeInstanceOf(DidError);
             expect(error.message).toEqual("Event ID is invalid. Expected format: {did}#service-{integer}");
         });
 
@@ -427,7 +427,7 @@ describe("HcsDid", () => {
             console.log(`https://testnet.dragonglass.me/hedera/topics/${did.getTopicId().toString()}`);
 
             const didDoc = await did.resolve();
-            const didDocument = didDoc.toJsonTree().didDocument;
+            const didDocument = didDoc.toJsonTree();
 
             expect(didDocument).toEqual({
                 "@context": "https://www.w3.org/ns/did/v1",
@@ -474,7 +474,7 @@ describe("HcsDid", () => {
             console.log(`https://testnet.dragonglass.me/hedera/topics/${did.getTopicId().toString()}`);
 
             const didDoc = await did.resolve();
-            const didDocument = didDoc.toJsonTree().didDocument;
+            const didDocument = didDoc.toJsonTree();
 
             expect(didDocument).toEqual({
                 "@context": "https://www.w3.org/ns/did/v1",
@@ -518,7 +518,7 @@ describe("HcsDid", () => {
             console.log(`https://testnet.dragonglass.me/hedera/topics/${did.getTopicId().toString()}`);
 
             const didDoc = await did.resolve();
-            const didDocument = didDoc.toJsonTree().didDocument;
+            const didDocument = didDoc.toJsonTree();
 
             expect(didDocument).toEqual({
                 "@context": "https://www.w3.org/ns/did/v1",
@@ -561,7 +561,7 @@ describe("HcsDid", () => {
             console.log(`https://testnet.dragonglass.me/hedera/topics/${did.getTopicId().toString()}`);
 
             const didDoc = await did.resolve();
-            const didDocument = didDoc.toJsonTree().didDocument;
+            const didDocument = didDoc.toJsonTree();
 
             expect(didDocument).toEqual({
                 "@context": "https://www.w3.org/ns/did/v1",
@@ -600,7 +600,7 @@ describe("HcsDid", () => {
             } catch (err) {
                 error = err;
             }
-            expect(error).toBeInstanceOf(Error);
+            expect(error).toBeInstanceOf(DidError);
             expect(error.message).toEqual("privateKey is missing");
         });
 
@@ -614,7 +614,7 @@ describe("HcsDid", () => {
             } catch (err) {
                 error = err;
             }
-            expect(error).toBeInstanceOf(Error);
+            expect(error).toBeInstanceOf(DidError);
             expect(error.message).toEqual("Client configuration is missing");
         });
 
@@ -628,7 +628,7 @@ describe("HcsDid", () => {
             } catch (err) {
                 error = err;
             }
-            expect(error).toBeInstanceOf(Error);
+            expect(error).toBeInstanceOf(DidError);
             expect(error.message).toEqual("Validation failed. Verification Method args are missing");
         });
 
@@ -658,7 +658,7 @@ describe("HcsDid", () => {
             console.log(`https://testnet.dragonglass.me/hedera/topics/${did.getTopicId().toString()}`);
 
             const didDoc = await did.resolve();
-            const didDocument = didDoc.toJsonTree().didDocument;
+            const didDocument = didDoc.toJsonTree();
 
             expect(didDocument).toEqual({
                 "@context": "https://www.w3.org/ns/did/v1",
@@ -718,7 +718,7 @@ describe("HcsDid", () => {
             console.log(`https://testnet.dragonglass.me/hedera/topics/${did.getTopicId().toString()}`);
 
             const didDoc = await did.resolve();
-            const didDocument = didDoc.toJsonTree().didDocument;
+            const didDocument = didDoc.toJsonTree();
 
             expect(didDocument).toEqual({
                 "@context": "https://www.w3.org/ns/did/v1",
@@ -773,7 +773,7 @@ describe("HcsDid", () => {
             console.log(`https://testnet.dragonglass.me/hedera/topics/${did.getTopicId().toString()}`);
 
             const didDoc = await did.resolve();
-            const didDocument = didDoc.toJsonTree().didDocument;
+            const didDocument = didDoc.toJsonTree();
 
             expect(didDocument).toEqual({
                 "@context": "https://www.w3.org/ns/did/v1",
@@ -812,7 +812,7 @@ describe("HcsDid", () => {
             } catch (err) {
                 error = err;
             }
-            expect(error).toBeInstanceOf(Error);
+            expect(error).toBeInstanceOf(DidError);
             expect(error.message).toEqual("privateKey is missing");
         });
 
@@ -832,7 +832,7 @@ describe("HcsDid", () => {
             } catch (err) {
                 error = err;
             }
-            expect(error).toBeInstanceOf(Error);
+            expect(error).toBeInstanceOf(DidError);
             expect(error.message).toEqual("Client configuration is missing");
         });
 
@@ -852,7 +852,7 @@ describe("HcsDid", () => {
             } catch (err) {
                 error = err;
             }
-            expect(error).toBeInstanceOf(Error);
+            expect(error).toBeInstanceOf(DidError);
             expect(error.message).toEqual("Validation failed. Verification Relationship args are missing");
         });
 
@@ -876,7 +876,7 @@ describe("HcsDid", () => {
             });
 
             const didDoc = await did.resolve();
-            const didDocument = didDoc.toJsonTree().didDocument;
+            const didDocument = didDoc.toJsonTree();
 
             expect(didDocument).toEqual({
                 "@context": "https://www.w3.org/ns/did/v1",
@@ -930,7 +930,7 @@ describe("HcsDid", () => {
             });
 
             const didDoc = await did.resolve();
-            const didDocument = didDoc.toJsonTree().didDocument;
+            const didDocument = didDoc.toJsonTree();
 
             expect(didDocument).toEqual({
                 "@context": "https://www.w3.org/ns/did/v1",
@@ -980,7 +980,7 @@ describe("HcsDid", () => {
             });
 
             const didDoc = await did.resolve();
-            const didDocument = didDoc.toJsonTree().didDocument;
+            const didDocument = didDoc.toJsonTree();
 
             expect(didDocument).toEqual({
                 "@context": "https://www.w3.org/ns/did/v1",

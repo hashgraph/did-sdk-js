@@ -1,5 +1,6 @@
 import { DidDocument } from "./identity/did-document";
 import { DidDocumentJsonProperties } from "./identity/did-document-json-properties";
+import { DidError, DidErrorCode } from "./identity/did-error";
 import { DidMethodOperation } from "./identity/did-method-operation";
 import { DidParser } from "./identity/did-parser";
 import { HederaDidResolver } from "./identity/did-resolver";
@@ -35,6 +36,8 @@ export {
     ArraysUtils,
     DidDocument,
     DidDocumentJsonProperties,
+    DidError,
+    DidErrorCode,
     DidMethodOperation,
     DidParser,
     DidSyntax,
@@ -42,7 +45,6 @@ export {
     Hashing,
     HcsDid,
     HcsDidCreateDidOwnerEvent,
-    HcsDidUpdateDidOwnerEvent,
     HcsDidCreateServiceEvent,
     HcsDidCreateVerificationMethodEvent,
     HcsDidCreateVerificationRelationshipEvent,
@@ -55,13 +57,14 @@ export {
     HcsDidRevokeVerificationRelationshipEvent,
     HcsDidTopicListener,
     HcsDidTransaction,
+    HcsDidUpdateDidOwnerEvent,
     HcsDidUpdateServiceEvent,
     HcsDidUpdateVerificationMethodEvent,
     HcsDidUpdateVerificationRelationshipEvent,
+    HederaDidResolver,
     JsonClass,
     MessageEnvelope,
     SerializableMirrorConsensusResponse,
     TimestampUtils,
     Validator,
-    HederaDidResolver,
 };

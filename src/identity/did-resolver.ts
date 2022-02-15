@@ -1,5 +1,13 @@
 import NodeClient from "@hashgraph/sdk/lib/client/NodeClient";
-import { DIDResolutionOptions, DIDResolutionResult, DIDResolver, ParsedDID, Resolvable } from "did-resolver";
+import {
+    DIDDocumentMetadata,
+    DIDResolutionOptions,
+    DIDResolutionResult,
+    DIDResolver,
+    ParsedDID,
+    Resolvable,
+} from "did-resolver";
+import { DidErrorCode } from "..";
 import { HcsDid } from "./hcs/did/hcs-did";
 
 export enum Errors {
@@ -34,49 +42,39 @@ export class HederaDidResolver {
 
     async resolve(
         did: string,
-        parsed: ParsedDID,
-        // eslint-disable-next-line @typescript-eslint/no-unused-vars
+        _parsed: ParsedDID,
         _unused: Resolvable,
         options: DIDResolutionOptions
     ): Promise<DIDResolutionResult> {
-        let networkName, topicId, didIdString;
-        try {
-            [networkName, topicId, didIdString] = HcsDid.parseIdentifier(parsed.did);
-        } catch (e: any) {
-            return {
-                didResolutionMetadata: {
-                    error: Errors.invalidDid,
-                    message: `Not a valid did:hedera: ${parsed.id} \n ${e.toString()}`,
-                },
-                didDocumentMetadata: {},
-                didDocument: null,
-            };
-        }
-
         //TODO: check network
 
         try {
             const registeredDid = new HcsDid({ identifier: did, client: this.client });
-            const { didDocument, deactivated, versionId, nextVersionId } = (await registeredDid.resolve()).toJsonTree();
-            const status = deactivated ? { deactivated: true } : {};
-            let versionMeta = {
-                versionId: versionId,
-            };
-            let versionMetaNext = {
-                nextVersionId: nextVersionId,
+            const didDocument = await registeredDid.resolve();
+            const status: Partial<DIDDocumentMetadata> = didDocument.getDeactivated() ? { deactivated: true } : {};
+
+            let documentMeta: Partial<DIDDocumentMetadata> = {
+                versionId: didDocument.getVersionId(),
             };
 
+            if (!status.deactivated) {
+                documentMeta = {
+                    ...documentMeta,
+                    created: didDocument.getCreated().toDate().toISOString(),
+                    updated: didDocument.getUpdated().toDate().toISOString(),
+                };
+            }
+
             return {
-                didDocumentMetadata: { ...status, ...versionMeta, ...versionMetaNext },
+                didDocumentMetadata: { ...status, ...documentMeta },
                 didResolutionMetadata: { contentType: "application/did+ld+json" },
-                didDocument,
+                didDocument: didDocument.toJsonTree(),
             };
-            // eslint-disable-next-line @typescript-eslint/no-explicit-any
         } catch (e: any) {
             return {
                 didResolutionMetadata: {
-                    error: Errors.notFound,
-                    message: e.toString(), // This is not in spec, nut may be helpful
+                    error: this.getErrorCode(e),
+                    message: e.toString(), // This is not in spec, but may be helpful
                 },
                 didDocumentMetadata: {},
                 didDocument: null,
@@ -86,5 +84,18 @@ export class HederaDidResolver {
 
     build(): Record<string, DIDResolver> {
         return { hedera: this.resolve.bind(this) };
+    }
+
+    private getErrorCode(error: any): Errors {
+        switch (error?.code) {
+            case DidErrorCode.INVALID_DID_STRING:
+                return Errors.invalidDid;
+            case DidErrorCode.INVALID_NETWORK:
+                return Errors.unknownNetwork;
+            case DidErrorCode.DID_NOT_FOUND:
+                return Errors.notFound;
+            default:
+                return Errors.notFound;
+        }
     }
 }
