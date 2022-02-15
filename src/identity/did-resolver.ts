@@ -1,4 +1,4 @@
-import NodeClient from "@hashgraph/sdk/lib/client/NodeClient";
+import { Client } from "@hashgraph/sdk";
 import {
     DIDDocumentMetadata,
     DIDResolutionOptions,
@@ -7,7 +7,8 @@ import {
     ParsedDID,
     Resolvable,
 } from "did-resolver";
-import { DidErrorCode } from "..";
+import { DidErrorCode } from "./did-error";
+import { DidSyntax } from "./did-syntax";
 import { HcsDid } from "./hcs/did/hcs-did";
 
 export enum Errors {
@@ -29,15 +30,29 @@ export enum Errors {
     unknownNetwork = "unknownNetwork",
 }
 
-export function getResolver(client: NodeClient): Record<string, DIDResolver> {
+export function getResolver(client?: Client): Record<string, DIDResolver> {
     return new HederaDidResolver(client).build();
 }
 
 export class HederaDidResolver {
-    private client: NodeClient;
+    private static readonly DEFAULT_CLIENTS = {
+        [DidSyntax.HEDERA_NETWORK_TESTNET]: Client.forTestnet(),
+        [DidSyntax.HEDERA_NETWORK_MAINNET]: Client.forMainnet(),
+        [DidSyntax.HEDERA_NETWORK_PREVIEWNET]: Client.forPreviewnet(),
+    };
 
-    constructor(client: NodeClient) {
+    private client: Client;
+
+    constructor(client?: Client) {
         this.client = client;
+    }
+
+    public getClient(networkName: string) {
+        if (this.client) {
+            return this.client;
+        }
+
+        return HederaDidResolver.DEFAULT_CLIENTS[networkName];
     }
 
     async resolve(
@@ -46,10 +61,11 @@ export class HederaDidResolver {
         _unused: Resolvable,
         options: DIDResolutionOptions
     ): Promise<DIDResolutionResult> {
-        //TODO: check network
+        const networkName = did?.split(DidSyntax.DID_METHOD_SEPARATOR)[2];
+        const client = this.getClient(networkName);
 
         try {
-            const registeredDid = new HcsDid({ identifier: did, client: this.client });
+            const registeredDid = new HcsDid({ identifier: did, client: client });
             const didDocument = await registeredDid.resolve();
             const status: Partial<DIDDocumentMetadata> = didDocument.getDeactivated() ? { deactivated: true } : {};
 

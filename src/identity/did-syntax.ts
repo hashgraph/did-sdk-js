@@ -5,6 +5,7 @@ export module DidSyntax {
     export const DID_TOPIC_SEPARATOR = "_";
     export const HEDERA_NETWORK_MAINNET = "mainnet";
     export const HEDERA_NETWORK_TESTNET = "testnet";
+    export const HEDERA_NETWORK_PREVIEWNET = "previewnet";
 
     export enum Method {
         HEDERA_HCS = "hedera",
