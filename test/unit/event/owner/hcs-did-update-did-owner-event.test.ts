@@ -1,5 +1,5 @@
 import { PrivateKey } from "@hashgraph/sdk";
-import { Hashing, HcsDidEventTargetName, HcsDidUpdateDidOwnerEvent } from "../../../../dist";
+import { DidError, Hashing, HcsDidEventTargetName, HcsDidUpdateDidOwnerEvent } from "../../../../dist";
 
 describe("HcsDidUpdateDidOwnerEvent", () => {
     const privateKey = PrivateKey.fromString(
@@ -21,7 +21,7 @@ describe("HcsDidUpdateDidOwnerEvent", () => {
                 error = err;
             }
 
-            expect(error).toBeInstanceOf(Error);
+            expect(error).toBeInstanceOf(DidError);
             expect(error.message).toEqual("Validation failed. DID Owner args are missing");
         });
 
@@ -33,7 +33,7 @@ describe("HcsDidUpdateDidOwnerEvent", () => {
                 error = err;
             }
 
-            expect(error).toBeInstanceOf(Error);
+            expect(error).toBeInstanceOf(DidError);
             expect(error.message).toEqual("Validation failed. DID Owner args are missing");
         });
 
@@ -45,7 +45,7 @@ describe("HcsDidUpdateDidOwnerEvent", () => {
                 error = err;
             }
 
-            expect(error).toBeInstanceOf(Error);
+            expect(error).toBeInstanceOf(DidError);
             expect(error.message).toEqual("Validation failed. DID Owner args are missing");
         });
 
@@ -57,7 +57,7 @@ describe("HcsDidUpdateDidOwnerEvent", () => {
                 error = err;
             }
 
-            expect(error).toBeInstanceOf(Error);
+            expect(error).toBeInstanceOf(DidError);
             expect(error.message).toEqual("Event ID is invalid. Expected format: {did}#did-root-key");
         });
     });

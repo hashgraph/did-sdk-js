@@ -1,5 +1,6 @@
 import { PublicKey } from "@hashgraph/sdk";
 import { Hashing } from "../../../../../utils/hashing";
+import { DidError } from "../../../../did-error";
 import { HcsDidEvent } from "../hcs-did-event";
 import { HcsDidEventTargetName } from "../hcs-did-event-target-name";
 import { VerificationMethodSupportedKeyType } from "./types";
@@ -16,11 +17,11 @@ export class HcsDidCreateVerificationMethodEvent extends HcsDidEvent {
         super();
 
         if (!id || !type || !controller || !publicKey) {
-            throw new Error("Validation failed. Verification Method args are missing");
+            throw new DidError("Validation failed. Verification Method args are missing");
         }
 
         if (!this.isKeyEventIdValid(id)) {
-            throw new Error("Event ID is invalid. Expected format: {did}#key-{integer}");
+            throw new DidError("Event ID is invalid. Expected format: {did}#key-{integer}");
         }
 
         this.id = id;
