@@ -2,6 +2,7 @@ import { DidDocument } from "./identity/did-document";
 import { DidDocumentJsonProperties } from "./identity/did-document-json-properties";
 import { DidMethodOperation } from "./identity/did-method-operation";
 import { DidParser } from "./identity/did-parser";
+import { HederaDidResolver } from "./identity/did-resolver";
 import { DidSyntax } from "./identity/did-syntax";
 import { HcsDidDeleteEvent } from "./identity/hcs/did/event/document/hcs-did-delete-event";
 import { HcsDidEventTargetName } from "./identity/hcs/did/event/hcs-did-event-target-name";
@@ -62,4 +63,5 @@ export {
     SerializableMirrorConsensusResponse,
     TimestampUtils,
     Validator,
+    HederaDidResolver,
 };
