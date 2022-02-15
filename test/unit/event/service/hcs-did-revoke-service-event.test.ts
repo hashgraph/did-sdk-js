@@ -1,5 +1,5 @@
 import { PrivateKey } from "@hashgraph/sdk";
-import { Hashing, HcsDidEventTargetName, HcsDidRevokeServiceEvent } from "../../../../dist";
+import { DidError, Hashing, HcsDidEventTargetName, HcsDidRevokeServiceEvent } from "../../../../dist";
 
 describe("HcsDidRevokeServiceEvent", () => {
     const privateKey = PrivateKey.fromString(
@@ -21,7 +21,7 @@ describe("HcsDidRevokeServiceEvent", () => {
                 error = err;
             }
 
-            expect(error).toBeInstanceOf(Error);
+            expect(error).toBeInstanceOf(DidError);
             expect(error.message).toEqual("Validation failed. Services args are missing");
         });
 
@@ -33,7 +33,7 @@ describe("HcsDidRevokeServiceEvent", () => {
                 error = err;
             }
 
-            expect(error).toBeInstanceOf(Error);
+            expect(error).toBeInstanceOf(DidError);
             expect(error.message).toEqual("Event ID is invalid. Expected format: {did}#service-{integer}");
         });
     });

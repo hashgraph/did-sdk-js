@@ -1,5 +1,6 @@
 import { PublicKey } from "@hashgraph/sdk";
 import { Hashing } from "../../../../../utils/hashing";
+import { DidError } from "../../../../did-error";
 import { HcsDidEvent } from "../hcs-did-event";
 import { HcsDidEventTargetName } from "../hcs-did-event-target-name";
 
@@ -17,11 +18,11 @@ export class HcsDidCreateDidOwnerEvent extends HcsDidEvent {
         super();
 
         if (!id || !controller || !publicKey) {
-            throw new Error("Validation failed. DID Owner args are missing");
+            throw new DidError("Validation failed. DID Owner args are missing");
         }
 
         if (!this.isOwnerEventIdValid(id)) {
-            throw new Error("Event ID is invalid. Expected format: {did}#did-root-key");
+            throw new DidError("Event ID is invalid. Expected format: {did}#did-root-key");
         }
 
         this.id = id;

@@ -1,5 +1,5 @@
 import { PrivateKey } from "@hashgraph/sdk";
-import { Hashing, HcsDidEventTargetName, HcsDidUpdateVerificationMethodEvent } from "../../../../dist";
+import { DidError, Hashing, HcsDidEventTargetName, HcsDidUpdateVerificationMethodEvent } from "../../../../dist";
 
 describe("HcsDidUpdateVerificationMethodEvent", () => {
     const privateKey = PrivateKey.fromString(
@@ -31,7 +31,7 @@ describe("HcsDidUpdateVerificationMethodEvent", () => {
                 error = err;
             }
 
-            expect(error).toBeInstanceOf(Error);
+            expect(error).toBeInstanceOf(DidError);
             expect(error.message).toEqual("Validation failed. Verification Method args are missing");
         });
 
@@ -43,7 +43,7 @@ describe("HcsDidUpdateVerificationMethodEvent", () => {
                 error = err;
             }
 
-            expect(error).toBeInstanceOf(Error);
+            expect(error).toBeInstanceOf(DidError);
             expect(error.message).toEqual("Validation failed. Verification Method args are missing");
         });
 
@@ -60,7 +60,7 @@ describe("HcsDidUpdateVerificationMethodEvent", () => {
                 error = err;
             }
 
-            expect(error).toBeInstanceOf(Error);
+            expect(error).toBeInstanceOf(DidError);
             expect(error.message).toEqual("Validation failed. Verification Method args are missing");
         });
 
@@ -77,7 +77,7 @@ describe("HcsDidUpdateVerificationMethodEvent", () => {
                 error = err;
             }
 
-            expect(error).toBeInstanceOf(Error);
+            expect(error).toBeInstanceOf(DidError);
             expect(error.message).toEqual("Validation failed. Verification Method args are missing");
         });
 
@@ -94,7 +94,7 @@ describe("HcsDidUpdateVerificationMethodEvent", () => {
                 error = err;
             }
 
-            expect(error).toBeInstanceOf(Error);
+            expect(error).toBeInstanceOf(DidError);
             expect(error.message).toEqual("Event ID is invalid. Expected format: {did}#key-{integer}");
         });
     });

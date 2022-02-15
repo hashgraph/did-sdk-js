@@ -1,5 +1,6 @@
 import { Client, Timestamp, TopicId, TopicMessage, TopicMessageQuery } from "@hashgraph/sdk";
 import SubscriptionHandle from "@hashgraph/sdk/lib/topic/SubscriptionHandle";
+import { DidError } from "../../did-error";
 import { MessageEnvelope } from "../message-envelope";
 import { HcsDidMessage } from "./hcs-did-message";
 
@@ -159,7 +160,7 @@ export class HcsDidTopicListener {
         if (this.errorHandler) {
             this.errorHandler(err);
         } else if (!this.ignoreErrors) {
-            throw new Error(err.message);
+            throw new DidError(err.message);
         }
     }
 
