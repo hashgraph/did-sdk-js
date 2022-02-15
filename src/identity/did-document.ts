@@ -1,3 +1,4 @@
+import { Timestamp } from "@hashgraph/sdk";
 import {
     DidMethodOperation,
     HcsDidCreateDidOwnerEvent,
@@ -18,6 +19,11 @@ import { HcsDidUpdateVerificationRelationshipEvent } from "./hcs/did/event/verif
 export class DidDocument {
     private readonly id: string;
     private readonly context: string;
+
+    private created: Timestamp = null;
+    private updated: Timestamp = null;
+    private versionId: string = null;
+    private deactivated: boolean = false;
 
     private controller: any;
     private services: Map<string, any> = new Map();
@@ -48,6 +54,22 @@ export class DidDocument {
 
     public getId(): string {
         return this.id;
+    }
+
+    public getCreated() {
+        return this.created;
+    }
+
+    public getUpdated() {
+        return this.updated;
+    }
+
+    public getVersionId() {
+        return this.versionId;
+    }
+
+    public getDeactivated() {
+        return this.deactivated;
     }
 
     public toJsonTree(): any {
@@ -103,6 +125,29 @@ export class DidDocument {
         return JSON.stringify(this.toJsonTree());
     }
 
+    private setDocumentActivated(message: HcsDidMessage): void {
+        const timestamp = message.getTimestamp();
+
+        this.created = timestamp;
+        this.updated = timestamp;
+        this.deactivated = false;
+        this.versionId = timestamp.toDate().getTime().toString();
+    }
+
+    private setDocumentDeactivated(): void {
+        this.created = null;
+        this.updated = null;
+        this.deactivated = true;
+        this.versionId = null;
+    }
+
+    private setDocumentUpdated(message: HcsDidMessage): void {
+        const timestamp = message.getTimestamp();
+
+        this.updated = timestamp;
+        this.versionId = timestamp.toDate().getTime().toString();
+    }
+
     private processMessages(messages: HcsDidMessage[]): void {
         messages.forEach((msg) => {
             if (
@@ -142,7 +187,9 @@ export class DidDocument {
                     console.warn(`DID owner is already registered: ${this.controller}. Event will be ignored...`);
                     return;
                 }
+
                 this.controller = (event as HcsDidCreateDidOwnerEvent).getOwnerDef();
+                this.setDocumentActivated(message);
                 return;
             case HcsDidEventTargetName.SERVICE:
                 if (this.services.has(event.getId())) {
@@ -150,6 +197,7 @@ export class DidDocument {
                     return;
                 }
                 this.services.set(event.getId(), (event as HcsDidCreateServiceEvent).getServiceDef());
+                this.setDocumentUpdated(message);
                 return;
             case HcsDidEventTargetName.VERIFICATION_METHOD:
                 if (this.verificationMethods.has(event.getId())) {
@@ -163,6 +211,7 @@ export class DidDocument {
                     event.getId(),
                     (event as HcsDidCreateVerificationMethodEvent).getVerificationMethodDef()
                 );
+                this.setDocumentUpdated(message);
                 return;
             case HcsDidEventTargetName.VERIFICATION_RELATIONSHIP:
                 const type = (event as HcsDidCreateVerificationRelationshipEvent).getRelationshipType();
@@ -183,6 +232,7 @@ export class DidDocument {
                             (event as HcsDidCreateVerificationRelationshipEvent).getVerificationMethodDef()
                         );
                     }
+                    this.setDocumentUpdated(message);
                 } else {
                     console.warn(
                         `Create verificationRelationship event with type ${type} is not supported. Event will be ignored...`
@@ -200,6 +250,7 @@ export class DidDocument {
         switch (event.targetName) {
             case HcsDidEventTargetName.DID_OWNER:
                 this.controller = (event as HcsDidUpdateDidOwnerEvent).getOwnerDef();
+                this.setDocumentUpdated(message);
                 return;
             case HcsDidEventTargetName.SERVICE:
                 if (!this.services.has(event.getId())) {
@@ -209,6 +260,7 @@ export class DidDocument {
                     return;
                 }
                 this.services.set(event.getId(), (event as HcsDidUpdateServiceEvent).getServiceDef());
+                this.setDocumentUpdated(message);
                 return;
             case HcsDidEventTargetName.VERIFICATION_METHOD:
                 if (!this.verificationMethods.has(event.getId())) {
@@ -222,6 +274,7 @@ export class DidDocument {
                     event.getId(),
                     (event as HcsDidUpdateVerificationMethodEvent).getVerificationMethodDef()
                 );
+                this.setDocumentUpdated(message);
                 return;
             case HcsDidEventTargetName.VERIFICATION_RELATIONSHIP:
                 const type = (event as HcsDidUpdateVerificationRelationshipEvent).getRelationshipType();
@@ -238,6 +291,7 @@ export class DidDocument {
                         event.getId(),
                         (event as HcsDidUpdateVerificationRelationshipEvent).getVerificationMethodDef()
                     );
+                    this.setDocumentUpdated(message);
                 } else {
                     console.warn(
                         `Update verificationRelationship event with type ${type} is not supported. Event will be ignored...`
@@ -260,6 +314,7 @@ export class DidDocument {
                 }
 
                 this.services.delete(event.getId());
+                this.setDocumentUpdated(message);
                 return;
             case HcsDidEventTargetName.VERIFICATION_METHOD:
                 if (!this.verificationMethods.has(event.getId())) {
@@ -276,6 +331,7 @@ export class DidDocument {
                         (id) => id !== event.getId()
                     );
                 });
+                this.setDocumentUpdated(message);
 
                 return;
             case HcsDidEventTargetName.VERIFICATION_RELATIONSHIP:
@@ -300,6 +356,8 @@ export class DidDocument {
                     if (canRemoveVerificationMethod) {
                         this.verificationMethods.delete(event.getId());
                     }
+
+                    this.setDocumentUpdated(message);
                 } else {
                     console.warn(
                         `Revoke verificationRelationship event with type ${type} is not supported. Event will be ignored...`
@@ -322,6 +380,7 @@ export class DidDocument {
                 Object.keys(this.verificationRelationships).forEach(
                     (relName) => (this.verificationRelationships[relName] = [])
                 );
+                this.setDocumentDeactivated();
                 return;
             default:
                 console.warn(`Delete ${event.targetName} operation is not supported. Event will be ignored...`);

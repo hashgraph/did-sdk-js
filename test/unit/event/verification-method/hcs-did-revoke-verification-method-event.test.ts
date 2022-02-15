@@ -1,5 +1,5 @@
 import { PrivateKey } from "@hashgraph/sdk";
-import { Hashing, HcsDidEventTargetName, HcsDidRevokeVerificationMethodEvent } from "../../../../dist";
+import { DidError, Hashing, HcsDidEventTargetName, HcsDidRevokeVerificationMethodEvent } from "../../../../dist";
 
 describe("HcsDidRevokeVerificationMethodEvent", () => {
     const privateKey = PrivateKey.fromString(
@@ -21,7 +21,7 @@ describe("HcsDidRevokeVerificationMethodEvent", () => {
                 error = err;
             }
 
-            expect(error).toBeInstanceOf(Error);
+            expect(error).toBeInstanceOf(DidError);
             expect(error.message).toEqual("Validation failed. Verification Method args are missing");
         });
 
@@ -33,7 +33,7 @@ describe("HcsDidRevokeVerificationMethodEvent", () => {
                 error = err;
             }
 
-            expect(error).toBeInstanceOf(Error);
+            expect(error).toBeInstanceOf(DidError);
             expect(error.message).toEqual("Event ID is invalid. Expected format: {did}#key-{integer}");
         });
     });
