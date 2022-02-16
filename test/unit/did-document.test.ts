@@ -207,7 +207,7 @@ describe("DidDocument", () => {
             expect(doc.getVersionId()).toBeTruthy();
         });
 
-        it("successfuly handles add service, verificationMethod and verificationRelationship events", () => {
+        it("successfully handles add service, verificationMethod and verificationRelationship events", () => {
             const key1 = PrivateKey.generate();
             const key2 = PrivateKey.generate();
 
@@ -290,7 +290,7 @@ describe("DidDocument", () => {
             expect(doc.getVersionId()).toBeTruthy();
         });
 
-        it("successfuly handles update service, verificationMethod and verificationRelationship events", () => {
+        it("successfully handles update service, verificationMethod and verificationRelationship events", () => {
             const key1 = PrivateKey.generate();
             const key2 = PrivateKey.generate();
             const key3 = PrivateKey.generate();
@@ -438,7 +438,7 @@ describe("DidDocument", () => {
             expect(doc.getVersionId()).toBeTruthy();
         });
 
-        it("successfuly handles revoke service, verificationMethod and verificationRelationship events", () => {
+        it("successfully handles revoke service, verificationMethod and verificationRelationship events", () => {
             const key1 = PrivateKey.generate();
             const key2 = PrivateKey.generate();
             const key3 = PrivateKey.generate();
