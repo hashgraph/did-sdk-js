@@ -30,12 +30,12 @@ exports.decrypt = decrypt;
 describe("HcsDidMessage", () => {
     const client = Client.forTestnet();
     const privateKey = PrivateKey.generate();
-    const identifer = `did:hedera:${network}:${Hashing.multibase.encode(
+    const identifier = `did:hedera:${network}:${Hashing.multibase.encode(
         privateKey.publicKey.toBytes()
     )}_${DID_TOPIC_ID1}`;
 
     it("Test Valid Message", () => {
-        const did = new HcsDid({ identifier: identifer, privateKey: privateKey, client: client });
+        const did = new HcsDid({ identifier: identifier, privateKey: privateKey, client: client });
 
         const message = new HcsDidMessage(
             DidMethodOperation.CREATE,
@@ -51,7 +51,7 @@ describe("HcsDidMessage", () => {
     });
 
     it("Test Invalid Did", () => {
-        const did = new HcsDid({ identifier: identifer, privateKey: privateKey, client: client });
+        const did = new HcsDid({ identifier: identifier, privateKey: privateKey, client: client });
 
         const message = new HcsDidMessage(
             DidMethodOperation.CREATE,
@@ -67,7 +67,7 @@ describe("HcsDidMessage", () => {
     });
 
     it("Test Invalid Topic", () => {
-        const did = new HcsDid({ identifier: identifer, privateKey: privateKey, client: client });
+        const did = new HcsDid({ identifier: identifier, privateKey: privateKey, client: client });
 
         const message = new HcsDidMessage(
             DidMethodOperation.CREATE,
@@ -84,7 +84,7 @@ describe("HcsDidMessage", () => {
     });
 
     it("Test Missing Data", () => {
-        const did = new HcsDid({ identifier: identifer, privateKey: privateKey, client: client });
+        const did = new HcsDid({ identifier: identifier, privateKey: privateKey, client: client });
 
         let message = new HcsDidMessage(
             null,
