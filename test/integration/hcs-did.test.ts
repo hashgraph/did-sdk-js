@@ -129,7 +129,7 @@ describe("HcsDid", () => {
             expect(error.message).toEqual("Client configuration is missing");
         });
 
-        it("successfuly resolves just registered DID", async () => {
+        it("successfully resolves just registered DID", async () => {
             const privateKey = PrivateKey.fromString(OPERATOR_KEY);
             const did = new HcsDid({ privateKey, client });
 
@@ -650,7 +650,7 @@ describe("HcsDid", () => {
             });
 
             /**
-             *  wait for 9s so DIDOwner and VerificationMethod event to be propogated to mirror node
+             *  wait for 9s so DIDOwner and VerificationMethod event to be propagated to mirror node
              */
             await new Promise((resolve) => setTimeout(resolve, 9000));
 
@@ -710,7 +710,7 @@ describe("HcsDid", () => {
             });
 
             /**
-             *  wait for 9s so DIDOwner and VerificationMethod event to be propogated to mirror node
+             *  wait for 9s so DIDOwner and VerificationMethod event to be propagated to mirror node
              */
             await new Promise((resolve) => setTimeout(resolve, 9000));
 
@@ -765,7 +765,7 @@ describe("HcsDid", () => {
             });
 
             /**
-             *  wait for 9s so DIDOwner and VerificationMethod event to be propogated to mirror node
+             *  wait for 9s so DIDOwner and VerificationMethod event to be propagated to mirror node
              */
             await new Promise((resolve) => setTimeout(resolve, 9000));
 
