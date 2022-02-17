@@ -64,7 +64,7 @@ async function main() {
 
     console.log("\n");
     console.log("===================================================");
-    console.log("DragaonGlass Explorer:");
+    console.log("DragonGlass Explorer:");
     console.log(`https://testnet.dragonglass.me/hedera/topics/${registeredDid.getTopicId().toString()}`);
     console.log("\n");
 }
