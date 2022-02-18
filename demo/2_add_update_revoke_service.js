@@ -1,20 +1,20 @@
 const { PrivateKey, Client } = require("@hashgraph/sdk");
 const { HcsDid } = require("../dist");
-const { OPERATOR_ID, OPERATOR_KEY, DID_IDENTIFIER, DID_PRIVATE_KEY } = require("./config");
+require('dotenv').config();
 
 async function main() {
     /**
      * Setup
      */
     const client = Client.forTestnet();
-    client.setOperator(OPERATOR_ID, OPERATOR_KEY);
+    client.setOperator(process.env.OPERATOR_ID, process.env.OPERATOR_KEY);
 
-    const didPrivateKey = PrivateKey.fromString(DID_PRIVATE_KEY);
+    const didPrivateKey = PrivateKey.fromString(process.env.DID_PRIVATE_KEY);
 
     /**
      * Build DID instance
      */
-    const registeredDid = new HcsDid({ identifier: DID_IDENTIFIER, privateKey: didPrivateKey, client: client });
+    const registeredDid = new HcsDid({ identifier: process.env.DID_IDENTIFIER, privateKey: didPrivateKey, client: client });
 
     /**
      * Add Service

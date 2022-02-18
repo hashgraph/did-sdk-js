@@ -1,6 +1,6 @@
 const { Client } = require("@hashgraph/sdk");
 const { HcsDid, HcsDidEventMessageResolver } = require("../dist");
-const { DID_IDENTIFIER } = require("./config");
+require('dotenv').config();
 
 async function main() {
     /**
@@ -11,7 +11,7 @@ async function main() {
     /**
      * Build DID instance
      */
-    const did = new HcsDid({ identifier: DID_IDENTIFIER });
+    const did = new HcsDid({ identifier: process.env.DID_IDENTIFIER });
 
     /**
      * Read DID resolver setup
