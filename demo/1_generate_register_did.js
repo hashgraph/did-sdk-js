@@ -1,13 +1,13 @@
 const { PrivateKey, Client } = require("@hashgraph/sdk");
 const { HcsDid } = require("../dist");
-const { OPERATOR_ID, OPERATOR_KEY } = require("./config");
+require('dotenv').config();
 
 async function main() {
     /**
      * Client setup
      */
     const client = Client.forTestnet();
-    client.setOperator(OPERATOR_ID, OPERATOR_KEY);
+    client.setOperator(process.env.OPERATOR_ID, process.env.OPERATOR_KEY);
 
     /**
      * Build DID instance
