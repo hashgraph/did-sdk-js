@@ -10,7 +10,7 @@ Hedera Consensus Service (HCS) allows applications to share common channels to p
 
 This SDK is designed to simplify :
 
-- Creation and initialization of the DID registration on **HCS Private Topic**,
+- Creation and initialization of the DID registration on **HCS Restricted Topic**,
 - Generation of decentralized identifiers for [Hedera DID Method][did-method-spec] and creation of DID documents,
 - Create, update, revoke, deletion, and resolution of DID documents based on [DID Document Core Properties][did-core-prop] event/log messages recorded on **HCS Topic**
 - Transferring ownership of DID identifier and DID Document to another party.
