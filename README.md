@@ -41,12 +41,12 @@ npm install --save @hashgraph/did-sdk-js
 
 ## Examples
 
-Sample demo step by step javascript example are available at [Demo Folder][demo-location]. Make sure to add appropriate `testnet` account details in <b>`config.js`</b>
+Sample demo step by step javascript example are available at [Demo Folder][demo-location]. Make sure to add appropriate `testnet` account details in <b>`.env`</b>
 
 - OPERATOR_ID=0.0.xxxx
 - OPERATOR_KEY=302...
 
-After running first step of the demo flow use printed out values to complete the <b>`config.js`</b> configuration file.
+After running first step of the demo flow use printed out values to complete the <b>`.env`</b> configuration file.
 
 - DID_IDENTIFIER=did:hedera:testnet:..._0.0.xxx
 - DID_PRIVATE_KEY=302...
