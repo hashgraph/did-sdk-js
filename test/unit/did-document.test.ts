@@ -120,7 +120,7 @@ describe("DidDocument", () => {
             expect(doc.getVersionId()).toBeTruthy();
         });
 
-        it("handes DID delete event", () => {
+        it("handles DID delete event", () => {
             const messages = [
                 new HcsDidMessage(
                     DidMethodOperation.CREATE,
@@ -144,7 +144,7 @@ describe("DidDocument", () => {
             expect(doc.getVersionId()).toBeNull();
         });
 
-        it("handes change DID owner event", () => {
+        it("handles change DID owner event", () => {
             const otherOwnerKey = PrivateKey.generate();
             const otherOwnerIdentifier =
                 "did:hedera:testnet:" + Hashing.multibase.encode(otherOwnerKey.publicKey.toBytes()) + "_0.0.29999999";
