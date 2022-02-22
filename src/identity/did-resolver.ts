@@ -35,12 +35,6 @@ export function getResolver(client?: Client): Record<string, DIDResolver> {
 }
 
 export class HederaDidResolver {
-    private static readonly DEFAULT_CLIENTS = {
-        [DidSyntax.HEDERA_NETWORK_TESTNET]: Client.forTestnet(),
-        [DidSyntax.HEDERA_NETWORK_MAINNET]: Client.forMainnet(),
-        [DidSyntax.HEDERA_NETWORK_PREVIEWNET]: Client.forPreviewnet(),
-    };
-
     private client: Client;
 
     constructor(client?: Client) {
@@ -52,7 +46,7 @@ export class HederaDidResolver {
             return this.client;
         }
 
-        return HederaDidResolver.DEFAULT_CLIENTS[networkName];
+        return Client.forName(networkName);
     }
 
     async resolve(
