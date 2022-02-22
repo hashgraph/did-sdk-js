@@ -1,8 +1,6 @@
-
 const { Client, Timestamp } = require("@hashgraph/sdk");
 const { HcsDid } = require("../dist");
 const { DID_IDENTIFIER } = require("./.env.json");
-
 
 async function main() {
     /**
@@ -18,7 +16,8 @@ async function main() {
     /**
      * Read DID resolver setup
      */
-    const result = await did.readMessages(Timestamp.fromDate("2022-02-21T07:58:03.082Z"));
+    //const result = await did.readMessages(Timestamp.fromDate("2022-02-21T07:58:03.082Z"));
+    const result = await did.readMessages();
 
     result.forEach((msg) => {
         console.log("\n");
