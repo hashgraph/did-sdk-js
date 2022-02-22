@@ -1,6 +1,6 @@
 const { Client } = require("@hashgraph/sdk");
 const { HcsDid } = require("../dist");
-const { DID_IDENTIFIER } = require("./config");
+const { DID_IDENTIFIER } = require("./.env.json");
 
 async function main() {
     /**
