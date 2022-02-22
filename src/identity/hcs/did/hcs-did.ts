@@ -52,10 +52,18 @@ export class HcsDid {
     protected resolvedAt: Timestamp;
     protected document: DidDocument;
 
-    constructor(args: { identifier?: string; privateKey?: PrivateKey; client?: Client }) {
+    protected onMessageConfirmed: (message: MessageEnvelope<HcsDidMessage>) => void;
+
+    constructor(args: {
+        identifier?: string;
+        privateKey?: PrivateKey;
+        client?: Client;
+        onMessageConfirmed?: (message: MessageEnvelope<HcsDidMessage>) => void;
+    }) {
         this.identifier = args.identifier;
         this.privateKey = args.privateKey;
         this.client = args.client;
+        this.onMessageConfirmed = args.onMessageConfirmed;
 
         if (!this.identifier && !this.privateKey) {
             throw new DidError("identifier and privateKey cannot both be empty");
@@ -548,6 +556,10 @@ export class HcsDid {
                     reject(err);
                 })
                 .onMessageConfirmed((msg) => {
+                    if (this.onMessageConfirmed) {
+                        this.onMessageConfirmed(msg);
+                    }
+
                     console.log("Message Published");
                     console.log(
                         `Explore on DragonGlass: https://testnet.dragonglass.me/hedera/topics/${this.getTopicId()}`
