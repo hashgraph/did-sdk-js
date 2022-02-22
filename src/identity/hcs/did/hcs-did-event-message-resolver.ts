@@ -30,9 +30,9 @@ export class HcsDidEventMessageResolver {
      *
      * @param topicId The HCS DID topic ID.
      */
-    constructor(topicId: TopicId) {
+    constructor(topicId: TopicId, startTime: Timestamp = new Timestamp(0, 0)) {
         this.topicId = topicId;
-        this.listener = new HcsDidTopicListener(this.topicId);
+        this.listener = new HcsDidTopicListener(this.topicId, startTime);
 
         this.noMoreMessagesTimeout = HcsDidEventMessageResolver.DEFAULT_TIMEOUT;
         this.lastMessageArrivalTime = Long.fromInt(Date.now());
@@ -46,7 +46,6 @@ export class HcsDidEventMessageResolver {
         this.existingSignatures = [];
 
         this.listener
-            .setStartTime(new Timestamp(0, 0))
             .setEndTime(Timestamp.fromDate(new Date()))
             .setIgnoreErrors(false)
             .onError(this.errorHandler)
