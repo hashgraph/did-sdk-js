@@ -1,5 +1,5 @@
 const { Client, Timestamp } = require("@hashgraph/sdk");
-const { HcsDid } = require("../dist");
+const { HcsDid, HcsDidEventMessageResolver } = require("../dist");
 const { DID_IDENTIFIER } = require("./.env.json");
 
 async function main() {
