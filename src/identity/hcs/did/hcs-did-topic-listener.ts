@@ -219,4 +219,9 @@ export class HcsDidTopicListener {
         this.ignoreErrors = ignoreErrors;
         return this;
     }
+
+    public onComplete(handler: () => void) {
+        this.query.setCompletionHandler(handler);
+        return this;
+    }
 }
