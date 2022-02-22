@@ -16,10 +16,10 @@ export class HcsDidEventMessageResolver {
     public static DEFAULT_TIMEOUT: Long = Long.fromInt(30000);
 
     protected topicId: TopicId;
-    protected messages: HcsDidMessage[] = [];
+    protected messages: MessageEnvelope<HcsDidMessage>[] = [];
 
     private lastMessageArrivalTime: Long;
-    private resultsHandler: (input: HcsDidMessage[]) => void;
+    private resultsHandler: (input: MessageEnvelope<HcsDidMessage>[]) => void;
     private errorHandler: (input: Error) => void;
     private existingSignatures: string[];
     private readonly listener: HcsDidTopicListener;
@@ -74,8 +74,7 @@ export class HcsDidEventMessageResolver {
         }
 
         this.existingSignatures.push(envelope.getSignature());
-        const message: HcsDidMessage = envelope.open();
-        this.messages.push(message);
+        this.messages.push(envelope);
     }
 
     /**
@@ -104,7 +103,7 @@ export class HcsDidEventMessageResolver {
      * @param handler The results handler.
      * @return This resolver instance.
      */
-    public whenFinished(handler: (input: HcsDidMessage[]) => void): HcsDidEventMessageResolver {
+    public whenFinished(handler: (input: MessageEnvelope<HcsDidMessage>[]) => void): HcsDidEventMessageResolver {
         this.resultsHandler = handler;
         return this;
     }
