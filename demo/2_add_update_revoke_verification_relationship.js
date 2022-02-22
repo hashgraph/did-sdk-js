@@ -1,6 +1,6 @@
 const { PrivateKey, Client } = require("@hashgraph/sdk");
 const { HcsDid } = require("../dist");
-const { OPERATOR_ID, OPERATOR_KEY, DID_PRIVATE_KEY, DID_IDENTIFIER } = require("./config");
+const { OPERATOR_ID, OPERATOR_KEY, DID_PRIVATE_KEY, DID_IDENTIFIER } = require("./.env.json");
 
 async function main() {
     /**

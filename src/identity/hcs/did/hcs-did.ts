@@ -104,7 +104,7 @@ export class HcsDid {
             const topicId = (await txId.getReceipt(this.client)).topicId;
 
             this.topicId = topicId;
-            this.network = this.client.networkName;
+            this.network = this.client.ledgerId.toString();
             this.identifier = this.buildIdentifier(this.privateKey.publicKey);
         }
 

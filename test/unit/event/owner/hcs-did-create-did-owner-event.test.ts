@@ -75,7 +75,7 @@ describe("HcsDidCreateDidOwnerEvent", () => {
     });
 
     describe("#getController", () => {
-        it("returns identifier passed via contructor", () => {
+        it("returns identifier passed via constructor", () => {
             expect(event.getController()).toEqual(identifier);
         });
     });
