@@ -213,7 +213,6 @@ export class HcsDid {
             throw new DidError("Client configuration is missing");
         }
 
-        console.log(`topicId: ${this.topicId} \n startTime: ${startTime}`);
         return new Promise((resolve, reject) => {
             new HcsDidEventMessageResolver(this.topicId, startTime)
                 .setTimeout(HcsDid.READ_TOPIC_MESSAGES_TIMEOUT)
