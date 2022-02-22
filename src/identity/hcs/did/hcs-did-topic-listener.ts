@@ -23,9 +23,9 @@ export class HcsDidTopicListener {
      *
      * @param didTopicId The DID consensus topic ID.
      */
-    constructor(topicId: TopicId) {
+    constructor(topicId: TopicId, startTime: Timestamp = new Timestamp(0, 0)) {
         this.topicId = topicId;
-        this.query = new TopicMessageQuery().setTopicId(topicId);
+        this.query = new TopicMessageQuery().setTopicId(topicId).setStartTime(startTime);
         this.ignoreErrors = false;
     }
 
