@@ -10,7 +10,7 @@ Hedera Consensus Service (HCS) allows applications to share common channels to p
 
 This SDK is designed to simplify :
 
-- Creation and initialization of the DID registration on **HCS Private Topic**,
+- Creation and initialization of the DID registration on **HCS Restricted Topic**,
 - Generation of decentralized identifiers for [Hedera DID Method][did-method-spec] and creation of DID documents,
 - Create, update, revoke, deletion, and resolution of DID documents based on [DID Document Core Properties][did-core-prop] event/log messages recorded on **HCS Topic**
 - Transferring ownership of DID identifier and DID Document to another party.
@@ -41,12 +41,12 @@ npm install --save @hashgraph/did-sdk-js
 
 ## Examples
 
-Sample demo step by step javascript example are available at [Demo Folder][demo-location]. Make sure to add appropriate `testnet` account details in <b>`config.js`</b>
+Sample demo step by step javascript example are available at [Demo Folder][demo-location]. Make sure to add appropriate `testnet` account details in <b>`.env.json`</b>
 
 - OPERATOR_ID=0.0.xxxx
 - OPERATOR_KEY=302...
 
-After running first step of the demo flow use printed out values to complete the <b>`config.js`</b> configuration file.
+After running first step of the demo flow use printed out values to complete the <b>`.env.json`</b> configuration file.
 
 - DID_IDENTIFIER=did:hedera:testnet:..._0.0.xxx
 - DID_PRIVATE_KEY=302...
