@@ -196,6 +196,30 @@ export class HcsDid {
         });
     }
 
+    public readMessages(startTime: Timestamp): Promise<HcsDidMessage[]> {
+        if (!this.identifier) {
+            throw new DidError("DID is not registered");
+        }
+
+        if (!this.client) {
+            throw new DidError("Client configuration is missing");
+        }
+
+        console.log(`topicId: ${this.topicId} \n startTime: ${startTime}`);
+        return new Promise((resolve, reject) => {
+            new HcsDidEventMessageResolver(this.topicId, startTime)
+                .setTimeout(HcsDid.READ_TOPIC_MESSAGES_TIMEOUT)
+                .whenFinished((messages) => {
+                    this.messages = messages;
+                    resolve(this.messages);
+                })
+                .onError((err) => {
+                    reject(err);
+                })
+                .execute(this.client);
+        });
+    }
+
     /**
      *  Meta-information about DID
      */
