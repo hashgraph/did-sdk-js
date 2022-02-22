@@ -204,7 +204,7 @@ export class HcsDid {
         });
     }
 
-    public readMessages(startTime: Timestamp): Promise<HcsDidMessage[]> {
+    public async readMessages(startTime: Timestamp): Promise<HcsDidMessage[]> {
         if (!this.identifier) {
             throw new DidError("DID is not registered");
         }
