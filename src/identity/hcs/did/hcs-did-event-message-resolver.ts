@@ -1,6 +1,5 @@
 import { Client, Timestamp, TopicId } from "@hashgraph/sdk";
 import Long from "long";
-import { Sleep } from "../../../utils/sleep";
 import { Validator } from "../../../utils/validator";
 import { MessageEnvelope } from "../message-envelope";
 import { HcsDidMessage } from "./hcs-did-message";
@@ -16,10 +15,11 @@ export class HcsDidEventMessageResolver {
     public static DEFAULT_TIMEOUT: Long = Long.fromInt(30000);
 
     protected topicId: TopicId;
-    protected messages: HcsDidMessage[] = [];
+    protected messages: MessageEnvelope<HcsDidMessage>[] = [];
 
     private lastMessageArrivalTime: Long;
-    private resultsHandler: (input: HcsDidMessage[]) => void;
+    private nextMessageArrivalTimeout;
+    private resultsHandler: (input: MessageEnvelope<HcsDidMessage>[]) => void;
     private errorHandler: (input: Error) => void;
     private existingSignatures: string[];
     private readonly listener: HcsDidTopicListener;
@@ -49,6 +49,7 @@ export class HcsDidEventMessageResolver {
             .setEndTime(Timestamp.fromDate(new Date()))
             .setIgnoreErrors(false)
             .onError(this.errorHandler)
+            .onComplete(() => this.finish())
             .subscribe(client, (msg) => {
                 return this.handleMessage(msg);
             });
@@ -74,8 +75,7 @@ export class HcsDidEventMessageResolver {
         }
 
         this.existingSignatures.push(envelope.getSignature());
-        const message: HcsDidMessage = envelope.open();
-        this.messages.push(message);
+        this.messages.push(envelope);
     }
 
     /**
@@ -85,12 +85,25 @@ export class HcsDidEventMessageResolver {
         const timeDiff = Long.fromInt(Date.now()).sub(this.lastMessageArrivalTime);
 
         if (timeDiff.lt(this.noMoreMessagesTimeout)) {
-            await Sleep(this.noMoreMessagesTimeout.sub(timeDiff).toNumber());
-            await this.waitOrFinish();
+            if (this.nextMessageArrivalTimeout) {
+                clearTimeout(this.nextMessageArrivalTimeout);
+            }
+            this.nextMessageArrivalTimeout = setTimeout(
+                () => this.waitOrFinish(),
+                this.noMoreMessagesTimeout.sub(timeDiff).toNumber()
+            );
             return;
         }
 
+        this.finish();
+    }
+
+    protected async finish(): Promise<void> {
         this.resultsHandler(this.messages);
+
+        if (this.nextMessageArrivalTimeout) {
+            clearTimeout(this.nextMessageArrivalTimeout);
+        }
 
         if (this.listener) {
             this.listener.unsubscribe();
@@ -104,7 +117,7 @@ export class HcsDidEventMessageResolver {
      * @param handler The results handler.
      * @return This resolver instance.
      */
-    public whenFinished(handler: (input: HcsDidMessage[]) => void): HcsDidEventMessageResolver {
+    public whenFinished(handler: (input: MessageEnvelope<HcsDidMessage>[]) => void): HcsDidEventMessageResolver {
         this.resultsHandler = handler;
         return this;
     }
