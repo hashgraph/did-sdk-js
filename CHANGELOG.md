@@ -13,7 +13,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 * Generation of decentralized identifiers and creation of DID documents based on old [Hedera DID Method][did-method-spec]
 * Creation of `identity networks` within `appnets`.
 * Address book - a file on `Hedera File Service` that provides information about HCS topics and `appnet servers`.
-* Creation and initialization of the `VC topic` - an HCS topic playing a role of verifiable credentials registry.
+* Creation and initialization of the `VC topic` - an HCS topic playing a role of verifiable credentials' registry.
 * Creation (publishing), update, deletion and resolution of DID documents in `appnet identity networks`.
 * Issuance, revocation and status verification of `Verifiable Credentials`.
 

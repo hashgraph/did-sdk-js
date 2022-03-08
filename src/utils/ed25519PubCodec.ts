@@ -12,7 +12,7 @@ import varint from "varint";
  */
 
 export class Ed25519PubCodec implements BlockCodec<number, Uint8Array> {
-    // values retrived from https://raw.githubusercontent.com/multiformats/multicodec/master/table.csv
+    // values retrieved from https://raw.githubusercontent.com/multiformats/multicodec/master/table.csv
     name: string = "ed25519-pub";
     code: number = 0xed;
     encode(data: Uint8Array): ByteView<Uint8Array> {
