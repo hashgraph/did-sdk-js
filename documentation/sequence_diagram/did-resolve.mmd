@@ -18,7 +18,7 @@ HSDK ->> HMN: Subscribe to Topic
 HMN -->> HSDK: receive all messages
 HSDK -->> SDK: receive all messages
 SDK ->> SDK: extract all Events from messages
-SDK ->> SDK: proccess events
+SDK ->> SDK: process events
 SDK ->> SDK: generate DID Document
 SDK ->> App: send DID Document
 end
