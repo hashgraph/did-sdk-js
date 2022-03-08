@@ -1010,13 +1010,13 @@ describe("HcsDid", () => {
 async function readTopicMessages(topicId, client, timeout = null) {
     const messages = [];
 
-    new TopicMessageQuery()
-        .setTopicId(topicId)
-        .setStartTime(new Timestamp(0, 0))
-        .setEndTime(Timestamp.fromDate(new Date()))
-        .subscribe(client, null, (msg) => {
-            messages.push(msg);
-        });
+    await new TopicMessageQuery()
+      .setTopicId(topicId)
+      .setStartTime(new Timestamp(0, 0))
+      .setEndTime(Timestamp.fromDate(new Date()))
+      .subscribe(client, null, (msg) => {
+          messages.push(msg);
+      });
 
     /**
      * wait for READ_MESSAGES_TIMEOUT seconds and assume all messages were read
