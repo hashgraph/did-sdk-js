@@ -34,11 +34,9 @@ export abstract class HcsDidEvent {
 
         HcsDid.parseIdentifier(identifier);
 
-        if (this.OWNER_KEY_POSTFIX_REGEX.test(id) === false) {
-            return false;
-        }
+        return this.OWNER_KEY_POSTFIX_REGEX.test(id) !== false;
 
-        return true;
+
     }
 
     protected isServiceEventIdValid(eventId: string) {
@@ -50,11 +48,9 @@ export abstract class HcsDidEvent {
 
         HcsDid.parseIdentifier(identifier);
 
-        if (this.SERVICE_ID_POSTFIX_REGEX.test(id) === false) {
-            return false;
-        }
+        return this.SERVICE_ID_POSTFIX_REGEX.test(id) !== false;
 
-        return true;
+
     }
 
     protected isKeyEventIdValid(eventId: string) {
@@ -66,10 +62,8 @@ export abstract class HcsDidEvent {
 
         HcsDid.parseIdentifier(identifier);
 
-        if (this.KEY_ID_POSTFIX_REGEX.test(id) === false) {
-            return false;
-        }
+        return this.KEY_ID_POSTFIX_REGEX.test(id) !== false;
 
-        return true;
+
     }
 }

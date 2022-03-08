@@ -95,7 +95,7 @@ export class HcsDidEventMessageResolver {
             return;
         }
 
-        this.finish();
+        await this.finish();
     }
 
     protected async finish(): Promise<void> {
