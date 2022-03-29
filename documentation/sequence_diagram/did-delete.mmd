@@ -1,0 +1,18 @@
+sequenceDiagram
+Title: Delete DID
+  autonumber
+  participant App as Application
+  participant SDK as DID JS SDK
+  participant HSDK as Hashgraph JS SDK
+  participant HCS as Hedera Consensus Service
+  participant HMN as Hedera Mirror Node
+
+
+alt Delete DID
+
+App ->> SDK: Send Delete DID request with identifier and DID Private Key
+SDK ->> HSDK: Build Client (Set account that will pay for transaction)
+SDK ->> HMN: Send Delete DID Event
+HMN ->> SDK: Ack
+SDK ->> App: Send DID Identifier
+end
