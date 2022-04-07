@@ -14,10 +14,11 @@ App ->> HSDK: Build Client (Set account that will pay for transaction)
 App ->> HSDK: Generate New Owner DID Private Key (DPK)
 App ->> SDK: Register DID with DPK
 SDK ->> SDK: Build did identifier with topic id
-SDK ->> SDK: Create DID owner Event <br> with identifier
-SDK ->> HSDK: Build DID owner Event Transaction  <br> signed with DPK
+SDK ->> SDK: Create DID owner Event message <br> with identifier
+SDK ->> HSDK: Build DID owner Event message Transaction  <br> signed with DPK
 SDK ->> HSDK: Execute above transaction with Client
 HSDK ->> HCS: Submit message to Topic
 HCS ->> HMN: Propagate Message <br> to Topic
-SDK ->> App: Send DID Identifier <br> e.g. (did:hedera:testnet:z6Mk.._0.0.2..)
+SDK ->> HSDK: Subscribe to the topic and <br /> wait till message is successfully submited
+SDK -->> App: Send DID Identifier <br> e.g. (did:hedera:testnet:z6Mk.._0.0.2..)
 end
