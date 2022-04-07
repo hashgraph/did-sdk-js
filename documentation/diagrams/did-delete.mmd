@@ -12,7 +12,8 @@ alt Delete DID
 
 App ->> SDK: Send Delete DID request with identifier and DID Private Key
 SDK ->> HSDK: Build Client (Set account that will pay for transaction)
-SDK ->> HMN: Send Delete DID Event
-HMN ->> SDK: Ack
-SDK ->> App: Send DID Identifier
+SDK ->> HCS: Send Delete DID Event message
+HCS ->> HMN: Propagate Message <br> to Topic
+SDK ->> HSDK: Subscribe to the topic and <br /> wait till message is successfully submited
+SDK -->> App: Send DID Identifier
 end
