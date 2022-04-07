@@ -13,19 +13,18 @@ alt Register a DID
 App ->> HSDK: Build Client (Set account that will pay for transaction)
 App ->> HSDK: Generate DID Private Key (DPK)
 App ->> SDK: Register DID with DPK
-SDK ->> HSDK: Build Topic Create Transaction <br> By setting Transaction Fees <br> AmdinKey, SubmitKey <br> singed by DPK
+SDK ->> HSDK: Build Topic Create Transaction <br> By setting Transaction Fees <br> AdminKey, SubmitKey <br> signed by DPK
 SDK ->> HSDK: Execute above transaction with Client <br> (responsible for transaction payment)
 HSDK ->> HCS: Create Private Topic
 HCS ->> HMN: Propagate Topic
 SDK ->> HSDK: Request Receipt for Transaction
-HSDK --> SDK: Send receipt with Topic ID
+HSDK -->> SDK: Send receipt with Topic ID
 SDK ->> SDK: Build did identifier with topic id
-SDK ->> SDK: Create DID owner Event <br> with identifier
-SDK ->> HSDK: Build DID owner Event Transaction  <br> signed with DPK
+SDK ->> SDK: Create DID owner Event message <br> with identifier
+SDK ->> HSDK: Build DID owner Event message Transaction <br> signed with DPK
 SDK ->> HSDK: Execute above transaction with Client <br> (responsible for transaction payment)
 HSDK ->> HCS: Submit message to Topic
 HCS ->> HMN: Propagate Message <br> to Topic
-SDK ->> App: Send DID Identifier <br> e.g. (did:hedera:testnet:z6Mk.._0.0.2..)
+SDK ->> HSDK: Subscribe to the topic and <br /> wait till message is successfully submited
+SDK -->> App: Send DID Identifier <br> e.g. (did:hedera:testnet:z6Mk.._0.0.2..)
 end
-
-
