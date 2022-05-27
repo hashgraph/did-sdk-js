@@ -1,43 +1,53 @@
 {
-  "name": "@hashgraph/did-sdk-js",
-  "version": "0.1.1",
-  "description": "Support for the Hedera Hashgraph DID Method and Verifiable Credentials on the Hedera JavaScript/TypeScript SDK",
-  "main": "dist/index.js",
-  "module": "dist/index.js",
-  "files": [
-    "dist/**/*"
-  ],
-  "types": "dist/index.d.ts",
-  "scripts": {
-    "prepare": "npm run build",
-    "prepublish": "npm run build",
-    "build": "tsc",
-    "build:dev": "tsc --sourceMap -w",
-    "start": "node dist/index.js",
-    "start:dev": "nodemon --inspect dist/index.js",
-    "test": "mocha test/**/*.js"
-  },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/hashgraph/did-sdk-js.git"
-  },
-  "author": "Hedera Hashgraph, LLC",
-  "license": "Apache-2.0",
-  "bugs": {
-    "url": "https://github.com/hashgraph/did-sdk-js/issues"
-  },
-  "homepage": "https://github.com/hashgraph/did-sdk-js#readme",
-  "devDependencies": {
-    "@types/node": "^16.7.7",
-    "chai": "^4.3.4",
-    "mocha": "^9.0.1",
-    "nodemon": "^2.0.7",
-    "typescript": "^4.3.2"
-  },
-  "dependencies": {
-    "@hashgraph/sdk": "^2.0.20",
-    "bs58": "^4.0.1",
-    "js-base64": "^3.6.1",
-    "moment": "^2.29.1"
-  }
+    "name": "@hashgraph/did-sdk-js",
+    "version": "1.0.0",
+    "engines": {
+        "npm": ">=8.1.2",
+        "node": ">=16.13.1"
+    },
+    "description": "Support for the Hedera Hashgraph DID Method on the Hedera JavaScript/TypeScript SDK",
+    "main": "dist/index.js",
+    "module": "dist/index.js",
+    "files": [
+        "dist/**/*"
+    ],
+    "types": "dist/index.d.ts",
+    "scripts": {
+        "prepare": "npm run build",
+        "prepublish": "npm run build",
+        "build": "tsc",
+        "build:dev": "tsc --sourceMap -w",
+        "start": "node dist/index.js",
+        "start:dev": "nodemon --inspect dist/index.js",
+        "test": "jest",
+        "test:unit": "jest --testPathPattern=test/unit",
+        "test:integration": "jest --testPathPattern=test/integration"
+    },
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/hashgraph/did-sdk-js.git"
+    },
+    "author": "Hedera Hashgraph, LLC",
+    "license": "Apache-2.0",
+    "bugs": {
+        "url": "https://github.com/hashgraph/did-sdk-js/issues"
+    },
+    "homepage": "https://github.com/hashgraph/did-sdk-js#readme",
+    "devDependencies": {
+        "@types/jest": "^27.4.0",
+        "@types/node": "^16.7.7",
+        "jest": "^27.5.0",
+        "nodemon": "^2.0.7",
+        "prettier": "2.5.1",
+        "ts-jest": "^27.1.3",
+        "typescript": "^4.3.2"
+    },
+    "dependencies": {
+        "@hashgraph/sdk": "^2.8",
+        "js-base64": "^3.6.1",
+        "moment": "^2.29.1",
+        "multiformats": "^9.6.2",
+        "varint": "^6.0.0",
+        "did-resolver": "^3.1.5"
+    }
 }
