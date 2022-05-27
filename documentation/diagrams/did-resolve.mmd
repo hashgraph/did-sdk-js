@@ -1,0 +1,26 @@
+sequenceDiagram
+Title: DID Resolve
+  autonumber
+  participant App as Application
+  participant SDK as DID JS SDK
+  participant HSDK as Hashgraph JS SDK
+  participant HMN as Hedera Mirror Node
+
+
+alt Resolve a DID
+
+App ->> HSDK: Build Client (No Hedera account info needed)
+App ->> SDK: Create HCS DID Object with <br> DID Identifier <br> e.g. (did:hedera:testnet:z6Mk.._0.0.2..)
+App ->> SDK: Resolve a DID
+SDK ->> SDK: Extract topic id from DID
+SDK ->> HSDK: Subscribe to Topic
+HSDK ->> HMN: Subscribe to Topic 
+HMN -->> HSDK: Receive all messages
+HSDK -->> SDK: Receive all messages
+SDK ->> SDK: Extract all Events from messages
+SDK ->> SDK: Process events
+SDK ->> SDK: Generate DID Document
+SDK -->> App: Send DID Document
+end
+
+
