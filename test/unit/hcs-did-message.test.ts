@@ -6,27 +6,6 @@ const network = "testnet";
 const DID_TOPIC_ID1 = TopicId.fromString("0.0.2");
 const DID_TOPIC_ID2 = TopicId.fromString("0.0.3");
 
-const encrypt = (plainText, key) => {
-    const cipher = crypto.createCipheriv(
-        "aes-128-ecb",
-        crypto.createHash("sha256").update(String(key)).digest("base64").substr(0, 16),
-        null
-    );
-    return Buffer.concat([cipher.update(plainText, "utf8"), cipher.final()]).toString("base64");
-};
-
-const decrypt = (cipherText, key) => {
-    const cipher = crypto.createDecipheriv(
-        "aes-128-ecb",
-        crypto.createHash("sha256").update(String(key)).digest("base64").substr(0, 16),
-        null
-    );
-    return Buffer.concat([cipher.update(cipherText, "base64"), cipher.final()]).toString("utf8");
-};
-
-exports.encrypt = encrypt;
-exports.decrypt = decrypt;
-
 describe("HcsDidMessage", () => {
     const client = Client.forTestnet();
     const privateKey = PrivateKey.generate();
