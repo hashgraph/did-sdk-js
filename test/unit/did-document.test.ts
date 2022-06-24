@@ -9,6 +9,7 @@ import {
     HcsDidCreateVerificationRelationshipEvent,
     HcsDidDeleteEvent,
     HcsDidMessage,
+    HcsDidUpdateDidOwnerEvent,
 } from "../../dist";
 
 describe("DidDocument", () => {
@@ -170,7 +171,7 @@ describe("DidDocument", () => {
                 new HcsDidMessage(
                     DidMethodOperation.UPDATE,
                     identifier,
-                    new HcsDidCreateDidOwnerEvent(
+                    new HcsDidUpdateDidOwnerEvent(
                         otherOwnerIdentifier + "#did-root-key",
                         otherOwnerIdentifier,
                         otherOwnerKey.publicKey
