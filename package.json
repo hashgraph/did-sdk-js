@@ -28,7 +28,7 @@
   },
   "homepage": "https://github.com/hashgraph/did-sdk-js#readme",
   "devDependencies": {
-    "@types/node": "^16.7.7",
+    "@types/node": "^18.11.0",
     "chai": "^4.3.4",
     "mocha": "^9.0.1",
     "nodemon": "^2.0.7",
