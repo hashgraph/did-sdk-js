@@ -1,7 +1,7 @@
 import { AccountId, Client, PrivateKey, Timestamp, TopicMessageQuery } from "@hashgraph/sdk";
 import { DidError, Hashing, HcsDid } from "../../dist";
 
-const TOPIC_REGEXP = /^0\.0\.[0-9]{8,}/;
+const TOPIC_REGEXP = /^0\.0\.[0-9]{3,}/;
 
 const OPERATOR_ID = process.env.OPERATOR_ID;
 const OPERATOR_KEY = process.env.OPERATOR_KEY;
@@ -1011,12 +1011,12 @@ async function readTopicMessages(topicId, client, timeout = null) {
     const messages = [];
 
     await new TopicMessageQuery()
-      .setTopicId(topicId)
-      .setStartTime(new Timestamp(0, 0))
-      .setEndTime(Timestamp.fromDate(new Date()))
-      .subscribe(client, null, (msg) => {
-          messages.push(msg);
-      });
+        .setTopicId(topicId)
+        .setStartTime(new Timestamp(0, 0))
+        .setEndTime(Timestamp.fromDate(new Date()))
+        .subscribe(client, null, (msg) => {
+            messages.push(msg);
+        });
 
     /**
      * wait for READ_MESSAGES_TIMEOUT seconds and assume all messages were read
