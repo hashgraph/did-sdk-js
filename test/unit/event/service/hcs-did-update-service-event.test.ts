@@ -69,7 +69,7 @@ describe("HcsDidUpdateServiceEvent", () => {
     describe("#getId", () => {
         it("returns id passed via constructor", () => {
             expect(event.getId()).toEqual(
-                "did:hedera:testnet:z6MkogVzoGJMVVLhaz82cA5jZQKAAqUghhCrpzkSDFDwxfJa_0.0.29613327#service-1"
+                "did:hedera:testnet:zAEExD23v9wrEUVHKvb7tiJmAMGCqHoxW8yqWNyFw3SXC_0.0.29613327#service-1"
             );
         });
     });
@@ -89,7 +89,7 @@ describe("HcsDidUpdateServiceEvent", () => {
     describe("#getBase64", () => {
         it("returns event data encoded in base64", () => {
             expect(event.getBase64()).toEqual(
-                "eyJTZXJ2aWNlIjp7ImlkIjoiZGlkOmhlZGVyYTp0ZXN0bmV0Ono2TWtvZ1Z6b0dKTVZWTGhhejgyY0E1alpRS0FBcVVnaGhDcnB6a1NERkR3eGZKYV8wLjAuMjk2MTMzMjcjc2VydmljZS0xIiwidHlwZSI6IkRJRENvbW1NZXNzYWdpbmciLCJzZXJ2aWNlRW5kcG9pbnQiOiJodHRwczovL3ZjLnRlc3Quc2VydmljZS5jb20ifX0="
+                "eyJTZXJ2aWNlIjp7ImlkIjoiZGlkOmhlZGVyYTp0ZXN0bmV0OnpBRUV4RDIzdjl3ckVVVkhLdmI3dGlKbUFNR0NxSG94Vzh5cVdOeUZ3M1NYQ18wLjAuMjk2MTMzMjcjc2VydmljZS0xIiwidHlwZSI6IkRJRENvbW1NZXNzYWdpbmciLCJzZXJ2aWNlRW5kcG9pbnQiOiJodHRwczovL3ZjLnRlc3Quc2VydmljZS5jb20ifX0="
             );
         });
     });
@@ -98,7 +98,7 @@ describe("HcsDidUpdateServiceEvent", () => {
         it("returns event JSON structure", () => {
             expect(event.toJsonTree()).toEqual({
                 Service: {
-                    id: "did:hedera:testnet:z6MkogVzoGJMVVLhaz82cA5jZQKAAqUghhCrpzkSDFDwxfJa_0.0.29613327#service-1",
+                    id: "did:hedera:testnet:zAEExD23v9wrEUVHKvb7tiJmAMGCqHoxW8yqWNyFw3SXC_0.0.29613327#service-1",
                     serviceEndpoint: "https://vc.test.service.com",
                     type: "DIDCommMessaging",
                 },
@@ -108,14 +108,14 @@ describe("HcsDidUpdateServiceEvent", () => {
 
     describe("#toJSON", () => {
         expect(event.toJSON()).toEqual(
-            '{"Service":{"id":"did:hedera:testnet:z6MkogVzoGJMVVLhaz82cA5jZQKAAqUghhCrpzkSDFDwxfJa_0.0.29613327#service-1","type":"DIDCommMessaging","serviceEndpoint":"https://vc.test.service.com"}}'
+            '{"Service":{"id":"did:hedera:testnet:zAEExD23v9wrEUVHKvb7tiJmAMGCqHoxW8yqWNyFw3SXC_0.0.29613327#service-1","type":"DIDCommMessaging","serviceEndpoint":"https://vc.test.service.com"}}'
         );
     });
 
     describe("#fromJsonTree", () => {
         it("rebuilds HcsDidUpdateServiceEvent object", () => {
             const eventFromJson = HcsDidUpdateServiceEvent.fromJsonTree({
-                id: "did:hedera:testnet:z6MkogVzoGJMVVLhaz82cA5jZQKAAqUghhCrpzkSDFDwxfJa_0.0.29613327#service-1",
+                id: "did:hedera:testnet:zAEExD23v9wrEUVHKvb7tiJmAMGCqHoxW8yqWNyFw3SXC_0.0.29613327#service-1",
                 serviceEndpoint: "https://vc.test.service.com",
                 type: "DIDCommMessaging",
             });
@@ -123,7 +123,7 @@ describe("HcsDidUpdateServiceEvent", () => {
             expect(eventFromJson).toBeInstanceOf(HcsDidUpdateServiceEvent);
             expect(eventFromJson.toJsonTree()).toEqual({
                 Service: {
-                    id: "did:hedera:testnet:z6MkogVzoGJMVVLhaz82cA5jZQKAAqUghhCrpzkSDFDwxfJa_0.0.29613327#service-1",
+                    id: "did:hedera:testnet:zAEExD23v9wrEUVHKvb7tiJmAMGCqHoxW8yqWNyFw3SXC_0.0.29613327#service-1",
                     serviceEndpoint: "https://vc.test.service.com",
                     type: "DIDCommMessaging",
                 },

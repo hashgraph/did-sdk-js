@@ -80,7 +80,7 @@ describe("DidDocument", () => {
                     {
                         controller: identifier,
                         id: `${identifier}#did-root-key`,
-                        publicKeyMultibase: "z6MkogVzoGJMVVLhaz82cA5jZQKAAqUghhCrpzkSDFDwxfJa",
+                        publicKeyMultibase: "zAEExD23v9wrEUVHKvb7tiJmAMGCqHoxW8yqWNyFw3SXC",
                         type: "Ed25519VerificationKey2018",
                     },
                 ],
@@ -110,7 +110,7 @@ describe("DidDocument", () => {
                     {
                         controller: identifier,
                         id: `${identifier}#did-root-key`,
-                        publicKeyMultibase: "z6MkogVzoGJMVVLhaz82cA5jZQKAAqUghhCrpzkSDFDwxfJa",
+                        publicKeyMultibase: "zAEExD23v9wrEUVHKvb7tiJmAMGCqHoxW8yqWNyFw3SXC",
                         type: "Ed25519VerificationKey2018",
                     },
                 ],
@@ -268,7 +268,7 @@ describe("DidDocument", () => {
                     {
                         controller: identifier,
                         id: `${identifier}#did-root-key`,
-                        publicKeyMultibase: "z6MkogVzoGJMVVLhaz82cA5jZQKAAqUghhCrpzkSDFDwxfJa",
+                        publicKeyMultibase: "zAEExD23v9wrEUVHKvb7tiJmAMGCqHoxW8yqWNyFw3SXC",
                         type: "Ed25519VerificationKey2018",
                     },
                     {
@@ -410,7 +410,7 @@ describe("DidDocument", () => {
                     {
                         controller: identifier,
                         id: `${identifier}#did-root-key`,
-                        publicKeyMultibase: "z6MkogVzoGJMVVLhaz82cA5jZQKAAqUghhCrpzkSDFDwxfJa",
+                        publicKeyMultibase: "zAEExD23v9wrEUVHKvb7tiJmAMGCqHoxW8yqWNyFw3SXC",
                         type: "Ed25519VerificationKey2018",
                     },
                     {
@@ -549,7 +549,7 @@ describe("DidDocument", () => {
                     {
                         controller: identifier,
                         id: `${identifier}#did-root-key`,
-                        publicKeyMultibase: "z6MkogVzoGJMVVLhaz82cA5jZQKAAqUghhCrpzkSDFDwxfJa",
+                        publicKeyMultibase: "zAEExD23v9wrEUVHKvb7tiJmAMGCqHoxW8yqWNyFw3SXC",
                         type: "Ed25519VerificationKey2018",
                     },
                     {
