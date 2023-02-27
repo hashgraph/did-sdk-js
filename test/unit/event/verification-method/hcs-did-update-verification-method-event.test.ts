@@ -102,7 +102,7 @@ describe("HcsDidUpdateVerificationMethodEvent", () => {
     describe("#getId", () => {
         it("returns id passed via constructor", () => {
             expect(event.getId()).toEqual(
-                "did:hedera:testnet:z6MkogVzoGJMVVLhaz82cA5jZQKAAqUghhCrpzkSDFDwxfJa_0.0.29613327#key-1"
+                "did:hedera:testnet:zAEExD23v9wrEUVHKvb7tiJmAMGCqHoxW8yqWNyFw3SXC_0.0.29613327#key-1"
             );
         });
     });
@@ -116,7 +116,7 @@ describe("HcsDidUpdateVerificationMethodEvent", () => {
     describe("#getController", () => {
         it("returns type passed via constructor", () => {
             expect(event.getController()).toEqual(
-                "did:hedera:testnet:z6MkogVzoGJMVVLhaz82cA5jZQKAAqUghhCrpzkSDFDwxfJa_0.0.29613327"
+                "did:hedera:testnet:zAEExD23v9wrEUVHKvb7tiJmAMGCqHoxW8yqWNyFw3SXC_0.0.29613327"
             );
         });
     });
@@ -129,14 +129,14 @@ describe("HcsDidUpdateVerificationMethodEvent", () => {
 
     describe("#getPublicKeyMultibase", () => {
         it("returns public key base58 encoded", () => {
-            expect(event.getPublicKeyMultibase()).toEqual("z6MkogVzoGJMVVLhaz82cA5jZQKAAqUghhCrpzkSDFDwxfJa");
+            expect(event.getPublicKeyMultibase()).toEqual("zAEExD23v9wrEUVHKvb7tiJmAMGCqHoxW8yqWNyFw3SXC");
         });
     });
 
     describe("#getBase64", () => {
         it("returns event data encoded in base64", () => {
             expect(event.getBase64()).toEqual(
-                "eyJWZXJpZmljYXRpb25NZXRob2QiOnsiaWQiOiJkaWQ6aGVkZXJhOnRlc3RuZXQ6ejZNa29nVnpvR0pNVlZMaGF6ODJjQTVqWlFLQUFxVWdoaENycHprU0RGRHd4ZkphXzAuMC4yOTYxMzMyNyNrZXktMSIsInR5cGUiOiJFZDI1NTE5VmVyaWZpY2F0aW9uS2V5MjAxOCIsImNvbnRyb2xsZXIiOiJkaWQ6aGVkZXJhOnRlc3RuZXQ6ejZNa29nVnpvR0pNVlZMaGF6ODJjQTVqWlFLQUFxVWdoaENycHprU0RGRHd4ZkphXzAuMC4yOTYxMzMyNyIsInB1YmxpY0tleU11bHRpYmFzZSI6Ino2TWtvZ1Z6b0dKTVZWTGhhejgyY0E1alpRS0FBcVVnaGhDcnB6a1NERkR3eGZKYSJ9fQ=="
+                "eyJWZXJpZmljYXRpb25NZXRob2QiOnsiaWQiOiJkaWQ6aGVkZXJhOnRlc3RuZXQ6ekFFRXhEMjN2OXdyRVVWSEt2Yjd0aUptQU1HQ3FIb3hXOHlxV055RnczU1hDXzAuMC4yOTYxMzMyNyNrZXktMSIsInR5cGUiOiJFZDI1NTE5VmVyaWZpY2F0aW9uS2V5MjAxOCIsImNvbnRyb2xsZXIiOiJkaWQ6aGVkZXJhOnRlc3RuZXQ6ekFFRXhEMjN2OXdyRVVWSEt2Yjd0aUptQU1HQ3FIb3hXOHlxV055RnczU1hDXzAuMC4yOTYxMzMyNyIsInB1YmxpY0tleU11bHRpYmFzZSI6InpBRUV4RDIzdjl3ckVVVkhLdmI3dGlKbUFNR0NxSG94Vzh5cVdOeUZ3M1NYQyJ9fQ=="
             );
         });
     });
@@ -145,9 +145,9 @@ describe("HcsDidUpdateVerificationMethodEvent", () => {
         it("returns event JSON structure", () => {
             expect(event.toJsonTree()).toEqual({
                 VerificationMethod: {
-                    controller: "did:hedera:testnet:z6MkogVzoGJMVVLhaz82cA5jZQKAAqUghhCrpzkSDFDwxfJa_0.0.29613327",
-                    id: "did:hedera:testnet:z6MkogVzoGJMVVLhaz82cA5jZQKAAqUghhCrpzkSDFDwxfJa_0.0.29613327#key-1",
-                    publicKeyMultibase: "z6MkogVzoGJMVVLhaz82cA5jZQKAAqUghhCrpzkSDFDwxfJa",
+                    controller: "did:hedera:testnet:zAEExD23v9wrEUVHKvb7tiJmAMGCqHoxW8yqWNyFw3SXC_0.0.29613327",
+                    id: "did:hedera:testnet:zAEExD23v9wrEUVHKvb7tiJmAMGCqHoxW8yqWNyFw3SXC_0.0.29613327#key-1",
+                    publicKeyMultibase: "zAEExD23v9wrEUVHKvb7tiJmAMGCqHoxW8yqWNyFw3SXC",
                     type: "Ed25519VerificationKey2018",
                 },
             });
@@ -157,7 +157,7 @@ describe("HcsDidUpdateVerificationMethodEvent", () => {
     describe("#toJSON", () => {
         it("returns stringified JSON structure version", () => {
             expect(event.toJSON()).toEqual(
-                '{"VerificationMethod":{"id":"did:hedera:testnet:z6MkogVzoGJMVVLhaz82cA5jZQKAAqUghhCrpzkSDFDwxfJa_0.0.29613327#key-1","type":"Ed25519VerificationKey2018","controller":"did:hedera:testnet:z6MkogVzoGJMVVLhaz82cA5jZQKAAqUghhCrpzkSDFDwxfJa_0.0.29613327","publicKeyMultibase":"z6MkogVzoGJMVVLhaz82cA5jZQKAAqUghhCrpzkSDFDwxfJa"}}'
+                '{"VerificationMethod":{"id":"did:hedera:testnet:zAEExD23v9wrEUVHKvb7tiJmAMGCqHoxW8yqWNyFw3SXC_0.0.29613327#key-1","type":"Ed25519VerificationKey2018","controller":"did:hedera:testnet:zAEExD23v9wrEUVHKvb7tiJmAMGCqHoxW8yqWNyFw3SXC_0.0.29613327","publicKeyMultibase":"zAEExD23v9wrEUVHKvb7tiJmAMGCqHoxW8yqWNyFw3SXC"}}'
             );
         });
     });
@@ -165,18 +165,18 @@ describe("HcsDidUpdateVerificationMethodEvent", () => {
     describe("#fromJsonTree", () => {
         it("rebuilds HcsDidUpdateVerificationMethodEvent object", () => {
             const eventFromJson = HcsDidUpdateVerificationMethodEvent.fromJsonTree({
-                controller: "did:hedera:testnet:z6MkogVzoGJMVVLhaz82cA5jZQKAAqUghhCrpzkSDFDwxfJa_0.0.29613327",
-                id: "did:hedera:testnet:z6MkogVzoGJMVVLhaz82cA5jZQKAAqUghhCrpzkSDFDwxfJa_0.0.29613327#key-1",
-                publicKeyMultibase: "z6MkogVzoGJMVVLhaz82cA5jZQKAAqUghhCrpzkSDFDwxfJa",
+                controller: "did:hedera:testnet:zAEExD23v9wrEUVHKvb7tiJmAMGCqHoxW8yqWNyFw3SXC_0.0.29613327",
+                id: "did:hedera:testnet:zAEExD23v9wrEUVHKvb7tiJmAMGCqHoxW8yqWNyFw3SXC_0.0.29613327#key-1",
+                publicKeyMultibase: "zAEExD23v9wrEUVHKvb7tiJmAMGCqHoxW8yqWNyFw3SXC",
                 type: "Ed25519VerificationKey2018",
             });
 
             expect(eventFromJson).toBeInstanceOf(HcsDidUpdateVerificationMethodEvent);
             expect(eventFromJson.toJsonTree()).toEqual({
                 VerificationMethod: {
-                    controller: "did:hedera:testnet:z6MkogVzoGJMVVLhaz82cA5jZQKAAqUghhCrpzkSDFDwxfJa_0.0.29613327",
-                    id: "did:hedera:testnet:z6MkogVzoGJMVVLhaz82cA5jZQKAAqUghhCrpzkSDFDwxfJa_0.0.29613327#key-1",
-                    publicKeyMultibase: "z6MkogVzoGJMVVLhaz82cA5jZQKAAqUghhCrpzkSDFDwxfJa",
+                    controller: "did:hedera:testnet:zAEExD23v9wrEUVHKvb7tiJmAMGCqHoxW8yqWNyFw3SXC_0.0.29613327",
+                    id: "did:hedera:testnet:zAEExD23v9wrEUVHKvb7tiJmAMGCqHoxW8yqWNyFw3SXC_0.0.29613327#key-1",
+                    publicKeyMultibase: "zAEExD23v9wrEUVHKvb7tiJmAMGCqHoxW8yqWNyFw3SXC",
                     type: "Ed25519VerificationKey2018",
                 },
             });

@@ -41,7 +41,7 @@ describe("HcsDidRevokeServiceEvent", () => {
     describe("#getId", () => {
         it("returns id passed via constructor", () => {
             expect(event.getId()).toEqual(
-                "did:hedera:testnet:z6MkogVzoGJMVVLhaz82cA5jZQKAAqUghhCrpzkSDFDwxfJa_0.0.29613327#service-1"
+                "did:hedera:testnet:zAEExD23v9wrEUVHKvb7tiJmAMGCqHoxW8yqWNyFw3SXC_0.0.29613327#service-1"
             );
         });
     });
@@ -49,7 +49,7 @@ describe("HcsDidRevokeServiceEvent", () => {
     describe("#getBase64", () => {
         it("returns event data encoded in base64", () => {
             expect(event.getBase64()).toEqual(
-                "eyJTZXJ2aWNlIjp7ImlkIjoiZGlkOmhlZGVyYTp0ZXN0bmV0Ono2TWtvZ1Z6b0dKTVZWTGhhejgyY0E1alpRS0FBcVVnaGhDcnB6a1NERkR3eGZKYV8wLjAuMjk2MTMzMjcjc2VydmljZS0xIn19"
+                "eyJTZXJ2aWNlIjp7ImlkIjoiZGlkOmhlZGVyYTp0ZXN0bmV0OnpBRUV4RDIzdjl3ckVVVkhLdmI3dGlKbUFNR0NxSG94Vzh5cVdOeUZ3M1NYQ18wLjAuMjk2MTMzMjcjc2VydmljZS0xIn19"
             );
         });
     });
@@ -58,7 +58,7 @@ describe("HcsDidRevokeServiceEvent", () => {
         it("returns event JSON structure", () => {
             expect(event.toJsonTree()).toEqual({
                 Service: {
-                    id: "did:hedera:testnet:z6MkogVzoGJMVVLhaz82cA5jZQKAAqUghhCrpzkSDFDwxfJa_0.0.29613327#service-1",
+                    id: "did:hedera:testnet:zAEExD23v9wrEUVHKvb7tiJmAMGCqHoxW8yqWNyFw3SXC_0.0.29613327#service-1",
                 },
             });
         });
@@ -66,20 +66,20 @@ describe("HcsDidRevokeServiceEvent", () => {
 
     describe("#toJSON", () => {
         expect(event.toJSON()).toEqual(
-            '{"Service":{"id":"did:hedera:testnet:z6MkogVzoGJMVVLhaz82cA5jZQKAAqUghhCrpzkSDFDwxfJa_0.0.29613327#service-1"}}'
+            '{"Service":{"id":"did:hedera:testnet:zAEExD23v9wrEUVHKvb7tiJmAMGCqHoxW8yqWNyFw3SXC_0.0.29613327#service-1"}}'
         );
     });
 
     describe("#fromJsonTree", () => {
         it("rebuilds HcsDidRevokeServiceEvent object", () => {
             const eventFromJson = HcsDidRevokeServiceEvent.fromJsonTree({
-                id: "did:hedera:testnet:z6MkogVzoGJMVVLhaz82cA5jZQKAAqUghhCrpzkSDFDwxfJa_0.0.29613327#service-1",
+                id: "did:hedera:testnet:zAEExD23v9wrEUVHKvb7tiJmAMGCqHoxW8yqWNyFw3SXC_0.0.29613327#service-1",
             });
 
             expect(eventFromJson).toBeInstanceOf(HcsDidRevokeServiceEvent);
             expect(eventFromJson.toJsonTree()).toEqual({
                 Service: {
-                    id: "did:hedera:testnet:z6MkogVzoGJMVVLhaz82cA5jZQKAAqUghhCrpzkSDFDwxfJa_0.0.29613327#service-1",
+                    id: "did:hedera:testnet:zAEExD23v9wrEUVHKvb7tiJmAMGCqHoxW8yqWNyFw3SXC_0.0.29613327#service-1",
                 },
             });
         });

@@ -1,5 +1,4 @@
 import { Client, PrivateKey, TopicId } from "@hashgraph/sdk";
-import crypto from "crypto";
 import { DidMethodOperation, Hashing, HcsDid, HcsDidCreateDidOwnerEvent, HcsDidMessage } from "../../dist";
 
 const network = "testnet";
@@ -7,7 +6,7 @@ const DID_TOPIC_ID1 = TopicId.fromString("0.0.2");
 const DID_TOPIC_ID2 = TopicId.fromString("0.0.3");
 
 describe("HcsDidMessage", () => {
-    const client = Client.forTestnet();
+    const client = Client.forTestnet({ scheduleNetworkUpdate: false });
     const privateKey = PrivateKey.generate();
     const identifier = `did:hedera:${network}:${Hashing.multibase.encode(
         privateKey.publicKey.toBytes()

@@ -131,7 +131,7 @@ describe("HcsDidUpdateVerificationRelationshipEvent", () => {
     describe("#getId", () => {
         it("returns id passed via constructor", () => {
             expect(event.getId()).toEqual(
-                "did:hedera:testnet:z6MkogVzoGJMVVLhaz82cA5jZQKAAqUghhCrpzkSDFDwxfJa_0.0.29613327#key-1"
+                "did:hedera:testnet:zAEExD23v9wrEUVHKvb7tiJmAMGCqHoxW8yqWNyFw3SXC_0.0.29613327#key-1"
             );
         });
     });
@@ -151,7 +151,7 @@ describe("HcsDidUpdateVerificationRelationshipEvent", () => {
     describe("#getController", () => {
         it("returns type passed via constructor", () => {
             expect(event.getController()).toEqual(
-                "did:hedera:testnet:z6MkogVzoGJMVVLhaz82cA5jZQKAAqUghhCrpzkSDFDwxfJa_0.0.29613327"
+                "did:hedera:testnet:zAEExD23v9wrEUVHKvb7tiJmAMGCqHoxW8yqWNyFw3SXC_0.0.29613327"
             );
         });
     });
@@ -164,14 +164,14 @@ describe("HcsDidUpdateVerificationRelationshipEvent", () => {
 
     describe("#getPublicKeyMultibase", () => {
         it("returns public key base58 encoded", () => {
-            expect(event.getPublicKeyMultibase()).toEqual("z6MkogVzoGJMVVLhaz82cA5jZQKAAqUghhCrpzkSDFDwxfJa");
+            expect(event.getPublicKeyMultibase()).toEqual("zAEExD23v9wrEUVHKvb7tiJmAMGCqHoxW8yqWNyFw3SXC");
         });
     });
 
     describe("#getBase64", () => {
         it("returns event data encoded in base64", () => {
             expect(event.getBase64()).toEqual(
-                "eyJWZXJpZmljYXRpb25SZWxhdGlvbnNoaXAiOnsiaWQiOiJkaWQ6aGVkZXJhOnRlc3RuZXQ6ejZNa29nVnpvR0pNVlZMaGF6ODJjQTVqWlFLQUFxVWdoaENycHprU0RGRHd4ZkphXzAuMC4yOTYxMzMyNyNrZXktMSIsInJlbGF0aW9uc2hpcFR5cGUiOiJhdXRoZW50aWNhdGlvbiIsInR5cGUiOiJFZDI1NTE5VmVyaWZpY2F0aW9uS2V5MjAxOCIsImNvbnRyb2xsZXIiOiJkaWQ6aGVkZXJhOnRlc3RuZXQ6ejZNa29nVnpvR0pNVlZMaGF6ODJjQTVqWlFLQUFxVWdoaENycHprU0RGRHd4ZkphXzAuMC4yOTYxMzMyNyIsInB1YmxpY0tleU11bHRpYmFzZSI6Ino2TWtvZ1Z6b0dKTVZWTGhhejgyY0E1alpRS0FBcVVnaGhDcnB6a1NERkR3eGZKYSJ9fQ=="
+                "eyJWZXJpZmljYXRpb25SZWxhdGlvbnNoaXAiOnsiaWQiOiJkaWQ6aGVkZXJhOnRlc3RuZXQ6ekFFRXhEMjN2OXdyRVVWSEt2Yjd0aUptQU1HQ3FIb3hXOHlxV055RnczU1hDXzAuMC4yOTYxMzMyNyNrZXktMSIsInJlbGF0aW9uc2hpcFR5cGUiOiJhdXRoZW50aWNhdGlvbiIsInR5cGUiOiJFZDI1NTE5VmVyaWZpY2F0aW9uS2V5MjAxOCIsImNvbnRyb2xsZXIiOiJkaWQ6aGVkZXJhOnRlc3RuZXQ6ekFFRXhEMjN2OXdyRVVWSEt2Yjd0aUptQU1HQ3FIb3hXOHlxV055RnczU1hDXzAuMC4yOTYxMzMyNyIsInB1YmxpY0tleU11bHRpYmFzZSI6InpBRUV4RDIzdjl3ckVVVkhLdmI3dGlKbUFNR0NxSG94Vzh5cVdOeUZ3M1NYQyJ9fQ=="
             );
         });
     });
@@ -180,9 +180,9 @@ describe("HcsDidUpdateVerificationRelationshipEvent", () => {
         it("returns event JSON structure", () => {
             expect(event.toJsonTree()).toEqual({
                 VerificationRelationship: {
-                    controller: "did:hedera:testnet:z6MkogVzoGJMVVLhaz82cA5jZQKAAqUghhCrpzkSDFDwxfJa_0.0.29613327",
-                    id: "did:hedera:testnet:z6MkogVzoGJMVVLhaz82cA5jZQKAAqUghhCrpzkSDFDwxfJa_0.0.29613327#key-1",
-                    publicKeyMultibase: "z6MkogVzoGJMVVLhaz82cA5jZQKAAqUghhCrpzkSDFDwxfJa",
+                    controller: "did:hedera:testnet:zAEExD23v9wrEUVHKvb7tiJmAMGCqHoxW8yqWNyFw3SXC_0.0.29613327",
+                    id: "did:hedera:testnet:zAEExD23v9wrEUVHKvb7tiJmAMGCqHoxW8yqWNyFw3SXC_0.0.29613327#key-1",
+                    publicKeyMultibase: "zAEExD23v9wrEUVHKvb7tiJmAMGCqHoxW8yqWNyFw3SXC",
                     relationshipType: "authentication",
                     type: "Ed25519VerificationKey2018",
                 },
@@ -193,7 +193,7 @@ describe("HcsDidUpdateVerificationRelationshipEvent", () => {
     describe("#toJSON", () => {
         it("returns stringified JSON structure version", () => {
             expect(event.toJSON()).toEqual(
-                '{"VerificationRelationship":{"id":"did:hedera:testnet:z6MkogVzoGJMVVLhaz82cA5jZQKAAqUghhCrpzkSDFDwxfJa_0.0.29613327#key-1","relationshipType":"authentication","type":"Ed25519VerificationKey2018","controller":"did:hedera:testnet:z6MkogVzoGJMVVLhaz82cA5jZQKAAqUghhCrpzkSDFDwxfJa_0.0.29613327","publicKeyMultibase":"z6MkogVzoGJMVVLhaz82cA5jZQKAAqUghhCrpzkSDFDwxfJa"}}'
+                '{"VerificationRelationship":{"id":"did:hedera:testnet:zAEExD23v9wrEUVHKvb7tiJmAMGCqHoxW8yqWNyFw3SXC_0.0.29613327#key-1","relationshipType":"authentication","type":"Ed25519VerificationKey2018","controller":"did:hedera:testnet:zAEExD23v9wrEUVHKvb7tiJmAMGCqHoxW8yqWNyFw3SXC_0.0.29613327","publicKeyMultibase":"zAEExD23v9wrEUVHKvb7tiJmAMGCqHoxW8yqWNyFw3SXC"}}'
             );
         });
     });
@@ -201,9 +201,9 @@ describe("HcsDidUpdateVerificationRelationshipEvent", () => {
     describe("#fromJsonTree", () => {
         it("rebuilds HcsDidUpdateVerificationRelationshipEvent object", () => {
             const eventFromJson = HcsDidUpdateVerificationRelationshipEvent.fromJsonTree({
-                controller: "did:hedera:testnet:z6MkogVzoGJMVVLhaz82cA5jZQKAAqUghhCrpzkSDFDwxfJa_0.0.29613327",
-                id: "did:hedera:testnet:z6MkogVzoGJMVVLhaz82cA5jZQKAAqUghhCrpzkSDFDwxfJa_0.0.29613327#key-1",
-                publicKeyMultibase: "z6MkogVzoGJMVVLhaz82cA5jZQKAAqUghhCrpzkSDFDwxfJa",
+                controller: "did:hedera:testnet:zAEExD23v9wrEUVHKvb7tiJmAMGCqHoxW8yqWNyFw3SXC_0.0.29613327",
+                id: "did:hedera:testnet:zAEExD23v9wrEUVHKvb7tiJmAMGCqHoxW8yqWNyFw3SXC_0.0.29613327#key-1",
+                publicKeyMultibase: "zAEExD23v9wrEUVHKvb7tiJmAMGCqHoxW8yqWNyFw3SXC",
                 relationshipType: "authentication",
                 type: "Ed25519VerificationKey2018",
             });
@@ -211,9 +211,9 @@ describe("HcsDidUpdateVerificationRelationshipEvent", () => {
             expect(eventFromJson).toBeInstanceOf(HcsDidUpdateVerificationRelationshipEvent);
             expect(eventFromJson.toJsonTree()).toEqual({
                 VerificationRelationship: {
-                    controller: "did:hedera:testnet:z6MkogVzoGJMVVLhaz82cA5jZQKAAqUghhCrpzkSDFDwxfJa_0.0.29613327",
-                    id: "did:hedera:testnet:z6MkogVzoGJMVVLhaz82cA5jZQKAAqUghhCrpzkSDFDwxfJa_0.0.29613327#key-1",
-                    publicKeyMultibase: "z6MkogVzoGJMVVLhaz82cA5jZQKAAqUghhCrpzkSDFDwxfJa",
+                    controller: "did:hedera:testnet:zAEExD23v9wrEUVHKvb7tiJmAMGCqHoxW8yqWNyFw3SXC_0.0.29613327",
+                    id: "did:hedera:testnet:zAEExD23v9wrEUVHKvb7tiJmAMGCqHoxW8yqWNyFw3SXC_0.0.29613327#key-1",
+                    publicKeyMultibase: "zAEExD23v9wrEUVHKvb7tiJmAMGCqHoxW8yqWNyFw3SXC",
                     relationshipType: "authentication",
                     type: "Ed25519VerificationKey2018",
                 },
