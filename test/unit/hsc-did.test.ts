@@ -5,7 +5,7 @@ describe("HcsDid", () => {
     let client;
 
     beforeAll(async () => {
-        client = Client.forTestnet();
+        client = Client.forTestnet({ scheduleNetworkUpdate: false });
     });
     describe("#constructor", () => {
         it("throws error because of missing identifier and privateKey", () => {
@@ -56,7 +56,7 @@ describe("HcsDid", () => {
         });
 
         it("accepts client parameter", () => {
-            const client = Client.forTestnet();
+            const client = Client.forTestnet({ scheduleNetworkUpdate: false });
             const identifier = "did:hedera:testnet:z6MkgUv5CvjRP6AsvEYqSRN7djB6p4zK9bcMQ93g5yK6Td7N_0.0.29613327";
             const did = new HcsDid({ identifier, client });
 
@@ -71,7 +71,7 @@ describe("HcsDid", () => {
         it("throws error if topicId missing", () => {
             let error = null;
             try {
-                HcsDid.parseIdentifier("did:hedera:testnet:z6Mkkcn1EDXc5vzpmvnQeCKpEswyrnQG7qq59k92gFRm1EGk");
+                HcsDid.parseIdentifier("did:hedera:testnet:z87meAWt7t2zrDxo7qw3PVTjexKWReYWS75LH29THy8kb");
             } catch (err) {
                 error = err;
             }
@@ -83,7 +83,7 @@ describe("HcsDid", () => {
         it("throws error if invalid prefix", () => {
             let error = null;
             try {
-                HcsDid.parseIdentifier("abcd:hedera:testnet:z6Mkkcn1EDXc5vzpmvnQeCKpEswyrnQG7qq59k92gFRm1EGk_0.0.1");
+                HcsDid.parseIdentifier("abcd:hedera:testnet:z87meAWt7t2zrDxo7qw3PVTjexKWReYWS75LH29THy8kb_0.0.1");
             } catch (err) {
                 error = err;
             }
@@ -95,7 +95,7 @@ describe("HcsDid", () => {
         it("throws error if invalid method name", () => {
             let error = null;
             try {
-                HcsDid.parseIdentifier("did:hashgraph:testnet:z6Mkkcn1EDXc5vzpmvnQeCKpEswyrnQG7qq59k92gFRm1EGk_0.0.1");
+                HcsDid.parseIdentifier("did:hashgraph:testnet:z87meAWt7t2zrDxo7qw3PVTjexKWReYWS75LH29THy8kb_0.0.1");
             } catch (err) {
                 error = err;
             }
@@ -107,7 +107,7 @@ describe("HcsDid", () => {
         it("throws error if Invalid Hedera network", () => {
             let error = null;
             try {
-                HcsDid.parseIdentifier("did:hedera:nonetwork:z6Mkkcn1EDXc5vzpmvnQeCKpEswyrnQG7qq59k92gFRm1EGk_0.0.1");
+                HcsDid.parseIdentifier("did:hedera:nonetwork:z87meAWt7t2zrDxo7qw3PVTjexKWReYWS75LH29THy8kb_0.0.1");
             } catch (err) {
                 error = err;
             }
@@ -130,12 +130,12 @@ describe("HcsDid", () => {
 
         it("should get array with NetworkName, topicId and didIdString", () => {
             const [networkName, topicId, didIdString] = HcsDid.parseIdentifier(
-                "did:hedera:testnet:z6Mkkcn1EDXc5vzpmvnQeCKpEswyrnQG7qq59k92gFRm1EGk_0.0.1"
+                "did:hedera:testnet:z87meAWt7t2zrDxo7qw3PVTjexKWReYWS75LH29THy8kb_0.0.1"
             );
 
             expect(networkName).toEqual("testnet");
             expect(topicId.toString()).toEqual("0.0.1");
-            expect(didIdString).toEqual("z6Mkkcn1EDXc5vzpmvnQeCKpEswyrnQG7qq59k92gFRm1EGk");
+            expect(didIdString).toEqual("z87meAWt7t2zrDxo7qw3PVTjexKWReYWS75LH29THy8kb");
         });
     });
 
@@ -145,7 +145,7 @@ describe("HcsDid", () => {
                 "302e020100300506032b657004220420a4b76d7089dfd33c83f586990c3a36ae92fb719fdf262e7749d1b0ddd1d055b0"
             );
             const result = HcsDid.publicKeyToIdString(privateKey.publicKey);
-            expect(result).toEqual("z6MkvD6JAfMyP6pgQoYxfE9rubgwLD9Hmz8rQh1FAxvbW8XB");
+            expect(result).toEqual("zGkqFaR7Y3ZLDJJiFyfC24W8wWdsSN6tVig6KLgxaaujo");
         });
     });
 
@@ -154,7 +154,7 @@ describe("HcsDid", () => {
             const privateKey = PrivateKey.fromString(
                 "302e020100300506032b657004220420a4b76d7089dfd33c83f586990c3a36ae92fb719fdf262e7749d1b0ddd1d055b0"
             );
-            const result = HcsDid.stringToPublicKey("z6MkvD6JAfMyP6pgQoYxfE9rubgwLD9Hmz8rQh1FAxvbW8XB");
+            const result = HcsDid.stringToPublicKey("zGkqFaR7Y3ZLDJJiFyfC24W8wWdsSN6tVig6KLgxaaujo");
             expect(result).toEqual(privateKey.publicKey);
         });
     });

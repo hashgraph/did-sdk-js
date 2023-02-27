@@ -6,7 +6,7 @@ async function main() {
     /**
      * Client setup
      */
-    const client = Client.forTestnet();
+    const client = Client.forTestnet({ scheduleNetworkUpdate: false });
     client.setOperator(OPERATOR_ID, OPERATOR_KEY);
 
     /**
