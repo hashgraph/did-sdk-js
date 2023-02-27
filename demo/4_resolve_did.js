@@ -6,7 +6,7 @@ async function main() {
     /**
      * Setup
      */
-    const client = Client.forTestnet();
+    const client = Client.forTestnet({ scheduleNetworkUpdate: false });
 
     /**
      * Build DID instance

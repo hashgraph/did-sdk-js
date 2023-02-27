@@ -26,6 +26,10 @@ export class HcsDidTopicListener {
     constructor(topicId: TopicId, startTime: Timestamp = new Timestamp(0, 0)) {
         this.topicId = topicId;
         this.query = new TopicMessageQuery().setTopicId(topicId).setStartTime(startTime);
+
+        this.query.setMaxBackoff(3000);
+        this.query.setMaxAttempts(10);
+
         this.ignoreErrors = false;
     }
 

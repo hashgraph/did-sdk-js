@@ -1,5 +1,5 @@
-import { DidParser, Hashing } from "../../dist";
 import { PrivateKey } from "@hashgraph/sdk";
+import { DidParser, Hashing } from "../../dist";
 
 describe("DidParser", () => {
     it("throw an error when invalid did string provided", async () => {
@@ -30,7 +30,7 @@ describe("DidParser", () => {
         const base58btcEncodedString = Hashing.multibase.encode(publickeybytes);
 
         [
-            "did:hedera:testnet:z6Mkkcn1EDXc5vzpmvnQeCKpEswyrnQG7qq59k92gFRm1EGk_0.0.29643290",
+            "did:hedera:testnet:z87meAWt7t2zrDxo7qw3PVTjexKWReYWS75LH29THy8kb_0.0.29643290",
             `did:hedera:testnet:${base58btcEncodedString}_0.0.1`,
         ].forEach((did) => {
             expect(DidParser.parse(did)).toBeDefined();

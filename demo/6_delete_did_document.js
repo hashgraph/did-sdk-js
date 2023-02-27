@@ -7,7 +7,7 @@ async function main() {
      * Client setup
      */
     const privateKey = PrivateKey.fromString(OPERATOR_KEY);
-    const client = Client.forTestnet();
+    const client = Client.forTestnet({ scheduleNetworkUpdate: false });
     client.setOperator(OPERATOR_ID, privateKey);
 
     const didPrivateKey = PrivateKey.fromString(DID_PRIVATE_KEY);
