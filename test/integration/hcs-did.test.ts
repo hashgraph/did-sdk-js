@@ -1,4 +1,4 @@
-import { AccountId, Client, PrivateKey, Timestamp, TopicMessageQuery } from "@hashgraph/sdk";
+import { AccountId, Client, PrivateKey, Timestamp, TopicMessage, TopicMessageQuery } from "@hashgraph/sdk";
 import { DidError, Hashing, HcsDid } from "../../dist";
 
 const TOPIC_REGEXP = /^0\.0\.[0-9]{3,}/;
@@ -1034,22 +1034,26 @@ describe("HcsDid", () => {
  */
 
 async function readTopicMessages(topicId, client, timeout = null) {
-    const messages = [];
+    const messages: TopicMessage[] = [];
 
     const query = new TopicMessageQuery()
         .setTopicId(topicId)
         .setStartTime(new Timestamp(0, 0))
-        .setEndTime(Timestamp.fromDate(new Date()))
-        .subscribe(client, null, (msg) => {
-            messages.push(msg);
-        });
+        .setEndTime(Timestamp.fromDate(new Date()));
+
+    query.setMaxBackoff(2000);
+    query.setMaxAttempts(15);
+
+    const querySubcription = query.subscribe(client, null, (msg) => {
+        messages.push(msg);
+    });
 
     /**
      * wait for READ_MESSAGES_TIMEOUT seconds and assume all messages were read
      */
     await delay(timeout || process.env.WAIT_BEFORE_RESOLVE_DID_FOR);
 
-    query.unsubscribe();
+    querySubcription.unsubscribe();
 
     return messages;
 }

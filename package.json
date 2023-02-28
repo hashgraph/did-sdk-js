@@ -19,9 +19,9 @@
         "build:dev": "tsc --sourceMap -w",
         "start": "node dist/index.js",
         "start:dev": "nodemon --inspect dist/index.js",
-        "test": "jest",
+        "test": "jest --detectOpenHandles --forceExit",
         "test:unit": "jest --testPathPattern=test/unit",
-        "test:integration": "jest --testPathPattern=test/integration"
+        "test:integration": "jest --testPathPattern=test/integration --detectOpenHandles --forceExit"
     },
     "repository": {
         "type": "git",
