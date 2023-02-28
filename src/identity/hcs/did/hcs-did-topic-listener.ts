@@ -27,8 +27,8 @@ export class HcsDidTopicListener {
         this.topicId = topicId;
         this.query = new TopicMessageQuery().setTopicId(topicId).setStartTime(startTime);
 
-        this.query.setMaxBackoff(3000);
-        this.query.setMaxAttempts(10);
+        this.query.setMaxBackoff(2000);
+        this.query.setMaxAttempts(15);
 
         this.ignoreErrors = false;
     }
