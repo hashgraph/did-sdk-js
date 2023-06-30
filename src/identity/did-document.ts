@@ -6,8 +6,10 @@ import {
     HcsDidMessage,
     HcsDidUpdateDidOwnerEvent,
 } from "..";
+import { IpfsDidDocumentDownloader } from "../utils/ipfs";
 import { DidDocumentJsonProperties } from "./did-document-json-properties";
 import { DidSyntax } from "./did-syntax";
+import { HcsDidCreateDidDocumentEvent } from "./hcs/did/event/document/hcs-did-create-did-document-event";
 import { HcsDidEventTargetName } from "./hcs/did/event/hcs-did-event-target-name";
 import { HcsDidUpdateServiceEvent } from "./hcs/did/event/service/hcs-did-update-service-event";
 import { HcsDidCreateVerificationMethodEvent } from "./hcs/did/event/verification-method/hcs-did-create-verification-method-event";
@@ -24,6 +26,7 @@ export class DidDocument {
     private updated: Timestamp = null;
     private versionId: string = null;
     private deactivated: boolean = false;
+    private downloader: IpfsDidDocumentDownloader = new IpfsDidDocumentDownloader();
 
     private controller: any;
     private services: Map<string, any> = new Map();
@@ -37,11 +40,9 @@ export class DidDocument {
         capabilityDelegation: [],
     };
 
-    constructor(did: string, messages: HcsDidMessage[]) {
+    constructor(did: string) {
         this.id = did;
         this.context = DidSyntax.DID_DOCUMENT_CONTEXT;
-
-        this.processMessages(messages);
     }
 
     public hasOwner() {
@@ -72,14 +73,49 @@ export class DidDocument {
         return this.deactivated;
     }
 
+    public async processMessages(messages: HcsDidMessage[]): Promise<void> {
+        for (const msg of messages) {
+            if (
+                !this.controller &&
+                msg.getOperation() === DidMethodOperation.CREATE &&
+                msg.getEvent().targetName !== HcsDidEventTargetName.DID_OWNER &&
+                msg.getEvent().targetName !== HcsDidEventTargetName.DID_DOCUMENT
+            ) {
+                console.warn("DID document owner is not registered. Event will be ignored...");
+                return;
+            }
+
+            switch (msg.getOperation()) {
+                case DidMethodOperation.CREATE:
+                    await this.processCreateMessage(msg);
+                    return;
+                case DidMethodOperation.UPDATE:
+                    await this.processUpdateMessage(msg);
+                    return;
+                case DidMethodOperation.REVOKE:
+                    await this.processRevokeMessage(msg);
+                    return;
+                case DidMethodOperation.DELETE:
+                    await this.processDeleteMessage(msg);
+                    return;
+                default:
+                    console.warn(`Operation ${msg.getOperation()} is not supported. Event will be ignored...`);
+            }
+        }
+    }
+
+    public setIpfsDownloader(downloader: IpfsDidDocumentDownloader) {
+        this.downloader = downloader;
+    }
+
     public toJsonTree(): any {
         let rootObject = {};
 
         rootObject[DidDocumentJsonProperties.CONTEXT] = this.context;
         rootObject[DidDocumentJsonProperties.ID] = this.id;
 
-        if (this.controller && this.id !== this.controller.controller) {
-            rootObject[DidDocumentJsonProperties.CONTROLLER] = this.controller.controller;
+        if (this.controller && this.id !== this.controller && this.id !== this.controller.controller) {
+            rootObject[DidDocumentJsonProperties.CONTROLLER] = this.controller.controller ?? this.controller;
         }
 
         rootObject[DidDocumentJsonProperties.VERIFICATION_METHOD] = Array.from(this.verificationMethods.values());
@@ -148,40 +184,40 @@ export class DidDocument {
         this.versionId = timestamp.toDate().getTime().toString();
     }
 
-    private processMessages(messages: HcsDidMessage[]): void {
-        messages.forEach((msg) => {
-            if (
-                !this.controller &&
-                msg.getOperation() === DidMethodOperation.CREATE &&
-                msg.getEvent().targetName !== HcsDidEventTargetName.DID_OWNER
-            ) {
-                console.warn("DID document owner is not registered. Event will be ignored...");
-                return;
-            }
-
-            switch (msg.getOperation()) {
-                case DidMethodOperation.CREATE:
-                    this.processCreateMessage(msg);
-                    return;
-                case DidMethodOperation.UPDATE:
-                    this.processUpdateMessage(msg);
-                    return;
-                case DidMethodOperation.REVOKE:
-                    this.processRevokeMessage(msg);
-                    return;
-                case DidMethodOperation.DELETE:
-                    this.processDeleteMessage(msg);
-                    return;
-                default:
-                    console.warn(`Operation ${msg.getOperation()} is not supported. Event will be ignored...`);
-            }
-        });
-    }
-
-    private processCreateMessage(message: HcsDidMessage): void {
+    private async processCreateMessage(message: HcsDidMessage): Promise<void> {
         const event = message.getEvent();
 
         switch (event.targetName) {
+            case HcsDidEventTargetName.DID_DOCUMENT:
+                const doc = await this.downloader.downloadDocument(event as HcsDidCreateDidDocumentEvent);
+                if (doc[DidDocumentJsonProperties.ID] !== this.id) {
+                    throw new Error("Document ID does not match did");
+                }
+                this.controller = doc[DidDocumentJsonProperties.CONTROLLER];
+
+                this.services = new Map(
+                    (doc[DidDocumentJsonProperties.SERVICE] ?? []).map((service) => [service.id, service])
+                );
+                this.verificationMethods = new Map(
+                    (doc[DidDocumentJsonProperties.VERIFICATION_METHOD] ?? []).map((verificationMethod) => [
+                        verificationMethod.id,
+                        verificationMethod,
+                    ])
+                );
+
+                this.verificationRelationships[DidDocumentJsonProperties.ASSERTION_METHOD] =
+                    doc[DidDocumentJsonProperties.ASSERTION_METHOD] ?? [];
+                this.verificationRelationships[DidDocumentJsonProperties.AUTHENTICATION] =
+                    doc[DidDocumentJsonProperties.AUTHENTICATION] ?? [];
+                this.verificationRelationships[DidDocumentJsonProperties.KEY_AGREEMENT] =
+                    doc[DidDocumentJsonProperties.KEY_AGREEMENT] ?? [];
+                this.verificationRelationships[DidDocumentJsonProperties.CAPABILITY_INVOCATION] =
+                    doc[DidDocumentJsonProperties.CAPABILITY_INVOCATION] ?? [];
+                this.verificationRelationships[DidDocumentJsonProperties.CAPABILITY_DELEGATION] =
+                    doc[DidDocumentJsonProperties.CAPABILITY_DELEGATION] ?? [];
+
+                return;
+
             case HcsDidEventTargetName.DID_OWNER:
                 if (this.controller) {
                     console.warn(`DID owner is already registered: ${this.controller}. Event will be ignored...`);
@@ -244,7 +280,7 @@ export class DidDocument {
         }
     }
 
-    private processUpdateMessage(message: HcsDidMessage): void {
+    private async processUpdateMessage(message: HcsDidMessage): Promise<void> {
         const event = message.getEvent();
 
         switch (event.targetName) {
@@ -303,7 +339,7 @@ export class DidDocument {
         }
     }
 
-    private processRevokeMessage(message: HcsDidMessage): void {
+    private async processRevokeMessage(message: HcsDidMessage): Promise<void> {
         const event = message.getEvent();
 
         switch (event.targetName) {
@@ -369,7 +405,7 @@ export class DidDocument {
         }
     }
 
-    private processDeleteMessage(message: HcsDidMessage): void {
+    private async processDeleteMessage(message: HcsDidMessage): Promise<void> {
         const event = message.getEvent();
 
         switch (event.targetName) {
