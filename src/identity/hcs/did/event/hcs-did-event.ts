@@ -25,6 +25,17 @@ export abstract class HcsDidEvent {
         throw new Error("not implemented");
     }
 
+    protected isDidValid(eventId: string) {
+        const [identifier, id] = eventId?.split("#");
+
+        if (!identifier) {
+            return false;
+        }
+
+        HcsDid.parseIdentifier(identifier);
+        return true;
+    }
+
     protected isOwnerEventIdValid(eventId: string) {
         const [identifier, id] = eventId?.split("#");
 
@@ -35,8 +46,6 @@ export abstract class HcsDidEvent {
         HcsDid.parseIdentifier(identifier);
 
         return this.OWNER_KEY_POSTFIX_REGEX.test(id) !== false;
-
-
     }
 
     protected isServiceEventIdValid(eventId: string) {
@@ -49,8 +58,6 @@ export abstract class HcsDidEvent {
         HcsDid.parseIdentifier(identifier);
 
         return this.SERVICE_ID_POSTFIX_REGEX.test(id) !== false;
-
-
     }
 
     protected isKeyEventIdValid(eventId: string) {
@@ -63,7 +70,5 @@ export abstract class HcsDidEvent {
         HcsDid.parseIdentifier(identifier);
 
         return this.KEY_ID_POSTFIX_REGEX.test(id) !== false;
-
-
     }
 }

@@ -1,5 +1,6 @@
 import { Hashing } from "../../../../utils/hashing";
 import { DidMethodOperation } from "../../../did-method-operation";
+import { HcsDidCreateDidDocumentEvent } from "./document/hcs-did-create-did-document-event";
 import { HcsDidDeleteEvent } from "./document/hcs-did-delete-event";
 import { HcsDidEvent } from "./hcs-did-event";
 import { HcsDidEventTargetName } from "./hcs-did-event-target-name";
@@ -18,6 +19,7 @@ import { HcsDidUpdateVerificationRelationshipEvent } from "./verification-relati
 const EVENT_NAME_TO_CLASS = {
     [DidMethodOperation.CREATE]: {
         [HcsDidEventTargetName.DID_OWNER]: HcsDidCreateDidOwnerEvent,
+        [HcsDidEventTargetName.DID_DOCUMENT]: HcsDidCreateDidDocumentEvent,
         [HcsDidEventTargetName.SERVICE]: HcsDidCreateServiceEvent,
         [HcsDidEventTargetName.VERIFICATION_METHOD]: HcsDidCreateVerificationMethodEvent,
         [HcsDidEventTargetName.VERIFICATION_RELATIONSHIP]: HcsDidCreateVerificationRelationshipEvent,
