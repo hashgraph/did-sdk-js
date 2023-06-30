@@ -5,6 +5,7 @@ import { DidMethodOperation } from "./identity/did-method-operation";
 import { DidParser } from "./identity/did-parser";
 import { HederaDidResolver } from "./identity/did-resolver";
 import { DidSyntax } from "./identity/did-syntax";
+import { HcsDidCreateDidDocumentEvent } from "./identity/hcs/did/event/document/hcs-did-create-did-document-event";
 import { HcsDidDeleteEvent } from "./identity/hcs/did/event/document/hcs-did-delete-event";
 import { HcsDidEventTargetName } from "./identity/hcs/did/event/hcs-did-event-target-name";
 import { HcsDidCreateDidOwnerEvent } from "./identity/hcs/did/event/owner/hcs-did-create-did-owner-event";
@@ -44,6 +45,7 @@ export {
     Ed25519PubCodec,
     Hashing,
     HcsDid,
+    HcsDidCreateDidDocumentEvent,
     HcsDidCreateDidOwnerEvent,
     HcsDidCreateServiceEvent,
     HcsDidCreateVerificationMethodEvent,
