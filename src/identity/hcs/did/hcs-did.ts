@@ -191,10 +191,15 @@ export class HcsDid {
         return new Promise((resolve, reject) => {
             new HcsDidEventMessageResolver(this.topicId)
                 .setTimeout(HcsDid.READ_TOPIC_MESSAGES_TIMEOUT)
-                .whenFinished((messages) => {
+                .whenFinished(async (messages) => {
                     this.messages = messages.map((msg) => msg.open());
-                    this.document = new DidDocument(this.identifier, this.messages);
-                    resolve(this.document);
+                    this.document = new DidDocument(this.identifier);
+                    try {
+                        await this.document.processMessages(this.messages);
+                        resolve(this.document);
+                    } catch (err) {
+                        reject(err);
+                    }
                 })
                 .onError((err) => {
                     // console.error(err);
