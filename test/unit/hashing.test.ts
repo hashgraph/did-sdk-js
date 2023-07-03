@@ -1,7 +1,7 @@
-import { Hashing } from "../../dist";
 import { PrivateKey } from "@hashgraph/sdk";
+import { Hashing } from "../../dist";
 
-describe("Util Multibase & Multicodec", () => {
+describe("Util Multibase", () => {
     it("Test Valid Multibase base58btc with ed25519 pub key encode", async () => {
         const privateKey = PrivateKey.generate();
 
@@ -9,8 +9,8 @@ describe("Util Multibase & Multicodec", () => {
         const base58btcEncodedString = Hashing.multibase.encode(publickeybytes);
         const decodedPublicKeyBytes = Hashing.multibase.decode(base58btcEncodedString);
 
-        // z is for base58btc & 6Mk is for ed25519 pub key
-        expect(base58btcEncodedString.startsWith("z6Mk")).toBeTruthy();
+        // z is for base58btc
+        expect(base58btcEncodedString.startsWith("z")).toBeTruthy();
         expect(decodedPublicKeyBytes).toStrictEqual(publickeybytes);
     });
 });

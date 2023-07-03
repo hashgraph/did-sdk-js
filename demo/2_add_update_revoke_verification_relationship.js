@@ -6,7 +6,7 @@ async function main() {
     /**
      * Setup
      */
-    const client = Client.forTestnet();
+    const client = Client.forTestnet({ scheduleNetworkUpdate: false });
     client.setOperator(OPERATOR_ID, OPERATOR_KEY);
 
     const didPrivateKey = PrivateKey.fromString(DID_PRIVATE_KEY);
@@ -17,12 +17,10 @@ async function main() {
     const registeredDid = new HcsDid({ identifier: DID_IDENTIFIER, privateKey: didPrivateKey, client: client });
 
     const verificationRelationshipIdentifier =
-        "did:hedera:testnet:z6Mkkcn1EDXc5vzpmvnQeCKpEswyrnQG7qq59k92gFRm1EGk_0.0.29617801";
-    const verificationRelationshipPublicKey = HcsDid.stringToPublicKey(
-        "z6Mkkcn1EDXc5vzpmvnQeCKpEswyrnQG7qq59k92gFRm1EGk"
-    );
+        "did:hedera:testnet:z87meAWt7t2zrDxo7qw3PVTjexKWReYWS75LH29THy8kb_0.0.29617801";
+    const verificationRelationshipPublicKey = HcsDid.stringToPublicKey("z87meAWt7t2zrDxo7qw3PVTjexKWReYWS75LH29THy8kb");
     const updatedVerificationRelationshipPublicKey = HcsDid.stringToPublicKey(
-        "z6MkhHbhBBLdKGiGnHPvrrH9GL7rgw6egpZiLgvQ9n7pHt1P"
+        "zAvU2AEh8ybRqNwHAM3CjbkjYaYHpt9oA1uugW9EVTg6P"
     );
     const verificationRelationshipType = "authentication";
 

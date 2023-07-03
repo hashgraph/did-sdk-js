@@ -53,7 +53,7 @@ describe("HcsDidRevokeVerificationRelationshipEvent", () => {
     describe("#getId", () => {
         it("returns id passed via constructor", () => {
             expect(event.getId()).toEqual(
-                "did:hedera:testnet:z6MkogVzoGJMVVLhaz82cA5jZQKAAqUghhCrpzkSDFDwxfJa_0.0.29613327#key-1"
+                "did:hedera:testnet:zAEExD23v9wrEUVHKvb7tiJmAMGCqHoxW8yqWNyFw3SXC_0.0.29613327#key-1"
             );
         });
     });
@@ -67,7 +67,7 @@ describe("HcsDidRevokeVerificationRelationshipEvent", () => {
     describe("#getBase64", () => {
         it("returns event data encoded in base64", () => {
             expect(event.getBase64()).toEqual(
-                "eyJWZXJpZmljYXRpb25SZWxhdGlvbnNoaXAiOnsiaWQiOiJkaWQ6aGVkZXJhOnRlc3RuZXQ6ejZNa29nVnpvR0pNVlZMaGF6ODJjQTVqWlFLQUFxVWdoaENycHprU0RGRHd4ZkphXzAuMC4yOTYxMzMyNyNrZXktMSIsInJlbGF0aW9uc2hpcFR5cGUiOiJhdXRoZW50aWNhdGlvbiJ9fQ=="
+                "eyJWZXJpZmljYXRpb25SZWxhdGlvbnNoaXAiOnsiaWQiOiJkaWQ6aGVkZXJhOnRlc3RuZXQ6ekFFRXhEMjN2OXdyRVVWSEt2Yjd0aUptQU1HQ3FIb3hXOHlxV055RnczU1hDXzAuMC4yOTYxMzMyNyNrZXktMSIsInJlbGF0aW9uc2hpcFR5cGUiOiJhdXRoZW50aWNhdGlvbiJ9fQ=="
             );
         });
     });
@@ -76,7 +76,7 @@ describe("HcsDidRevokeVerificationRelationshipEvent", () => {
         it("returns event JSON structure", () => {
             expect(event.toJsonTree()).toEqual({
                 VerificationRelationship: {
-                    id: "did:hedera:testnet:z6MkogVzoGJMVVLhaz82cA5jZQKAAqUghhCrpzkSDFDwxfJa_0.0.29613327#key-1",
+                    id: "did:hedera:testnet:zAEExD23v9wrEUVHKvb7tiJmAMGCqHoxW8yqWNyFw3SXC_0.0.29613327#key-1",
                     relationshipType: "authentication",
                 },
             });
@@ -86,7 +86,7 @@ describe("HcsDidRevokeVerificationRelationshipEvent", () => {
     describe("#toJSON", () => {
         it("returns stringified JSON structure version", () => {
             expect(event.toJSON()).toEqual(
-                '{"VerificationRelationship":{"id":"did:hedera:testnet:z6MkogVzoGJMVVLhaz82cA5jZQKAAqUghhCrpzkSDFDwxfJa_0.0.29613327#key-1","relationshipType":"authentication"}}'
+                '{"VerificationRelationship":{"id":"did:hedera:testnet:zAEExD23v9wrEUVHKvb7tiJmAMGCqHoxW8yqWNyFw3SXC_0.0.29613327#key-1","relationshipType":"authentication"}}'
             );
         });
     });
@@ -94,14 +94,14 @@ describe("HcsDidRevokeVerificationRelationshipEvent", () => {
     describe("#fromJsonTree", () => {
         it("rebuilds HcsDidRevokeVerificationRelationshipEvent object", () => {
             const eventFromJson = HcsDidRevokeVerificationRelationshipEvent.fromJsonTree({
-                id: "did:hedera:testnet:z6MkogVzoGJMVVLhaz82cA5jZQKAAqUghhCrpzkSDFDwxfJa_0.0.29613327#key-1",
+                id: "did:hedera:testnet:zAEExD23v9wrEUVHKvb7tiJmAMGCqHoxW8yqWNyFw3SXC_0.0.29613327#key-1",
                 relationshipType: "authentication",
             });
 
             expect(eventFromJson).toBeInstanceOf(HcsDidRevokeVerificationRelationshipEvent);
             expect(eventFromJson.toJsonTree()).toEqual({
                 VerificationRelationship: {
-                    id: "did:hedera:testnet:z6MkogVzoGJMVVLhaz82cA5jZQKAAqUghhCrpzkSDFDwxfJa_0.0.29613327#key-1",
+                    id: "did:hedera:testnet:zAEExD23v9wrEUVHKvb7tiJmAMGCqHoxW8yqWNyFw3SXC_0.0.29613327#key-1",
                     relationshipType: "authentication",
                 },
             });
