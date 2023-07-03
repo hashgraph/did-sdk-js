@@ -12,7 +12,7 @@ import {
 describe("HcsDidTransaction", () => {
     const network = "testnet";
     const DID_TOPIC_ID1 = TopicId.fromString("0.0.2");
-    const client = Client.forTestnet();
+    const client = Client.forTestnet({ scheduleNetworkUpdate: false });
     const privateKey = PrivateKey.generate();
     const identifier = `did:hedera:${network}:${Hashing.multibase.encode(
         privateKey.publicKey.toBytes()
