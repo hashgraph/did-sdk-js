@@ -1,7 +1,7 @@
-import { AccountId, Client, PrivateKey, Timestamp, TopicMessageQuery } from "@hashgraph/sdk";
+import { AccountId, Client, PrivateKey, Timestamp, TopicMessage, TopicMessageQuery } from "@hashgraph/sdk";
 import { DidError, Hashing, HcsDid } from "../../dist";
 
-const TOPIC_REGEXP = /^0\.0\.[0-9]{8,}/;
+const TOPIC_REGEXP = /^0\.0\.[0-9]{3,}/;
 
 const OPERATOR_ID = process.env.OPERATOR_ID;
 const OPERATOR_KEY = process.env.OPERATOR_KEY;
@@ -11,13 +11,17 @@ const NETWORK = "testnet";
 // hedera
 const MIRROR_PROVIDER = ["hcs." + NETWORK + ".mirrornode.hedera.com:5600"];
 
+function delay(time) {
+    return new Promise((resolve) => setTimeout(resolve, time));
+}
+
 describe("HcsDid", () => {
     let client;
 
     beforeAll(async () => {
         const operatorId = AccountId.fromString(OPERATOR_ID);
         const operatorKey = PrivateKey.fromString(OPERATOR_KEY);
-        client = Client.forTestnet();
+        client = Client.forTestnet({ scheduleNetworkUpdate: false });
         client.setMirrorNetwork(MIRROR_PROVIDER);
         client.setOperator(operatorId, operatorKey);
     });
@@ -135,6 +139,8 @@ describe("HcsDid", () => {
 
             await did.register();
 
+            await delay(process.env.WAIT_BEFORE_RESOLVE_DID_FOR);
+
             const didDoc = await did.resolve();
             const didDocument = didDoc.toJsonTree();
 
@@ -200,6 +206,8 @@ describe("HcsDid", () => {
 
             await did.register();
 
+            await delay(process.env.WAIT_BEFORE_RESOLVE_DID_FOR);
+
             let didJSON = (await did.resolve()).toJsonTree();
             expect(didJSON).toEqual({
                 "@context": "https://www.w3.org/ns/did/v1",
@@ -218,6 +226,9 @@ describe("HcsDid", () => {
 
             await did.delete();
 
+            const messages = await readTopicMessages(did.getTopicId(), client);
+            expect(messages.length).toEqual(2);
+
             didJSON = (await did.resolve()).toJsonTree();
             expect(didJSON).toEqual({
                 "@context": "https://www.w3.org/ns/did/v1",
@@ -226,9 +237,6 @@ describe("HcsDid", () => {
                 id: did.getIdentifier(),
                 verificationMethod: [],
             });
-
-            let messages = await readTopicMessages(did.getTopicId(), client);
-            expect(messages.length).toEqual(2);
         });
     });
 
@@ -328,6 +336,9 @@ describe("HcsDid", () => {
                 newPrivateKey: newDidPrivateKey,
             });
 
+            const messages = await readTopicMessages(did.getTopicId(), client);
+            expect(messages.length).toEqual(2);
+
             const doc = (await did.resolve()).toJsonTree();
 
             expect(doc).toEqual({
@@ -345,9 +356,6 @@ describe("HcsDid", () => {
                     },
                 ],
             });
-
-            let messages = await readTopicMessages(did.getTopicId(), client);
-            expect(messages.length).toEqual(2);
         });
     });
 
@@ -426,6 +434,8 @@ describe("HcsDid", () => {
 
             console.log(`https://testnet.dragonglass.me/hedera/topics/${did.getTopicId().toString()}`);
 
+            await delay(process.env.WAIT_BEFORE_RESOLVE_DID_FOR);
+
             const didDoc = await did.resolve();
             const didDocument = didDoc.toJsonTree();
 
@@ -473,6 +483,8 @@ describe("HcsDid", () => {
 
             console.log(`https://testnet.dragonglass.me/hedera/topics/${did.getTopicId().toString()}`);
 
+            await delay(process.env.WAIT_BEFORE_RESOLVE_DID_FOR);
+
             const didDoc = await did.resolve();
             const didDocument = didDoc.toJsonTree();
 
@@ -517,6 +529,8 @@ describe("HcsDid", () => {
 
             console.log(`https://testnet.dragonglass.me/hedera/topics/${did.getTopicId().toString()}`);
 
+            await delay(process.env.WAIT_BEFORE_RESOLVE_DID_FOR);
+
             const didDoc = await did.resolve();
             const didDocument = didDoc.toJsonTree();
 
@@ -559,6 +573,8 @@ describe("HcsDid", () => {
             });
 
             console.log(`https://testnet.dragonglass.me/hedera/topics/${did.getTopicId().toString()}`);
+
+            await delay(process.env.WAIT_BEFORE_RESOLVE_DID_FOR);
 
             const didDoc = await did.resolve();
             const didDocument = didDoc.toJsonTree();
@@ -638,8 +654,8 @@ describe("HcsDid", () => {
 
             //new verification DID and publickey
             const newVerificationDid =
-                "did:hedera:testnet:z6Mkkcn1EDXc5vzpmvnQeCKpEswyrnQG7qq59k92gFRm1EGk_0.0.29617801#key-1";
-            const publicKey = HcsDid.stringToPublicKey("z6Mkkcn1EDXc5vzpmvnQeCKpEswyrnQG7qq59k92gFRm1EGk");
+                "did:hedera:testnet:z87meAWt7t2zrDxo7qw3PVTjexKWReYWS75LH29THy8kb_0.0.29617801#key-1";
+            const publicKey = HcsDid.stringToPublicKey("z87meAWt7t2zrDxo7qw3PVTjexKWReYWS75LH29THy8kb");
 
             await did.register();
             await did.addVerificationMethod({
@@ -652,7 +668,7 @@ describe("HcsDid", () => {
             /**
              *  wait for 9s so DIDOwner and VerificationMethod event to be propagated to mirror node
              */
-            await new Promise((resolve) => setTimeout(resolve, 9000));
+            await delay(process.env.WAIT_BEFORE_RESOLVE_DID_FOR);
 
             console.log(`${did.getIdentifier()}`);
             console.log(`https://testnet.dragonglass.me/hedera/topics/${did.getTopicId().toString()}`);
@@ -691,9 +707,9 @@ describe("HcsDid", () => {
 
             //new verification DID and publickey
             const newVerificationDid =
-                "did:hedera:testnet:z6Mkkcn1EDXc5vzpmvnQeCKpEswyrnQG7qq59k92gFRm1EGk_0.0.29617801#key-1";
-            const publicKey = HcsDid.stringToPublicKey("z6Mkkcn1EDXc5vzpmvnQeCKpEswyrnQG7qq59k92gFRm1EGk");
-            const updatePublicKey = HcsDid.stringToPublicKey("z6MkhHbhBBLdKGiGnHPvrrH9GL7rgw6egpZiLgvQ9n7pHt1P");
+                "did:hedera:testnet:z87meAWt7t2zrDxo7qw3PVTjexKWReYWS75LH29THy8kb_0.0.29617801#key-1";
+            const publicKey = HcsDid.stringToPublicKey("z87meAWt7t2zrDxo7qw3PVTjexKWReYWS75LH29THy8kb");
+            const updatePublicKey = HcsDid.stringToPublicKey("zAvU2AEh8ybRqNwHAM3CjbkjYaYHpt9oA1uugW9EVTg6P");
 
             await did.register();
             await did.addVerificationMethod({
@@ -712,7 +728,7 @@ describe("HcsDid", () => {
             /**
              *  wait for 9s so DIDOwner and VerificationMethod event to be propagated to mirror node
              */
-            await new Promise((resolve) => setTimeout(resolve, 9000));
+            await delay(process.env.WAIT_BEFORE_RESOLVE_DID_FOR);
 
             console.log(`${did.getIdentifier()}`);
             console.log(`https://testnet.dragonglass.me/hedera/topics/${did.getTopicId().toString()}`);
@@ -750,8 +766,8 @@ describe("HcsDid", () => {
 
             //new verification DID and publickey
             const newVerificationDid =
-                "did:hedera:testnet:z6Mkkcn1EDXc5vzpmvnQeCKpEswyrnQG7qq59k92gFRm1EGk_0.0.29617801#key-1";
-            const publicKey = HcsDid.stringToPublicKey("z6Mkkcn1EDXc5vzpmvnQeCKpEswyrnQG7qq59k92gFRm1EGk");
+                "did:hedera:testnet:z87meAWt7t2zrDxo7qw3PVTjexKWReYWS75LH29THy8kb_0.0.29617801#key-1";
+            const publicKey = HcsDid.stringToPublicKey("z87meAWt7t2zrDxo7qw3PVTjexKWReYWS75LH29THy8kb");
 
             await did.register();
             await did.addVerificationMethod({
@@ -767,7 +783,7 @@ describe("HcsDid", () => {
             /**
              *  wait for 9s so DIDOwner and VerificationMethod event to be propagated to mirror node
              */
-            await new Promise((resolve) => setTimeout(resolve, 9000));
+            await delay(process.env.WAIT_BEFORE_RESOLVE_DID_FOR);
 
             console.log(`${did.getIdentifier()}`);
             console.log(`https://testnet.dragonglass.me/hedera/topics/${did.getTopicId().toString()}`);
@@ -862,8 +878,8 @@ describe("HcsDid", () => {
 
             //new verification DID and publickey
             const newVerificationDid =
-                "did:hedera:testnet:z6Mkkcn1EDXc5vzpmvnQeCKpEswyrnQG7qq59k92gFRm1EGk_0.0.29617801#key-1";
-            const publicKey = HcsDid.stringToPublicKey("z6Mkkcn1EDXc5vzpmvnQeCKpEswyrnQG7qq59k92gFRm1EGk");
+                "did:hedera:testnet:z87meAWt7t2zrDxo7qw3PVTjexKWReYWS75LH29THy8kb_0.0.29617801#key-1";
+            const publicKey = HcsDid.stringToPublicKey("z87meAWt7t2zrDxo7qw3PVTjexKWReYWS75LH29THy8kb");
 
             await (
                 await did.register()
@@ -874,6 +890,8 @@ describe("HcsDid", () => {
                 controller: did.getIdentifier(),
                 publicKey,
             });
+
+            await delay(process.env.WAIT_BEFORE_RESOLVE_DID_FOR);
 
             const didDoc = await did.resolve();
             const didDocument = didDoc.toJsonTree();
@@ -907,11 +925,15 @@ describe("HcsDid", () => {
             const privateKey = PrivateKey.fromString(OPERATOR_KEY);
             const did = new HcsDid({ privateKey, client });
 
-            //new verification DID and publickey
+            const pk = PrivateKey.generate();
+            console.log(Hashing.multibase.encode(pk.publicKey.toBytes()));
+
+            // new verification DID and publickey
             const newVerificationDid =
-                "did:hedera:testnet:z6Mkkcn1EDXc5vzpmvnQeCKpEswyrnQG7qq59k92gFRm1EGk_0.0.29617801#key-1";
-            const publicKey = HcsDid.stringToPublicKey("z6Mkkcn1EDXc5vzpmvnQeCKpEswyrnQG7qq59k92gFRm1EGk");
-            const updatePublicKey = HcsDid.stringToPublicKey("z6MkhHbhBBLdKGiGnHPvrrH9GL7rgw6egpZiLgvQ9n7pHt1P");
+                "did:hedera:testnet:z87meAWt7t2zrDxo7qw3PVTjexKWReYWS75LH29THy8kb_0.0.29617801#key-1";
+
+            const publicKey = HcsDid.stringToPublicKey("z87meAWt7t2zrDxo7qw3PVTjexKWReYWS75LH29THy8kb");
+            const updatePublicKey = HcsDid.stringToPublicKey("zAvU2AEh8ybRqNwHAM3CjbkjYaYHpt9oA1uugW9EVTg6P");
 
             await did.register();
             await did.addVerificationRelationship({
@@ -928,6 +950,8 @@ describe("HcsDid", () => {
                 controller: did.getIdentifier(),
                 publicKey: updatePublicKey,
             });
+
+            await delay(process.env.WAIT_BEFORE_RESOLVE_DID_FOR);
 
             const didDoc = await did.resolve();
             const didDocument = didDoc.toJsonTree();
@@ -963,8 +987,8 @@ describe("HcsDid", () => {
 
             //new verification DID and publickey
             const newVerificationDid =
-                "did:hedera:testnet:z6Mkkcn1EDXc5vzpmvnQeCKpEswyrnQG7qq59k92gFRm1EGk_0.0.29617801#key-1";
-            const publicKey = HcsDid.stringToPublicKey("z6Mkkcn1EDXc5vzpmvnQeCKpEswyrnQG7qq59k92gFRm1EGk");
+                "did:hedera:testnet:z87meAWt7t2zrDxo7qw3PVTjexKWReYWS75LH29THy8kb_0.0.29617801#key-1";
+            const publicKey = HcsDid.stringToPublicKey("z87meAWt7t2zrDxo7qw3PVTjexKWReYWS75LH29THy8kb");
 
             await did.register();
             await did.addVerificationRelationship({
@@ -978,6 +1002,8 @@ describe("HcsDid", () => {
                 id: newVerificationDid,
                 relationshipType: "authentication",
             });
+
+            await delay(process.env.WAIT_BEFORE_RESOLVE_DID_FOR);
 
             const didDoc = await did.resolve();
             const didDocument = didDoc.toJsonTree();
@@ -1008,20 +1034,26 @@ describe("HcsDid", () => {
  */
 
 async function readTopicMessages(topicId, client, timeout = null) {
-    const messages = [];
+    const messages: TopicMessage[] = [];
 
-    await new TopicMessageQuery()
-      .setTopicId(topicId)
-      .setStartTime(new Timestamp(0, 0))
-      .setEndTime(Timestamp.fromDate(new Date()))
-      .subscribe(client, null, (msg) => {
-          messages.push(msg);
-      });
+    const query = new TopicMessageQuery()
+        .setTopicId(topicId)
+        .setStartTime(new Timestamp(0, 0))
+        .setEndTime(Timestamp.fromDate(new Date()));
+
+    query.setMaxBackoff(2000);
+    query.setMaxAttempts(15);
+
+    const querySubcription = query.subscribe(client, null, (msg) => {
+        messages.push(msg);
+    });
 
     /**
      * wait for READ_MESSAGES_TIMEOUT seconds and assume all messages were read
      */
-    await new Promise((resolve) => setTimeout(resolve, timeout || 6000));
+    await delay(timeout || process.env.WAIT_BEFORE_RESOLVE_DID_FOR);
+
+    querySubcription.unsubscribe();
 
     return messages;
 }

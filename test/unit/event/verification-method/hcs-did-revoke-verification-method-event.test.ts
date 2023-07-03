@@ -41,7 +41,7 @@ describe("HcsDidRevokeVerificationMethodEvent", () => {
     describe("#getId", () => {
         it("returns id passed via constructor", () => {
             expect(event.getId()).toEqual(
-                "did:hedera:testnet:z6MkogVzoGJMVVLhaz82cA5jZQKAAqUghhCrpzkSDFDwxfJa_0.0.29613327#key-1"
+                "did:hedera:testnet:zAEExD23v9wrEUVHKvb7tiJmAMGCqHoxW8yqWNyFw3SXC_0.0.29613327#key-1"
             );
         });
     });
@@ -49,7 +49,7 @@ describe("HcsDidRevokeVerificationMethodEvent", () => {
     describe("#getBase64", () => {
         it("returns event data encoded in base64", () => {
             expect(event.getBase64()).toEqual(
-                "eyJWZXJpZmljYXRpb25NZXRob2QiOnsiaWQiOiJkaWQ6aGVkZXJhOnRlc3RuZXQ6ejZNa29nVnpvR0pNVlZMaGF6ODJjQTVqWlFLQUFxVWdoaENycHprU0RGRHd4ZkphXzAuMC4yOTYxMzMyNyNrZXktMSJ9fQ=="
+                "eyJWZXJpZmljYXRpb25NZXRob2QiOnsiaWQiOiJkaWQ6aGVkZXJhOnRlc3RuZXQ6ekFFRXhEMjN2OXdyRVVWSEt2Yjd0aUptQU1HQ3FIb3hXOHlxV055RnczU1hDXzAuMC4yOTYxMzMyNyNrZXktMSJ9fQ=="
             );
         });
     });
@@ -58,7 +58,7 @@ describe("HcsDidRevokeVerificationMethodEvent", () => {
         it("returns event JSON structure", () => {
             expect(event.toJsonTree()).toEqual({
                 VerificationMethod: {
-                    id: "did:hedera:testnet:z6MkogVzoGJMVVLhaz82cA5jZQKAAqUghhCrpzkSDFDwxfJa_0.0.29613327#key-1",
+                    id: "did:hedera:testnet:zAEExD23v9wrEUVHKvb7tiJmAMGCqHoxW8yqWNyFw3SXC_0.0.29613327#key-1",
                 },
             });
         });
@@ -67,7 +67,7 @@ describe("HcsDidRevokeVerificationMethodEvent", () => {
     describe("#toJSON", () => {
         it("returns stringified JSON structure version", () => {
             expect(event.toJSON()).toEqual(
-                '{"VerificationMethod":{"id":"did:hedera:testnet:z6MkogVzoGJMVVLhaz82cA5jZQKAAqUghhCrpzkSDFDwxfJa_0.0.29613327#key-1"}}'
+                '{"VerificationMethod":{"id":"did:hedera:testnet:zAEExD23v9wrEUVHKvb7tiJmAMGCqHoxW8yqWNyFw3SXC_0.0.29613327#key-1"}}'
             );
         });
     });
@@ -75,13 +75,13 @@ describe("HcsDidRevokeVerificationMethodEvent", () => {
     describe("#fromJsonTree", () => {
         it("rebuilds HcsDidRevokeVerificationMethodEvent object", () => {
             const eventFromJson = HcsDidRevokeVerificationMethodEvent.fromJsonTree({
-                id: "did:hedera:testnet:z6MkogVzoGJMVVLhaz82cA5jZQKAAqUghhCrpzkSDFDwxfJa_0.0.29613327#key-1",
+                id: "did:hedera:testnet:zAEExD23v9wrEUVHKvb7tiJmAMGCqHoxW8yqWNyFw3SXC_0.0.29613327#key-1",
             });
 
             expect(eventFromJson).toBeInstanceOf(HcsDidRevokeVerificationMethodEvent);
             expect(eventFromJson.toJsonTree()).toEqual({
                 VerificationMethod: {
-                    id: "did:hedera:testnet:z6MkogVzoGJMVVLhaz82cA5jZQKAAqUghhCrpzkSDFDwxfJa_0.0.29613327#key-1",
+                    id: "did:hedera:testnet:zAEExD23v9wrEUVHKvb7tiJmAMGCqHoxW8yqWNyFw3SXC_0.0.29613327#key-1",
                 },
             });
         });

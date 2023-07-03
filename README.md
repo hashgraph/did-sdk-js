@@ -89,7 +89,7 @@ const client = Client.forTestnet();
 /**
 * CHANGE IT. use values from step 1: registered DID console output
 */
-const existingDIDIdentifier = "did:hedera:testnet:z6MkvD6JAfMyP6pgQoYxfE9rubgwLD9Hmz8rQh1FAxvbW8XB_0.0.29656526";
+const existingDIDIdentifier = "did:hedera:testnet:zGkqFaR7Y3ZLDJJiFyfC24W8wWdsSN6tVig6KLgxaaujo_0.0.29656526";
 
 /**
 * Build DID instance
@@ -140,7 +140,7 @@ client.setOperator(OPERATOR_ID, OPERATOR_KEY);
 const existingOwnerDIDPrivateKey = PrivateKey.fromString(
     "302e020100300506032b657004220420a4b76d7089dfd33c83f586990c3a36ae92fb719fdf262e7749d1b0ddd1d055b0"
 );
-const existingDIDIdentifier = "did:hedera:testnet:z6MkvD6JAfMyP6pgQoYxfE9rubgwLD9Hmz8rQh1FAxvbW8XB_0.0.29656526";
+const existingDIDIdentifier = "did:hedera:testnet:zGkqFaR7Y3ZLDJJiFyfC24W8wWdsSN6tVig6KLgxaaujo_0.0.29656526";
 
 /**
 * Build DID instance
@@ -201,7 +201,7 @@ client.setOperator(OPERATOR_ID, OPERATOR_KEY);
 const didPrivateKey = PrivateKey.fromString(
     "302e020100300506032b657004220420a4b76d7089dfd33c83f586990c3a36ae92fb719fdf262e7749d1b0ddd1d055b0"
 );
-const existingDIDIdentifier = "did:hedera:testnet:z6MkvD6JAfMyP6pgQoYxfE9rubgwLD9Hmz8rQh1FAxvbW8XB_0.0.29656526";
+const existingDIDIdentifier = "did:hedera:testnet:zGkqFaR7Y3ZLDJJiFyfC24W8wWdsSN6tVig6KLgxaaujo_0.0.29656526";
 
 /**
 * Build DID instance
@@ -277,7 +277,7 @@ client.setOperator(OPERATOR_ID, OPERATOR_KEY);
 const didPrivateKey = PrivateKey.fromString(
     "302e020100300506032b657004220420a4b76d7089dfd33c83f586990c3a36ae92fb719fdf262e7749d1b0ddd1d055b0"
 );
-const existingDIDIdentifier = "did:hedera:testnet:z6MkvD6JAfMyP6pgQoYxfE9rubgwLD9Hmz8rQh1FAxvbW8XB_0.0.29656526";
+const existingDIDIdentifier = "did:hedera:testnet:zGkqFaR7Y3ZLDJJiFyfC24W8wWdsSN6tVig6KLgxaaujo_0.0.29656526";
 
 /**
 * Build DID instance
@@ -362,7 +362,7 @@ client.setOperator(OPERATOR_ID, OPERATOR_KEY);
 const didPrivateKey = PrivateKey.fromString(
     "302e020100300506032b657004220420a4b76d7089dfd33c83f586990c3a36ae92fb719fdf262e7749d1b0ddd1d055b0"
 );
-const existingDIDIdentifier = "did:hedera:testnet:z6MkvD6JAfMyP6pgQoYxfE9rubgwLD9Hmz8rQh1FAxvbW8XB_0.0.29656526";
+const existingDIDIdentifier = "did:hedera:testnet:zGkqFaR7Y3ZLDJJiFyfC24W8wWdsSN6tVig6KLgxaaujo_0.0.29656526";
 
 /**
 * Build DID instance
@@ -452,7 +452,7 @@ client.setOperator(OPERATOR_ID, privateKey);
 const didPrivateKey = PrivateKey.fromString(
     "302e020100300506032b657004220420a4b76d7089dfd33c83f586990c3a36ae92fb719fdf262e7749d1b0ddd1d055b0"
 );
-const existingDIDIdentifier = "did:hedera:testnet:z6MkvD6JAfMyP6pgQoYxfE9rubgwLD9Hmz8rQh1FAxvbW8XB_0.0.29656526";
+const existingDIDIdentifier = "did:hedera:testnet:zGkqFaR7Y3ZLDJJiFyfC24W8wWdsSN6tVig6KLgxaaujo_0.0.29656526";
 
 /**
 * Build DID instance

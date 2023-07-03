@@ -473,7 +473,7 @@ export class HcsDid {
 
             const didIdString = didParts.shift();
 
-            if (didIdString.length < 48 || didParts.shift()) {
+            if (didIdString.length < 44 || didParts.shift()) {
                 throw new DidError(
                     "DID string is invalid. ID holds incorrect format.",
                     DidErrorCode.INVALID_DID_STRING

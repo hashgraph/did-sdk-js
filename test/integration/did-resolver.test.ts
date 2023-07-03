@@ -10,13 +10,17 @@ const NETWORK = "testnet";
 // hedera
 const MIRROR_PROVIDER = ["hcs." + NETWORK + ".mirrornode.hedera.com:5600"];
 
+function delay(time) {
+    return new Promise((resolve) => setTimeout(resolve, time));
+}
+
 describe("HederaDidResolver", () => {
     let client;
 
     beforeAll(async () => {
         const operatorId = AccountId.fromString(OPERATOR_ID);
         const operatorKey = PrivateKey.fromString(OPERATOR_KEY);
-        client = Client.forTestnet();
+        client = Client.forTestnet({ scheduleNetworkUpdate: false });
         client.setMirrorNetwork(MIRROR_PROVIDER);
         client.setOperator(operatorId, operatorKey);
     });
@@ -73,6 +77,8 @@ describe("HederaDidResolver", () => {
                 serviceEndpoint: "https://example.com/vcs",
             });
 
+            await delay(process.env.WAIT_BEFORE_RESOLVE_DID_FOR);
+
             const resolver = new Resolver({
                 ...new HederaDidResolver(client).build(),
             });
@@ -117,6 +123,8 @@ describe("HederaDidResolver", () => {
 
             await did.register();
             await did.delete();
+
+            await delay(process.env.WAIT_BEFORE_RESOLVE_DID_FOR);
 
             const resolver = new Resolver({
                 ...new HederaDidResolver().build(),

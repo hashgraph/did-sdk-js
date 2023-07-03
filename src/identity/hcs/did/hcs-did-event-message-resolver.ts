@@ -84,7 +84,7 @@ export class HcsDidEventMessageResolver {
     protected async waitOrFinish(): Promise<void> {
         const timeDiff = Long.fromInt(Date.now()).sub(this.lastMessageArrivalTime);
 
-        if (timeDiff.lt(this.noMoreMessagesTimeout)) {
+        if (timeDiff.lessThanOrEqual(this.noMoreMessagesTimeout)) {
             if (this.nextMessageArrivalTimeout) {
                 clearTimeout(this.nextMessageArrivalTimeout);
             }
