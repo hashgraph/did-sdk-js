@@ -2,8 +2,8 @@ import { AccountId, Client, PrivateKey } from "@hashgraph/sdk";
 import { Resolver } from "did-resolver";
 import { Hashing, HcsDid, HederaDidResolver } from "../../dist";
 
-const OPERATOR_ID = process.env.OPERATOR_ID;
-const OPERATOR_KEY = process.env.OPERATOR_KEY;
+const OPERATOR_ID = <string>process.env.OPERATOR_ID;
+const OPERATOR_KEY = <string>process.env.OPERATOR_KEY;
 // testnet, previewnet, mainnet
 const NETWORK = "testnet";
 
@@ -17,12 +17,16 @@ function delay(time) {
 describe("HederaDidResolver", () => {
     let client;
 
-    beforeAll(async () => {
+    beforeEach(async () => {
         const operatorId = AccountId.fromString(OPERATOR_ID);
         const operatorKey = PrivateKey.fromString(OPERATOR_KEY);
         client = Client.forTestnet({ scheduleNetworkUpdate: false });
         client.setMirrorNetwork(MIRROR_PROVIDER);
         client.setOperator(operatorId, operatorKey);
+    });
+
+    afterEach(() => {
+        client.close();
     });
 
     describe("#resolve", () => {
@@ -44,7 +48,7 @@ describe("HederaDidResolver", () => {
             /**
              * Does not return messages because Resolver wrapper handles that
              */
-            result = await resolver.resolve(null);
+            result = await resolver.resolve("");
             expect(result).toEqual({
                 didDocument: null,
                 didDocumentMetadata: {},
@@ -101,7 +105,7 @@ describe("HederaDidResolver", () => {
                         {
                             controller: did.getIdentifier(),
                             id: `${did.getIdentifier()}#did-root-key`,
-                            publicKeyMultibase: Hashing.multibase.encode(privateKey.publicKey.toBytes()),
+                            publicKeyBase58: Hashing.base58.encode(privateKey.publicKey.toBytes()),
                             type: "Ed25519VerificationKey2018",
                         },
                     ],
