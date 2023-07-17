@@ -3,8 +3,8 @@ import { DidError, Hashing, HcsDid } from "../../dist";
 
 const TOPIC_REGEXP = /^0\.0\.[0-9]{3,}/;
 
-const OPERATOR_ID = process.env.OPERATOR_ID;
-const OPERATOR_KEY = process.env.OPERATOR_KEY;
+const OPERATOR_ID = <string>process.env.OPERATOR_ID;
+const OPERATOR_KEY = <string>process.env.OPERATOR_KEY;
 // testnet, previewnet, mainnet
 const NETWORK = "testnet";
 
@@ -18,12 +18,16 @@ function delay(time) {
 describe("HcsDid", () => {
     let client;
 
-    beforeAll(async () => {
+    beforeEach(async () => {
         const operatorId = AccountId.fromString(OPERATOR_ID);
         const operatorKey = PrivateKey.fromString(OPERATOR_KEY);
         client = Client.forTestnet({ scheduleNetworkUpdate: false });
         client.setMirrorNetwork(MIRROR_PROVIDER);
         client.setOperator(operatorId, operatorKey);
+    });
+
+    afterEach(() => {
+        client.close();
     });
 
     describe("#register", () => {
@@ -33,7 +37,7 @@ describe("HcsDid", () => {
 
             await did.register();
 
-            let error = null;
+            let error;
             try {
                 await did.register();
             } catch (err) {
@@ -47,7 +51,7 @@ describe("HcsDid", () => {
             const privateKey = PrivateKey.generate();
             const did = new HcsDid({ privateKey });
 
-            let error = null;
+            let error;
             try {
                 await did.register();
             } catch (err) {
@@ -109,7 +113,7 @@ describe("HcsDid", () => {
             const privateKey = PrivateKey.generate();
             const did = new HcsDid({ privateKey, client });
 
-            let error = null;
+            let error;
             try {
                 await did.resolve();
             } catch (err) {
@@ -123,7 +127,7 @@ describe("HcsDid", () => {
             const identifier = "did:hedera:testnet:z6MkgUv5CvjRP6AsvEYqSRN7djB6p4zK9bcMQ93g5yK6Td7N_0.0.29613327";
             const did = new HcsDid({ identifier });
 
-            let error = null;
+            let error;
             try {
                 await did.resolve();
             } catch (err) {
@@ -153,7 +157,7 @@ describe("HcsDid", () => {
                     {
                         controller: did.getIdentifier(),
                         id: `${did.getIdentifier()}#did-root-key`,
-                        publicKeyMultibase: Hashing.multibase.encode(privateKey.publicKey.toBytes()),
+                        publicKeyBase58: Hashing.base58.encode(privateKey.publicKey.toBytes()),
                         type: "Ed25519VerificationKey2018",
                     },
                 ],
@@ -164,7 +168,7 @@ describe("HcsDid", () => {
     describe("#delete", () => {
         it("throws error if DID is not registered", async () => {
             const did = new HcsDid({ privateKey: PrivateKey.fromString(OPERATOR_KEY), client });
-            let error = null;
+            let error;
             try {
                 await did.delete();
             } catch (err) {
@@ -177,7 +181,7 @@ describe("HcsDid", () => {
         it("throws error if instance has no privateKey assigned", async () => {
             const identifier = "did:hedera:testnet:z6MkgUv5CvjRP6AsvEYqSRN7djB6p4zK9bcMQ93g5yK6Td7N_0.0.29613327";
             const did = new HcsDid({ identifier, client });
-            let error = null;
+            let error;
             try {
                 await did.delete();
             } catch (err) {
@@ -190,7 +194,7 @@ describe("HcsDid", () => {
         it("throws error if instance has no client assigned", async () => {
             const identifier = "did:hedera:testnet:z6MkgUv5CvjRP6AsvEYqSRN7djB6p4zK9bcMQ93g5yK6Td7N_0.0.29613327";
             const did = new HcsDid({ identifier, privateKey: PrivateKey.fromString(OPERATOR_KEY) });
-            let error = null;
+            let error;
             try {
                 await did.delete();
             } catch (err) {
@@ -218,7 +222,7 @@ describe("HcsDid", () => {
                     {
                         controller: did.getIdentifier(),
                         id: `${did.getIdentifier()}#did-root-key`,
-                        publicKeyMultibase: Hashing.multibase.encode(didPrivateKey.publicKey.toBytes()),
+                        publicKeyBase58: Hashing.base58.encode(didPrivateKey.publicKey.toBytes()),
                         type: "Ed25519VerificationKey2018",
                     },
                 ],
@@ -248,7 +252,7 @@ describe("HcsDid", () => {
             const didPrivateKey = PrivateKey.generate();
             const did = new HcsDid({ privateKey: didPrivateKey, client: client });
 
-            let error = null;
+            let error;
             try {
                 await did.changeOwner({
                     controller: newOwnerIdentifier,
@@ -267,7 +271,7 @@ describe("HcsDid", () => {
                 client: client,
             });
 
-            let error = null;
+            let error;
             try {
                 await did.changeOwner({
                     controller: newOwnerIdentifier,
@@ -287,7 +291,7 @@ describe("HcsDid", () => {
                 privateKey: didPrivateKey,
             });
 
-            let error = null;
+            let error;
             try {
                 await did.changeOwner({
                     controller: newOwnerIdentifier,
@@ -308,11 +312,11 @@ describe("HcsDid", () => {
                 client: client,
             });
 
-            let error = null;
+            let error;
             try {
                 await did.changeOwner({
                     controller: newOwnerIdentifier,
-                    newPrivateKey: null,
+                    newPrivateKey: <any>null,
                 });
             } catch (err) {
                 error = err;
@@ -351,7 +355,7 @@ describe("HcsDid", () => {
                     {
                         controller: newOwnerIdentifier,
                         id: `${did.getIdentifier()}#did-root-key`,
-                        publicKeyMultibase: Hashing.multibase.encode(newDidPrivateKey.publicKey.toBytes()),
+                        publicKeyBase58: Hashing.base58.encode(newDidPrivateKey.publicKey.toBytes()),
                         type: "Ed25519VerificationKey2018",
                     },
                 ],
@@ -364,9 +368,9 @@ describe("HcsDid", () => {
             const identifier = "did:hedera:testnet:z6MkgUv5CvjRP6AsvEYqSRN7djB6p4zK9bcMQ93g5yK6Td7N_0.0.29613327";
             const did = new HcsDid({ identifier });
 
-            let error = null;
+            let error;
             try {
-                await did.addService({ id: null, type: null, serviceEndpoint: null });
+                await did.addService(<any>{ id: null, type: null, serviceEndpoint: null });
             } catch (err) {
                 error = err;
             }
@@ -378,9 +382,9 @@ describe("HcsDid", () => {
             const privateKey = PrivateKey.generate();
             const did = new HcsDid({ privateKey });
 
-            let error = null;
+            let error;
             try {
-                await did.addService({ id: null, type: null, serviceEndpoint: null });
+                await did.addService(<any>{ id: null, type: null, serviceEndpoint: null });
             } catch (err) {
                 error = err;
             }
@@ -392,9 +396,9 @@ describe("HcsDid", () => {
             const privateKey = PrivateKey.generate();
             const did = new HcsDid({ privateKey, client });
 
-            let error = null;
+            let error;
             try {
-                await did.addService({ id: null, type: null, serviceEndpoint: null });
+                await did.addService(<any>{ id: null, type: null, serviceEndpoint: null });
             } catch (err) {
                 error = err;
             }
@@ -406,7 +410,7 @@ describe("HcsDid", () => {
             const privateKey = PrivateKey.fromString(OPERATOR_KEY);
             const did = new HcsDid({ privateKey, client });
 
-            let error = null;
+            let error;
             try {
                 await did.register();
                 await did.addService({
@@ -448,7 +452,7 @@ describe("HcsDid", () => {
                     {
                         controller: did.getIdentifier(),
                         id: `${did.getIdentifier()}#did-root-key`,
-                        publicKeyMultibase: Hashing.multibase.encode(privateKey.publicKey.toBytes()),
+                        publicKeyBase58: Hashing.base58.encode(privateKey.publicKey.toBytes()),
                         type: "Ed25519VerificationKey2018",
                     },
                 ],
@@ -497,7 +501,7 @@ describe("HcsDid", () => {
                     {
                         controller: did.getIdentifier(),
                         id: `${did.getIdentifier()}#did-root-key`,
-                        publicKeyMultibase: Hashing.multibase.encode(privateKey.publicKey.toBytes()),
+                        publicKeyBase58: Hashing.base58.encode(privateKey.publicKey.toBytes()),
                         type: "Ed25519VerificationKey2018",
                     },
                 ],
@@ -543,7 +547,7 @@ describe("HcsDid", () => {
                     {
                         controller: did.getIdentifier(),
                         id: `${did.getIdentifier()}#did-root-key`,
-                        publicKeyMultibase: Hashing.multibase.encode(privateKey.publicKey.toBytes()),
+                        publicKeyBase58: Hashing.base58.encode(privateKey.publicKey.toBytes()),
                         type: "Ed25519VerificationKey2018",
                     },
                 ],
@@ -588,7 +592,7 @@ describe("HcsDid", () => {
                     {
                         controller: did.getIdentifier(),
                         id: `${did.getIdentifier()}#did-root-key`,
-                        publicKeyMultibase: Hashing.multibase.encode(privateKey.publicKey.toBytes()),
+                        publicKeyBase58: Hashing.base58.encode(privateKey.publicKey.toBytes()),
                         type: "Ed25519VerificationKey2018",
                     },
                 ],
@@ -610,9 +614,9 @@ describe("HcsDid", () => {
             const identifier = "did:hedera:testnet:z6MkgUv5CvjRP6AsvEYqSRN7djB6p4zK9bcMQ93g5yK6Td7N_0.0.29613327";
             const did = new HcsDid({ identifier });
 
-            let error = null;
+            let error;
             try {
-                await did.addVerificationMethod({ id: null, type: null, controller: null, publicKey: null });
+                await did.addVerificationMethod(<any>{ id: null, type: null, controller: null, publicKey: null });
             } catch (err) {
                 error = err;
             }
@@ -624,9 +628,9 @@ describe("HcsDid", () => {
             const privateKey = PrivateKey.generate();
             const did = new HcsDid({ privateKey });
 
-            let error = null;
+            let error;
             try {
-                await did.addVerificationMethod({ id: null, type: null, controller: null, publicKey: null });
+                await did.addVerificationMethod(<any>{ id: null, type: null, controller: null, publicKey: null });
             } catch (err) {
                 error = err;
             }
@@ -638,9 +642,9 @@ describe("HcsDid", () => {
             const privateKey = PrivateKey.generate();
             const did = new HcsDid({ privateKey, client });
 
-            let error = null;
+            let error;
             try {
-                await did.addVerificationMethod({ id: null, type: null, controller: null, publicKey: null });
+                await did.addVerificationMethod(<any>{ id: null, type: null, controller: null, publicKey: null });
             } catch (err) {
                 error = err;
             }
@@ -685,13 +689,13 @@ describe("HcsDid", () => {
                     {
                         controller: did.getIdentifier(),
                         id: `${did.getIdentifier()}#did-root-key`,
-                        publicKeyMultibase: Hashing.multibase.encode(privateKey.publicKey.toBytes()),
+                        publicKeyBase58: Hashing.base58.encode(privateKey.publicKey.toBytes()),
                         type: "Ed25519VerificationKey2018",
                     },
                     {
                         controller: did.getIdentifier(),
                         id: newVerificationDid,
-                        publicKeyMultibase: Hashing.multibase.encode(publicKey.toBytes()),
+                        publicKeyBase58: Hashing.base58.encode(publicKey.toBytes()),
                         type: "Ed25519VerificationKey2018",
                     },
                 ],
@@ -745,13 +749,13 @@ describe("HcsDid", () => {
                     {
                         controller: did.getIdentifier(),
                         id: `${did.getIdentifier()}#did-root-key`,
-                        publicKeyMultibase: Hashing.multibase.encode(privateKey.publicKey.toBytes()),
+                        publicKeyBase58: Hashing.base58.encode(privateKey.publicKey.toBytes()),
                         type: "Ed25519VerificationKey2018",
                     },
                     {
                         controller: did.getIdentifier(),
                         id: newVerificationDid,
-                        publicKeyMultibase: Hashing.multibase.encode(updatePublicKey.toBytes()),
+                        publicKeyBase58: Hashing.base58.encode(updatePublicKey.toBytes()),
                         type: "Ed25519VerificationKey2018",
                     },
                 ],
@@ -800,7 +804,7 @@ describe("HcsDid", () => {
                     {
                         controller: did.getIdentifier(),
                         id: `${did.getIdentifier()}#did-root-key`,
-                        publicKeyMultibase: Hashing.multibase.encode(privateKey.publicKey.toBytes()),
+                        publicKeyBase58: Hashing.base58.encode(privateKey.publicKey.toBytes()),
                         type: "Ed25519VerificationKey2018",
                     },
                 ],
@@ -816,9 +820,9 @@ describe("HcsDid", () => {
             const identifier = "did:hedera:testnet:z6MkgUv5CvjRP6AsvEYqSRN7djB6p4zK9bcMQ93g5yK6Td7N_0.0.29613327";
             const did = new HcsDid({ identifier });
 
-            let error = null;
+            let error;
             try {
-                await did.addVerificationRelationship({
+                await did.addVerificationRelationship(<any>{
                     id: null,
                     relationshipType: null,
                     type: null,
@@ -836,9 +840,9 @@ describe("HcsDid", () => {
             const privateKey = PrivateKey.generate();
             const did = new HcsDid({ privateKey });
 
-            let error = null;
+            let error;
             try {
-                await did.addVerificationRelationship({
+                await did.addVerificationRelationship(<any>{
                     id: null,
                     relationshipType: null,
                     type: null,
@@ -856,9 +860,9 @@ describe("HcsDid", () => {
             const privateKey = PrivateKey.generate();
             const did = new HcsDid({ privateKey, client });
 
-            let error = null;
+            let error;
             try {
-                await did.addVerificationRelationship({
+                await did.addVerificationRelationship(<any>{
                     id: null,
                     relationshipType: null,
                     type: null,
@@ -905,13 +909,13 @@ describe("HcsDid", () => {
                     {
                         controller: did.getIdentifier(),
                         id: `${did.getIdentifier()}#did-root-key`,
-                        publicKeyMultibase: Hashing.multibase.encode(privateKey.publicKey.toBytes()),
+                        publicKeyBase58: Hashing.base58.encode(privateKey.publicKey.toBytes()),
                         type: "Ed25519VerificationKey2018",
                     },
                     {
                         controller: did.getIdentifier(),
                         id: newVerificationDid,
-                        publicKeyMultibase: Hashing.multibase.encode(publicKey.toBytes()),
+                        publicKeyBase58: Hashing.base58.encode(publicKey.toBytes()),
                         type: "Ed25519VerificationKey2018",
                     },
                 ],
@@ -965,13 +969,13 @@ describe("HcsDid", () => {
                     {
                         controller: did.getIdentifier(),
                         id: `${did.getIdentifier()}#did-root-key`,
-                        publicKeyMultibase: Hashing.multibase.encode(privateKey.publicKey.toBytes()),
+                        publicKeyBase58: Hashing.base58.encode(privateKey.publicKey.toBytes()),
                         type: "Ed25519VerificationKey2018",
                     },
                     {
                         controller: did.getIdentifier(),
                         id: newVerificationDid,
-                        publicKeyMultibase: Hashing.multibase.encode(updatePublicKey.toBytes()),
+                        publicKeyBase58: Hashing.base58.encode(updatePublicKey.toBytes()),
                         type: "Ed25519VerificationKey2018",
                     },
                 ],
@@ -1017,7 +1021,7 @@ describe("HcsDid", () => {
                     {
                         controller: did.getIdentifier(),
                         id: `${did.getIdentifier()}#did-root-key`,
-                        publicKeyMultibase: Hashing.multibase.encode(privateKey.publicKey.toBytes()),
+                        publicKeyBase58: Hashing.base58.encode(privateKey.publicKey.toBytes()),
                         type: "Ed25519VerificationKey2018",
                     },
                 ],
