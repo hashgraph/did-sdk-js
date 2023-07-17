@@ -14,9 +14,9 @@ describe("HcsDidRevokeVerificationMethodEvent", () => {
         });
 
         it("throws error if id is null", () => {
-            let error = null;
+            let error;
             try {
-                new HcsDidRevokeVerificationMethodEvent(null);
+                new HcsDidRevokeVerificationMethodEvent("");
             } catch (err) {
                 error = err;
             }
@@ -26,7 +26,7 @@ describe("HcsDidRevokeVerificationMethodEvent", () => {
         });
 
         it("throws error if id is not valid", () => {
-            let error = null;
+            let error;
             try {
                 new HcsDidRevokeVerificationMethodEvent(identifier);
             } catch (err) {
