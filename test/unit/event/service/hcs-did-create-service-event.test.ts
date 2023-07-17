@@ -18,9 +18,9 @@ describe("HcsDidCreateServiceEvent", () => {
         });
 
         it("throws error if id is null", () => {
-            let error = null;
+            let error;
             try {
-                new HcsDidCreateServiceEvent(null, "DIDCommMessaging", "https://vc.test.service.com");
+                new HcsDidCreateServiceEvent(<any>null, "DIDCommMessaging", "https://vc.test.service.com");
             } catch (err) {
                 error = err;
             }
@@ -30,9 +30,9 @@ describe("HcsDidCreateServiceEvent", () => {
         });
 
         it("throws error if type is null", () => {
-            let error = null;
+            let error;
             try {
-                new HcsDidCreateServiceEvent(identifier + "#service-1", null, "https://vc.test.service.com");
+                new HcsDidCreateServiceEvent(identifier + "#service-1", <any>null, "https://vc.test.service.com");
             } catch (err) {
                 error = err;
             }
@@ -42,9 +42,9 @@ describe("HcsDidCreateServiceEvent", () => {
         });
 
         it("throws error if serviceEndpoint is null", () => {
-            let error = null;
+            let error;
             try {
-                new HcsDidCreateServiceEvent(identifier + "#service-1", "DIDCommMessaging", null);
+                new HcsDidCreateServiceEvent(identifier + "#service-1", "DIDCommMessaging", <any>null);
             } catch (err) {
                 error = err;
             }
@@ -54,7 +54,7 @@ describe("HcsDidCreateServiceEvent", () => {
         });
 
         it("throws error if id is not valid", () => {
-            let error = null;
+            let error;
             try {
                 new HcsDidCreateServiceEvent(identifier, "DIDCommMessaging", "https://vc.test.service.com");
             } catch (err) {

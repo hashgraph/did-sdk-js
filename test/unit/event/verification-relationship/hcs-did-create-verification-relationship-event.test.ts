@@ -20,10 +20,10 @@ describe("HcsDidCreateVerificationRelationshipEvent", () => {
         });
 
         it("throws error if id is null", () => {
-            let error = null;
+            let error;
             try {
                 new HcsDidCreateVerificationRelationshipEvent(
-                    null,
+                    <any>null,
                     "authentication",
                     "Ed25519VerificationKey2018",
                     identifier,
@@ -38,11 +38,11 @@ describe("HcsDidCreateVerificationRelationshipEvent", () => {
         });
 
         it("throws error if relationshipType is null", () => {
-            let error = null;
+            let error;
             try {
                 new HcsDidCreateVerificationRelationshipEvent(
                     identifier + "#key-1",
-                    null,
+                    <any>null,
                     "Ed25519VerificationKey2018",
                     identifier,
                     privateKey.publicKey
@@ -56,12 +56,12 @@ describe("HcsDidCreateVerificationRelationshipEvent", () => {
         });
 
         it("throws error if type is null", () => {
-            let error = null;
+            let error;
             try {
                 new HcsDidCreateVerificationRelationshipEvent(
                     identifier + "#key-1",
                     "authentication",
-                    null,
+                    <any>null,
                     identifier,
                     privateKey.publicKey
                 );
@@ -74,13 +74,13 @@ describe("HcsDidCreateVerificationRelationshipEvent", () => {
         });
 
         it("throws error if controller is null", () => {
-            let error = null;
+            let error;
             try {
                 new HcsDidCreateVerificationRelationshipEvent(
                     identifier + "#key-1",
                     "authentication",
                     "Ed25519VerificationKey2018",
-                    null,
+                    <any>null,
                     privateKey.publicKey
                 );
             } catch (err) {
@@ -92,14 +92,14 @@ describe("HcsDidCreateVerificationRelationshipEvent", () => {
         });
 
         it("throws error if publicKey is null", () => {
-            let error = null;
+            let error;
             try {
                 new HcsDidCreateVerificationRelationshipEvent(
                     identifier + "#key-1",
                     "authentication",
                     "Ed25519VerificationKey2018",
                     identifier,
-                    null
+                    <any>null
                 );
             } catch (err) {
                 error = err;
@@ -110,7 +110,7 @@ describe("HcsDidCreateVerificationRelationshipEvent", () => {
         });
 
         it("throws error if id is not valid", () => {
-            let error = null;
+            let error;
             try {
                 new HcsDidCreateVerificationRelationshipEvent(
                     identifier,
@@ -162,16 +162,16 @@ describe("HcsDidCreateVerificationRelationshipEvent", () => {
         });
     });
 
-    describe("#getPublicKeyMultibase", () => {
+    describe("#getPublicKeyBase58", () => {
         it("returns public key base58 encoded", () => {
-            expect(event.getPublicKeyMultibase()).toEqual("zAEExD23v9wrEUVHKvb7tiJmAMGCqHoxW8yqWNyFw3SXC");
+            expect(event.getPublicKeyBase58()).toEqual("AEExD23v9wrEUVHKvb7tiJmAMGCqHoxW8yqWNyFw3SXC");
         });
     });
 
     describe("#getBase64", () => {
         it("returns event data encoded in base64", () => {
             expect(event.getBase64()).toEqual(
-                "eyJWZXJpZmljYXRpb25SZWxhdGlvbnNoaXAiOnsiaWQiOiJkaWQ6aGVkZXJhOnRlc3RuZXQ6ekFFRXhEMjN2OXdyRVVWSEt2Yjd0aUptQU1HQ3FIb3hXOHlxV055RnczU1hDXzAuMC4yOTYxMzMyNyNrZXktMSIsInJlbGF0aW9uc2hpcFR5cGUiOiJhdXRoZW50aWNhdGlvbiIsInR5cGUiOiJFZDI1NTE5VmVyaWZpY2F0aW9uS2V5MjAxOCIsImNvbnRyb2xsZXIiOiJkaWQ6aGVkZXJhOnRlc3RuZXQ6ekFFRXhEMjN2OXdyRVVWSEt2Yjd0aUptQU1HQ3FIb3hXOHlxV055RnczU1hDXzAuMC4yOTYxMzMyNyIsInB1YmxpY0tleU11bHRpYmFzZSI6InpBRUV4RDIzdjl3ckVVVkhLdmI3dGlKbUFNR0NxSG94Vzh5cVdOeUZ3M1NYQyJ9fQ=="
+                "eyJWZXJpZmljYXRpb25SZWxhdGlvbnNoaXAiOnsiaWQiOiJkaWQ6aGVkZXJhOnRlc3RuZXQ6ekFFRXhEMjN2OXdyRVVWSEt2Yjd0aUptQU1HQ3FIb3hXOHlxV055RnczU1hDXzAuMC4yOTYxMzMyNyNrZXktMSIsInJlbGF0aW9uc2hpcFR5cGUiOiJhdXRoZW50aWNhdGlvbiIsInR5cGUiOiJFZDI1NTE5VmVyaWZpY2F0aW9uS2V5MjAxOCIsImNvbnRyb2xsZXIiOiJkaWQ6aGVkZXJhOnRlc3RuZXQ6ekFFRXhEMjN2OXdyRVVWSEt2Yjd0aUptQU1HQ3FIb3hXOHlxV055RnczU1hDXzAuMC4yOTYxMzMyNyIsInB1YmxpY0tleUJhc2U1OCI6IkFFRXhEMjN2OXdyRVVWSEt2Yjd0aUptQU1HQ3FIb3hXOHlxV055RnczU1hDIn19"
             );
         });
     });
@@ -182,7 +182,7 @@ describe("HcsDidCreateVerificationRelationshipEvent", () => {
                 VerificationRelationship: {
                     controller: "did:hedera:testnet:zAEExD23v9wrEUVHKvb7tiJmAMGCqHoxW8yqWNyFw3SXC_0.0.29613327",
                     id: "did:hedera:testnet:zAEExD23v9wrEUVHKvb7tiJmAMGCqHoxW8yqWNyFw3SXC_0.0.29613327#key-1",
-                    publicKeyMultibase: "zAEExD23v9wrEUVHKvb7tiJmAMGCqHoxW8yqWNyFw3SXC",
+                    publicKeyBase58: "AEExD23v9wrEUVHKvb7tiJmAMGCqHoxW8yqWNyFw3SXC",
                     relationshipType: "authentication",
                     type: "Ed25519VerificationKey2018",
                 },
@@ -193,7 +193,7 @@ describe("HcsDidCreateVerificationRelationshipEvent", () => {
     describe("#toJSON", () => {
         it("returns stringified JSON structure version", () => {
             expect(event.toJSON()).toEqual(
-                '{"VerificationRelationship":{"id":"did:hedera:testnet:zAEExD23v9wrEUVHKvb7tiJmAMGCqHoxW8yqWNyFw3SXC_0.0.29613327#key-1","relationshipType":"authentication","type":"Ed25519VerificationKey2018","controller":"did:hedera:testnet:zAEExD23v9wrEUVHKvb7tiJmAMGCqHoxW8yqWNyFw3SXC_0.0.29613327","publicKeyMultibase":"zAEExD23v9wrEUVHKvb7tiJmAMGCqHoxW8yqWNyFw3SXC"}}'
+                '{"VerificationRelationship":{"id":"did:hedera:testnet:zAEExD23v9wrEUVHKvb7tiJmAMGCqHoxW8yqWNyFw3SXC_0.0.29613327#key-1","relationshipType":"authentication","type":"Ed25519VerificationKey2018","controller":"did:hedera:testnet:zAEExD23v9wrEUVHKvb7tiJmAMGCqHoxW8yqWNyFw3SXC_0.0.29613327","publicKeyBase58":"AEExD23v9wrEUVHKvb7tiJmAMGCqHoxW8yqWNyFw3SXC"}}'
             );
         });
     });
@@ -203,7 +203,7 @@ describe("HcsDidCreateVerificationRelationshipEvent", () => {
             const eventFromJson = HcsDidCreateVerificationRelationshipEvent.fromJsonTree({
                 controller: "did:hedera:testnet:zAEExD23v9wrEUVHKvb7tiJmAMGCqHoxW8yqWNyFw3SXC_0.0.29613327",
                 id: "did:hedera:testnet:zAEExD23v9wrEUVHKvb7tiJmAMGCqHoxW8yqWNyFw3SXC_0.0.29613327#key-1",
-                publicKeyMultibase: "zAEExD23v9wrEUVHKvb7tiJmAMGCqHoxW8yqWNyFw3SXC",
+                publicKeyBase58: "AEExD23v9wrEUVHKvb7tiJmAMGCqHoxW8yqWNyFw3SXC",
                 relationshipType: "authentication",
                 type: "Ed25519VerificationKey2018",
             });
@@ -213,7 +213,7 @@ describe("HcsDidCreateVerificationRelationshipEvent", () => {
                 VerificationRelationship: {
                     controller: "did:hedera:testnet:zAEExD23v9wrEUVHKvb7tiJmAMGCqHoxW8yqWNyFw3SXC_0.0.29613327",
                     id: "did:hedera:testnet:zAEExD23v9wrEUVHKvb7tiJmAMGCqHoxW8yqWNyFw3SXC_0.0.29613327#key-1",
-                    publicKeyMultibase: "zAEExD23v9wrEUVHKvb7tiJmAMGCqHoxW8yqWNyFw3SXC",
+                    publicKeyBase58: "AEExD23v9wrEUVHKvb7tiJmAMGCqHoxW8yqWNyFw3SXC",
                     relationshipType: "authentication",
                     type: "Ed25519VerificationKey2018",
                 },
