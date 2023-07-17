@@ -5,11 +5,6 @@ const TOPIC_REGEXP = /^0\.0\.[0-9]{3,}/;
 
 const OPERATOR_ID = <string>process.env.OPERATOR_ID;
 const OPERATOR_KEY = <string>process.env.OPERATOR_KEY;
-// testnet, previewnet, mainnet
-const NETWORK = "testnet";
-
-// hedera
-const MIRROR_PROVIDER = ["hcs." + NETWORK + ".mirrornode.hedera.com:5600"];
 
 function delay(time) {
     return new Promise((resolve) => setTimeout(resolve, time));
@@ -22,7 +17,6 @@ describe("HcsDid", () => {
         const operatorId = AccountId.fromString(OPERATOR_ID);
         const operatorKey = PrivateKey.fromString(OPERATOR_KEY);
         client = Client.forTestnet({ scheduleNetworkUpdate: false });
-        client.setMirrorNetwork(MIRROR_PROVIDER);
         client.setOperator(operatorId, operatorKey);
     });
 
