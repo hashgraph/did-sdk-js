@@ -1,13 +1,12 @@
 import { AccountId, Client, PrivateKey } from "@hashgraph/sdk";
 import { Resolver } from "did-resolver";
 import { Hashing, HcsDid, HederaDidResolver } from "../../dist";
+import { delayUntil } from "../utils";
 
 const OPERATOR_ID = <string>process.env.OPERATOR_ID;
 const OPERATOR_KEY = <string>process.env.OPERATOR_KEY;
 
-function delay(time) {
-    return new Promise((resolve) => setTimeout(resolve, time));
-}
+const WAIT_BEFORE_RESOLVE_DID_FOR = parseInt(<string>process.env.WAIT_BEFORE_RESOLVE_DID_FOR);
 
 describe("HederaDidResolver", () => {
     let client;
@@ -75,13 +74,17 @@ describe("HederaDidResolver", () => {
                 serviceEndpoint: "https://example.com/vcs",
             });
 
-            await delay(process.env.WAIT_BEFORE_RESOLVE_DID_FOR);
-
             const resolver = new Resolver({
-                ...new HederaDidResolver(client).build(),
+                ...new HederaDidResolver().build(),
             });
 
-            let result = await resolver.resolve(did.getIdentifier());
+            let result: any;
+
+            await delayUntil(async () => {
+                result = await resolver.resolve(did.getIdentifier());
+                return result?.didDocument?.service?.length === 1;
+            }, WAIT_BEFORE_RESOLVE_DID_FOR);
+
             expect(result).toEqual({
                 didDocument: {
                     "@context": "https://www.w3.org/ns/did/v1",
@@ -122,13 +125,17 @@ describe("HederaDidResolver", () => {
             await did.register();
             await did.delete();
 
-            await delay(process.env.WAIT_BEFORE_RESOLVE_DID_FOR);
-
             const resolver = new Resolver({
                 ...new HederaDidResolver().build(),
             });
 
-            let result = await resolver.resolve(did.getIdentifier());
+            let result: any;
+
+            await delayUntil(async () => {
+                result = await resolver.resolve(did.getIdentifier());
+                return result?.didDocument?.verificationMethod?.length === 0;
+            }, WAIT_BEFORE_RESOLVE_DID_FOR);
+
             expect(result).toEqual({
                 didDocument: {
                     "@context": "https://www.w3.org/ns/did/v1",
