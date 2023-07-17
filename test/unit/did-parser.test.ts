@@ -4,7 +4,7 @@ import { DidParser, Hashing } from "../../dist";
 describe("DidParser", () => {
     it("throw an error when invalid did string provided", async () => {
         [
-            null,
+            "",
             "invalidDid1",
             "did:invalid",
             "did:invalidMethod:8LjUL78kFVnWV9rFnNCTE5bZdRmjm2obqJwS892jVLak_0.0.24352",

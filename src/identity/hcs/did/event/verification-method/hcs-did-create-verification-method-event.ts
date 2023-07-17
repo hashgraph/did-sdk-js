@@ -46,8 +46,8 @@ export class HcsDidCreateVerificationMethodEvent extends HcsDidEvent {
         return this.publicKey;
     }
 
-    public getPublicKeyMultibase() {
-        return Hashing.multibase.encode(this.getPublicKey().toBytes());
+    public getPublicKeyBase58() {
+        return Hashing.base58.encode(this.getPublicKey().toBytes());
     }
 
     public getVerificationMethodDef() {
@@ -55,7 +55,7 @@ export class HcsDidCreateVerificationMethodEvent extends HcsDidEvent {
             id: this.getId(),
             type: this.getType(),
             controller: this.getController(),
-            publicKeyMultibase: this.getPublicKeyMultibase(),
+            publicKeyBase58: this.getPublicKeyBase58(),
         };
     }
 
@@ -65,7 +65,7 @@ export class HcsDidCreateVerificationMethodEvent extends HcsDidEvent {
                 id: this.getId(),
                 type: this.getType(),
                 controller: this.getController(),
-                publicKeyMultibase: this.getPublicKeyMultibase(),
+                publicKeyBase58: this.getPublicKeyBase58(),
             },
         };
     }
@@ -75,7 +75,7 @@ export class HcsDidCreateVerificationMethodEvent extends HcsDidEvent {
     }
 
     static fromJsonTree(tree: any): HcsDidCreateVerificationMethodEvent {
-        const publicKey = PublicKey.fromBytes(Hashing.multibase.decode(tree?.publicKeyMultibase));
+        const publicKey = PublicKey.fromBytes(Hashing.base58.decode(tree?.publicKeyBase58));
         return new HcsDidCreateVerificationMethodEvent(tree?.id, tree?.type, tree?.controller, publicKey);
     }
 }
