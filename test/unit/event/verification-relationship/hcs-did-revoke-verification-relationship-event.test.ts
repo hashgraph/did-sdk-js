@@ -14,9 +14,9 @@ describe("HcsDidRevokeVerificationRelationshipEvent", () => {
         });
 
         it("throws error if id is null", () => {
-            let error = null;
+            let error;
             try {
-                new HcsDidRevokeVerificationRelationshipEvent(null, "authentication");
+                new HcsDidRevokeVerificationRelationshipEvent("", "authentication");
             } catch (err) {
                 error = err;
             }
@@ -26,9 +26,9 @@ describe("HcsDidRevokeVerificationRelationshipEvent", () => {
         });
 
         it("throws error if relationshipType is null", () => {
-            let error = null;
+            let error;
             try {
-                new HcsDidRevokeVerificationRelationshipEvent(identifier + "#key-1", null);
+                new HcsDidRevokeVerificationRelationshipEvent(identifier + "#key-1", <any>null);
             } catch (err) {
                 error = err;
             }
@@ -38,7 +38,7 @@ describe("HcsDidRevokeVerificationRelationshipEvent", () => {
         });
 
         it("throws error if id is not valid", () => {
-            let error = null;
+            let error;
             try {
                 new HcsDidRevokeVerificationRelationshipEvent(identifier, "authentication");
             } catch (err) {
