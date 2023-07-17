@@ -1,14 +1,13 @@
-import { AccountId, Client, PrivateKey, Timestamp, TopicMessage, TopicMessageQuery } from "@hashgraph/sdk";
+import { AccountId, Client, PrivateKey } from "@hashgraph/sdk";
 import { DidError, Hashing, HcsDid } from "../../dist";
+import { delayUntil, readTopicMessages } from "../utils";
 
 const TOPIC_REGEXP = /^0\.0\.[0-9]{3,}/;
 
 const OPERATOR_ID = <string>process.env.OPERATOR_ID;
 const OPERATOR_KEY = <string>process.env.OPERATOR_KEY;
 
-function delay(time) {
-    return new Promise((resolve) => setTimeout(resolve, time));
-}
+const WAIT_BEFORE_RESOLVE_DID_FOR = parseInt(<string>process.env.WAIT_BEFORE_RESOLVE_DID_FOR);
 
 describe("HcsDid", () => {
     let client;
@@ -73,6 +72,12 @@ describe("HcsDid", () => {
             expect(did.getClient()).toEqual(client);
             expect(did.getNetwork()).toEqual("testnet");
 
+            await delayUntil(async () => {
+                const didDoc = await did.resolve();
+                const didDocument = didDoc.toJsonTree();
+                return didDocument?.verificationMethod?.length === 1;
+            }, WAIT_BEFORE_RESOLVE_DID_FOR);
+
             const messages = await readTopicMessages(did.getTopicId(), client);
 
             expect(messages.length).toEqual(1);
@@ -85,17 +90,35 @@ describe("HcsDid", () => {
             await did.register();
             const topicId = did.getTopicId();
 
+            await delayUntil(async () => {
+                const didDoc = await did.resolve();
+                const didDocument = didDoc.toJsonTree();
+                return didDocument?.verificationMethod?.length === 1;
+            }, WAIT_BEFORE_RESOLVE_DID_FOR);
+
             let messages = await readTopicMessages(did.getTopicId(), client);
             expect(messages.length).toEqual(1);
 
             await did.delete();
             expect(did.getTopicId()).toEqual(topicId);
 
+            await delayUntil(async () => {
+                const didDoc = await did.resolve();
+                const didDocument = didDoc.toJsonTree();
+                return didDocument?.verificationMethod?.length === 0;
+            }, WAIT_BEFORE_RESOLVE_DID_FOR);
+
             messages = await readTopicMessages(did.getTopicId(), client);
             expect(messages.length).toEqual(2);
 
             await did.register();
             expect(did.getTopicId()).toEqual(topicId);
+
+            await delayUntil(async () => {
+                const didDoc = await did.resolve();
+                const didDocument = didDoc.toJsonTree();
+                return didDocument?.verificationMethod?.length === 1;
+            }, WAIT_BEFORE_RESOLVE_DID_FOR);
 
             messages = await readTopicMessages(did.getTopicId(), client);
             expect(messages.length).toEqual(3);
@@ -137,10 +160,13 @@ describe("HcsDid", () => {
 
             await did.register();
 
-            await delay(process.env.WAIT_BEFORE_RESOLVE_DID_FOR);
+            let didDocument: any;
 
-            const didDoc = await did.resolve();
-            const didDocument = didDoc.toJsonTree();
+            await delayUntil(async () => {
+                const didDoc = await did.resolve();
+                didDocument = didDoc.toJsonTree();
+                return didDocument?.verificationMethod?.length > 0;
+            }, WAIT_BEFORE_RESOLVE_DID_FOR);
 
             expect(didDocument).toEqual({
                 "@context": "https://www.w3.org/ns/did/v1",
@@ -204,10 +230,15 @@ describe("HcsDid", () => {
 
             await did.register();
 
-            await delay(process.env.WAIT_BEFORE_RESOLVE_DID_FOR);
+            let didDocument: any;
 
-            let didJSON = (await did.resolve()).toJsonTree();
-            expect(didJSON).toEqual({
+            await delayUntil(async () => {
+                const didDoc = await did.resolve();
+                didDocument = didDoc.toJsonTree();
+                return didDocument?.verificationMethod?.length === 1;
+            }, WAIT_BEFORE_RESOLVE_DID_FOR);
+
+            expect(didDocument).toEqual({
                 "@context": "https://www.w3.org/ns/did/v1",
                 assertionMethod: [`${did.getIdentifier()}#did-root-key`],
                 authentication: [`${did.getIdentifier()}#did-root-key`],
@@ -224,17 +255,22 @@ describe("HcsDid", () => {
 
             await did.delete();
 
-            const messages = await readTopicMessages(did.getTopicId(), client);
-            expect(messages.length).toEqual(2);
+            await delayUntil(async () => {
+                const didDoc = await did.resolve();
+                didDocument = didDoc.toJsonTree();
+                return didDocument?.verificationMethod?.length === 0;
+            }, WAIT_BEFORE_RESOLVE_DID_FOR);
 
-            didJSON = (await did.resolve()).toJsonTree();
-            expect(didJSON).toEqual({
+            expect(didDocument).toEqual({
                 "@context": "https://www.w3.org/ns/did/v1",
                 assertionMethod: [],
                 authentication: [],
                 id: did.getIdentifier(),
                 verificationMethod: [],
             });
+
+            const messages = await readTopicMessages(did.getTopicId(), client);
+            expect(messages.length).toEqual(2);
         });
     });
 
@@ -334,12 +370,15 @@ describe("HcsDid", () => {
                 newPrivateKey: newDidPrivateKey,
             });
 
-            const messages = await readTopicMessages(did.getTopicId(), client);
-            expect(messages.length).toEqual(2);
+            let didDocument: any;
 
-            const doc = (await did.resolve()).toJsonTree();
+            await delayUntil(async () => {
+                const didDoc = await did.resolve();
+                didDocument = didDoc.toJsonTree();
+                return didDocument?.controller === newOwnerIdentifier;
+            }, WAIT_BEFORE_RESOLVE_DID_FOR);
 
-            expect(doc).toEqual({
+            expect(didDocument).toEqual({
                 "@context": "https://www.w3.org/ns/did/v1",
                 assertionMethod: [`${did.getIdentifier()}#did-root-key`],
                 authentication: [`${did.getIdentifier()}#did-root-key`],
@@ -354,6 +393,9 @@ describe("HcsDid", () => {
                     },
                 ],
             });
+
+            const messages = await readTopicMessages(did.getTopicId(), client);
+            expect(messages.length).toEqual(2);
         });
     });
 
@@ -430,12 +472,15 @@ describe("HcsDid", () => {
                 serviceEndpoint: "https://example.com/vcs",
             });
 
+            let didDocument: any;
+
+            await delayUntil(async () => {
+                const didDoc = await did.resolve();
+                didDocument = didDoc.toJsonTree();
+                return didDocument?.service?.length === 1;
+            }, WAIT_BEFORE_RESOLVE_DID_FOR);
+
             console.log(`https://testnet.dragonglass.me/hedera/topics/${did.getTopicId().toString()}`);
-
-            await delay(process.env.WAIT_BEFORE_RESOLVE_DID_FOR);
-
-            const didDoc = await did.resolve();
-            const didDocument = didDoc.toJsonTree();
 
             expect(didDocument).toEqual({
                 "@context": "https://www.w3.org/ns/did/v1",
@@ -479,12 +524,15 @@ describe("HcsDid", () => {
                 serviceEndpoint: "https://example.com/did",
             });
 
+            let didDocument: any;
+
+            await delayUntil(async () => {
+                const didDoc = await did.resolve();
+                didDocument = didDoc.toJsonTree();
+                return didDocument?.service?.length === 1;
+            }, WAIT_BEFORE_RESOLVE_DID_FOR);
+
             console.log(`https://testnet.dragonglass.me/hedera/topics/${did.getTopicId().toString()}`);
-
-            await delay(process.env.WAIT_BEFORE_RESOLVE_DID_FOR);
-
-            const didDoc = await did.resolve();
-            const didDocument = didDoc.toJsonTree();
 
             expect(didDocument).toEqual({
                 "@context": "https://www.w3.org/ns/did/v1",
@@ -525,12 +573,15 @@ describe("HcsDid", () => {
                 id: did.getIdentifier() + "#service-1",
             });
 
+            let didDocument: any;
+
+            await delayUntil(async () => {
+                const didDoc = await did.resolve();
+                didDocument = didDoc.toJsonTree();
+                return didDocument?.verificationMethod === 1 && !didDocument?.service;
+            }, WAIT_BEFORE_RESOLVE_DID_FOR);
+
             console.log(`https://testnet.dragonglass.me/hedera/topics/${did.getTopicId().toString()}`);
-
-            await delay(process.env.WAIT_BEFORE_RESOLVE_DID_FOR);
-
-            const didDoc = await did.resolve();
-            const didDocument = didDoc.toJsonTree();
 
             expect(didDocument).toEqual({
                 "@context": "https://www.w3.org/ns/did/v1",
@@ -570,12 +621,15 @@ describe("HcsDid", () => {
                 serviceEndpoint: "https://meeco.me/vijay",
             });
 
+            let didDocument: any;
+
+            await delayUntil(async () => {
+                const didDoc = await did.resolve();
+                didDocument = didDoc.toJsonTree();
+                return didDocument?.service?.length === 1;
+            }, WAIT_BEFORE_RESOLVE_DID_FOR);
+
             console.log(`https://testnet.dragonglass.me/hedera/topics/${did.getTopicId().toString()}`);
-
-            await delay(process.env.WAIT_BEFORE_RESOLVE_DID_FOR);
-
-            const didDoc = await did.resolve();
-            const didDocument = didDoc.toJsonTree();
 
             expect(didDocument).toEqual({
                 "@context": "https://www.w3.org/ns/did/v1",
@@ -663,16 +717,16 @@ describe("HcsDid", () => {
                 publicKey,
             });
 
-            /**
-             *  wait for 9s so DIDOwner and VerificationMethod event to be propagated to mirror node
-             */
-            await delay(process.env.WAIT_BEFORE_RESOLVE_DID_FOR);
+            let didDocument: any;
+
+            await delayUntil(async () => {
+                const didDoc = await did.resolve();
+                didDocument = didDoc.toJsonTree();
+                return didDocument?.verificationMethod?.length === 2;
+            }, WAIT_BEFORE_RESOLVE_DID_FOR);
 
             console.log(`${did.getIdentifier()}`);
             console.log(`https://testnet.dragonglass.me/hedera/topics/${did.getTopicId().toString()}`);
-
-            const didDoc = await did.resolve();
-            const didDocument = didDoc.toJsonTree();
 
             expect(didDocument).toEqual({
                 "@context": "https://www.w3.org/ns/did/v1",
@@ -723,16 +777,16 @@ describe("HcsDid", () => {
                 publicKey: updatePublicKey,
             });
 
-            /**
-             *  wait for 9s so DIDOwner and VerificationMethod event to be propagated to mirror node
-             */
-            await delay(process.env.WAIT_BEFORE_RESOLVE_DID_FOR);
+            let didDocument: any;
+
+            await delayUntil(async () => {
+                const didDoc = await did.resolve();
+                didDocument = didDoc.toJsonTree();
+                return didDocument?.verificationMethod?.length === 2;
+            }, WAIT_BEFORE_RESOLVE_DID_FOR);
 
             console.log(`${did.getIdentifier()}`);
             console.log(`https://testnet.dragonglass.me/hedera/topics/${did.getTopicId().toString()}`);
-
-            const didDoc = await did.resolve();
-            const didDocument = didDoc.toJsonTree();
 
             expect(didDocument).toEqual({
                 "@context": "https://www.w3.org/ns/did/v1",
@@ -778,16 +832,16 @@ describe("HcsDid", () => {
                 id: newVerificationDid,
             });
 
-            /**
-             *  wait for 9s so DIDOwner and VerificationMethod event to be propagated to mirror node
-             */
-            await delay(process.env.WAIT_BEFORE_RESOLVE_DID_FOR);
+            let didDocument: any;
+
+            await delayUntil(async () => {
+                const didDoc = await did.resolve();
+                didDocument = didDoc.toJsonTree();
+                return didDocument?.verificationMethod?.length === 1;
+            }, WAIT_BEFORE_RESOLVE_DID_FOR);
 
             console.log(`${did.getIdentifier()}`);
             console.log(`https://testnet.dragonglass.me/hedera/topics/${did.getTopicId().toString()}`);
-
-            const didDoc = await did.resolve();
-            const didDocument = didDoc.toJsonTree();
 
             expect(didDocument).toEqual({
                 "@context": "https://www.w3.org/ns/did/v1",
@@ -889,10 +943,13 @@ describe("HcsDid", () => {
                 publicKey,
             });
 
-            await delay(process.env.WAIT_BEFORE_RESOLVE_DID_FOR);
+            let didDocument: any;
 
-            const didDoc = await did.resolve();
-            const didDocument = didDoc.toJsonTree();
+            await delayUntil(async () => {
+                const didDoc = await did.resolve();
+                didDocument = didDoc.toJsonTree();
+                return didDocument?.authentication?.length === 2;
+            }, WAIT_BEFORE_RESOLVE_DID_FOR);
 
             expect(didDocument).toEqual({
                 "@context": "https://www.w3.org/ns/did/v1",
@@ -949,10 +1006,13 @@ describe("HcsDid", () => {
                 publicKey: updatePublicKey,
             });
 
-            await delay(process.env.WAIT_BEFORE_RESOLVE_DID_FOR);
+            let didDocument: any;
 
-            const didDoc = await did.resolve();
-            const didDocument = didDoc.toJsonTree();
+            await delayUntil(async () => {
+                const didDoc = await did.resolve();
+                didDocument = didDoc.toJsonTree();
+                return didDocument?.authentication?.length === 2;
+            }, WAIT_BEFORE_RESOLVE_DID_FOR);
 
             expect(didDocument).toEqual({
                 "@context": "https://www.w3.org/ns/did/v1",
@@ -1001,10 +1061,13 @@ describe("HcsDid", () => {
                 relationshipType: "authentication",
             });
 
-            await delay(process.env.WAIT_BEFORE_RESOLVE_DID_FOR);
+            let didDocument: any;
 
-            const didDoc = await did.resolve();
-            const didDocument = didDoc.toJsonTree();
+            await delayUntil(async () => {
+                const didDoc = await did.resolve();
+                didDocument = didDoc.toJsonTree();
+                return didDocument?.authentication?.length === 1;
+            }, WAIT_BEFORE_RESOLVE_DID_FOR);
 
             expect(didDocument).toEqual({
                 "@context": "https://www.w3.org/ns/did/v1",
@@ -1030,28 +1093,3 @@ describe("HcsDid", () => {
 /**
  * Test Helpers
  */
-
-async function readTopicMessages(topicId, client, timeout = null) {
-    const messages: TopicMessage[] = [];
-
-    const query = new TopicMessageQuery()
-        .setTopicId(topicId)
-        .setStartTime(new Timestamp(0, 0))
-        .setEndTime(Timestamp.fromDate(new Date()));
-
-    query.setMaxBackoff(2000);
-    query.setMaxAttempts(15);
-
-    const querySubcription = query.subscribe(client, null, (msg) => {
-        messages.push(msg);
-    });
-
-    /**
-     * wait for READ_MESSAGES_TIMEOUT seconds and assume all messages were read
-     */
-    await delay(timeout || process.env.WAIT_BEFORE_RESOLVE_DID_FOR);
-
-    querySubcription.unsubscribe();
-
-    return messages;
-}
