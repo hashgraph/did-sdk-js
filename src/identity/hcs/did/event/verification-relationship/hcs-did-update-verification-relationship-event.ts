@@ -4,7 +4,7 @@ import { HcsDidCreateVerificationRelationshipEvent } from "./hcs-did-create-veri
 
 export class HcsDidUpdateVerificationRelationshipEvent extends HcsDidCreateVerificationRelationshipEvent {
     static fromJsonTree(tree: any): HcsDidUpdateVerificationRelationshipEvent {
-        const publicKey = PublicKey.fromBytes(Hashing.multibase.decode(tree?.publicKeyMultibase));
+        const publicKey = PublicKey.fromBytes(Hashing.base58.decode(tree?.publicKeyBase58));
         return new HcsDidUpdateVerificationRelationshipEvent(
             tree?.id,
             tree?.relationshipType,
