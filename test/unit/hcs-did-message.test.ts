@@ -65,7 +65,7 @@ describe("HcsDidMessage", () => {
         const did = new HcsDid({ identifier: identifier, privateKey: privateKey, client: client });
 
         let message = new HcsDidMessage(
-            null,
+            <any>null,
             did.getIdentifier(),
             new HcsDidCreateDidOwnerEvent(
                 did.getIdentifier() + "#did-root-key",
@@ -79,7 +79,7 @@ describe("HcsDidMessage", () => {
 
         message = new HcsDidMessage(
             DidMethodOperation.CREATE,
-            null,
+            <any>null,
             new HcsDidCreateDidOwnerEvent(
                 did.getIdentifier() + "#did-root-key",
                 did.getIdentifier(),
@@ -90,7 +90,7 @@ describe("HcsDidMessage", () => {
         expect(message.getDid()).toEqual(null);
         expect(message.isValid()).toEqual(false);
 
-        message = new HcsDidMessage(DidMethodOperation.CREATE, did.getIdentifier(), null);
+        message = new HcsDidMessage(DidMethodOperation.CREATE, did.getIdentifier(), <any>null);
 
         expect(message.getEvent()).toEqual(null);
         expect(message.isValid()).toEqual(false);
