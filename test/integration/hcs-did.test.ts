@@ -30,6 +30,12 @@ describe("HcsDid", () => {
 
             await did.register();
 
+            await delayUntil(async () => {
+                const didDoc = await did.resolve();
+                const didDocument = didDoc.toJsonTree();
+                return didDocument?.verificationMethod?.length === 1;
+            }, WAIT_BEFORE_RESOLVE_DID_FOR);
+
             let error;
             try {
                 await did.register();
