@@ -36,7 +36,7 @@ describe("HcsDid", () => {
 
         it("throws error if passed identifier is invalid", () => {
             [
-                null,
+                "",
                 "invalidDid1",
                 "did:invalid",
                 "did:invalidMethod:8LjUL78kFVnWV9rFnNCTE5bZdRmjm2obqJwS892jVLak_0.0.24352",
@@ -69,7 +69,7 @@ describe("HcsDid", () => {
     });
     describe("#parseIdentifier", () => {
         it("throws error if topicId missing", () => {
-            let error = null;
+            let error;
             try {
                 HcsDid.parseIdentifier("did:hedera:testnet:z87meAWt7t2zrDxo7qw3PVTjexKWReYWS75LH29THy8kb");
             } catch (err) {
@@ -81,7 +81,7 @@ describe("HcsDid", () => {
         });
 
         it("throws error if invalid prefix", () => {
-            let error = null;
+            let error;
             try {
                 HcsDid.parseIdentifier("abcd:hedera:testnet:z87meAWt7t2zrDxo7qw3PVTjexKWReYWS75LH29THy8kb_0.0.1");
             } catch (err) {
@@ -93,7 +93,7 @@ describe("HcsDid", () => {
         });
 
         it("throws error if invalid method name", () => {
-            let error = null;
+            let error;
             try {
                 HcsDid.parseIdentifier("did:hashgraph:testnet:z87meAWt7t2zrDxo7qw3PVTjexKWReYWS75LH29THy8kb_0.0.1");
             } catch (err) {
@@ -105,7 +105,7 @@ describe("HcsDid", () => {
         });
 
         it("throws error if Invalid Hedera network", () => {
-            let error = null;
+            let error;
             try {
                 HcsDid.parseIdentifier("did:hedera:nonetwork:z87meAWt7t2zrDxo7qw3PVTjexKWReYWS75LH29THy8kb_0.0.1");
             } catch (err) {
@@ -117,7 +117,7 @@ describe("HcsDid", () => {
         });
 
         it("throws error if Invalid id string", () => {
-            let error = null;
+            let error;
             try {
                 HcsDid.parseIdentifier("did:hedera:testnet:z6Mkabcd_0.0.1");
             } catch (err) {
