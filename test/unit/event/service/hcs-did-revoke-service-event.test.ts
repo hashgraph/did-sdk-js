@@ -14,9 +14,9 @@ describe("HcsDidRevokeServiceEvent", () => {
         });
 
         it("throws error if id is null", () => {
-            let error = null;
+            let error;
             try {
-                new HcsDidRevokeServiceEvent(null);
+                new HcsDidRevokeServiceEvent("");
             } catch (err) {
                 error = err;
             }
@@ -26,7 +26,7 @@ describe("HcsDidRevokeServiceEvent", () => {
         });
 
         it("throws error if id is not valid", () => {
-            let error = null;
+            let error;
             try {
                 new HcsDidRevokeServiceEvent(identifier);
             } catch (err) {
