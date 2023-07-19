@@ -1,29 +1,26 @@
-import { AccountId, Client, PrivateKey, Timestamp, TopicMessage, TopicMessageQuery } from "@hashgraph/sdk";
+import { AccountId, Client, PrivateKey } from "@hashgraph/sdk";
 import { DidError, Hashing, HcsDid } from "../../dist";
+import { delayUntil, readTopicMessages } from "../utils";
 
 const TOPIC_REGEXP = /^0\.0\.[0-9]{3,}/;
 
-const OPERATOR_ID = process.env.OPERATOR_ID;
-const OPERATOR_KEY = process.env.OPERATOR_KEY;
-// testnet, previewnet, mainnet
-const NETWORK = "testnet";
+const OPERATOR_ID = <string>process.env.OPERATOR_ID;
+const OPERATOR_KEY = <string>process.env.OPERATOR_KEY;
 
-// hedera
-const MIRROR_PROVIDER = ["hcs." + NETWORK + ".mirrornode.hedera.com:5600"];
-
-function delay(time) {
-    return new Promise((resolve) => setTimeout(resolve, time));
-}
+const WAIT_BEFORE_RESOLVE_DID_FOR = parseInt(<string>process.env.WAIT_BEFORE_RESOLVE_DID_FOR);
 
 describe("HcsDid", () => {
     let client;
 
-    beforeAll(async () => {
+    beforeEach(async () => {
         const operatorId = AccountId.fromString(OPERATOR_ID);
         const operatorKey = PrivateKey.fromString(OPERATOR_KEY);
         client = Client.forTestnet({ scheduleNetworkUpdate: false });
-        client.setMirrorNetwork(MIRROR_PROVIDER);
         client.setOperator(operatorId, operatorKey);
+    });
+
+    afterEach(() => {
+        client.close();
     });
 
     describe("#register", () => {
@@ -33,7 +30,13 @@ describe("HcsDid", () => {
 
             await did.register();
 
-            let error = null;
+            await delayUntil(async () => {
+                const didDoc = await did.resolve();
+                const didDocument = didDoc.toJsonTree();
+                return didDocument?.verificationMethod?.length === 1;
+            }, WAIT_BEFORE_RESOLVE_DID_FOR);
+
+            let error;
             try {
                 await did.register();
             } catch (err) {
@@ -47,7 +50,7 @@ describe("HcsDid", () => {
             const privateKey = PrivateKey.generate();
             const did = new HcsDid({ privateKey });
 
-            let error = null;
+            let error;
             try {
                 await did.register();
             } catch (err) {
@@ -75,6 +78,12 @@ describe("HcsDid", () => {
             expect(did.getClient()).toEqual(client);
             expect(did.getNetwork()).toEqual("testnet");
 
+            await delayUntil(async () => {
+                const didDoc = await did.resolve();
+                const didDocument = didDoc.toJsonTree();
+                return didDocument?.verificationMethod?.length === 1;
+            }, WAIT_BEFORE_RESOLVE_DID_FOR);
+
             const messages = await readTopicMessages(did.getTopicId(), client);
 
             expect(messages.length).toEqual(1);
@@ -87,17 +96,35 @@ describe("HcsDid", () => {
             await did.register();
             const topicId = did.getTopicId();
 
+            await delayUntil(async () => {
+                const didDoc = await did.resolve();
+                const didDocument = didDoc.toJsonTree();
+                return didDocument?.verificationMethod?.length === 1;
+            }, WAIT_BEFORE_RESOLVE_DID_FOR);
+
             let messages = await readTopicMessages(did.getTopicId(), client);
             expect(messages.length).toEqual(1);
 
             await did.delete();
             expect(did.getTopicId()).toEqual(topicId);
 
+            await delayUntil(async () => {
+                const didDoc = await did.resolve();
+                const didDocument = didDoc.toJsonTree();
+                return didDocument?.verificationMethod?.length === 0;
+            }, WAIT_BEFORE_RESOLVE_DID_FOR);
+
             messages = await readTopicMessages(did.getTopicId(), client);
             expect(messages.length).toEqual(2);
 
             await did.register();
             expect(did.getTopicId()).toEqual(topicId);
+
+            await delayUntil(async () => {
+                const didDoc = await did.resolve();
+                const didDocument = didDoc.toJsonTree();
+                return didDocument?.verificationMethod?.length === 1;
+            }, WAIT_BEFORE_RESOLVE_DID_FOR);
 
             messages = await readTopicMessages(did.getTopicId(), client);
             expect(messages.length).toEqual(3);
@@ -109,7 +136,7 @@ describe("HcsDid", () => {
             const privateKey = PrivateKey.generate();
             const did = new HcsDid({ privateKey, client });
 
-            let error = null;
+            let error;
             try {
                 await did.resolve();
             } catch (err) {
@@ -123,7 +150,7 @@ describe("HcsDid", () => {
             const identifier = "did:hedera:testnet:z6MkgUv5CvjRP6AsvEYqSRN7djB6p4zK9bcMQ93g5yK6Td7N_0.0.29613327";
             const did = new HcsDid({ identifier });
 
-            let error = null;
+            let error;
             try {
                 await did.resolve();
             } catch (err) {
@@ -139,10 +166,13 @@ describe("HcsDid", () => {
 
             await did.register();
 
-            await delay(process.env.WAIT_BEFORE_RESOLVE_DID_FOR);
+            let didDocument: any;
 
-            const didDoc = await did.resolve();
-            const didDocument = didDoc.toJsonTree();
+            await delayUntil(async () => {
+                const didDoc = await did.resolve();
+                didDocument = didDoc.toJsonTree();
+                return didDocument?.verificationMethod?.length > 0;
+            }, WAIT_BEFORE_RESOLVE_DID_FOR);
 
             expect(didDocument).toEqual({
                 "@context": "https://www.w3.org/ns/did/v1",
@@ -153,7 +183,7 @@ describe("HcsDid", () => {
                     {
                         controller: did.getIdentifier(),
                         id: `${did.getIdentifier()}#did-root-key`,
-                        publicKeyMultibase: Hashing.multibase.encode(privateKey.publicKey.toBytes()),
+                        publicKeyBase58: Hashing.base58.encode(privateKey.publicKey.toBytes()),
                         type: "Ed25519VerificationKey2018",
                     },
                 ],
@@ -164,7 +194,7 @@ describe("HcsDid", () => {
     describe("#delete", () => {
         it("throws error if DID is not registered", async () => {
             const did = new HcsDid({ privateKey: PrivateKey.fromString(OPERATOR_KEY), client });
-            let error = null;
+            let error;
             try {
                 await did.delete();
             } catch (err) {
@@ -177,7 +207,7 @@ describe("HcsDid", () => {
         it("throws error if instance has no privateKey assigned", async () => {
             const identifier = "did:hedera:testnet:z6MkgUv5CvjRP6AsvEYqSRN7djB6p4zK9bcMQ93g5yK6Td7N_0.0.29613327";
             const did = new HcsDid({ identifier, client });
-            let error = null;
+            let error;
             try {
                 await did.delete();
             } catch (err) {
@@ -190,7 +220,7 @@ describe("HcsDid", () => {
         it("throws error if instance has no client assigned", async () => {
             const identifier = "did:hedera:testnet:z6MkgUv5CvjRP6AsvEYqSRN7djB6p4zK9bcMQ93g5yK6Td7N_0.0.29613327";
             const did = new HcsDid({ identifier, privateKey: PrivateKey.fromString(OPERATOR_KEY) });
-            let error = null;
+            let error;
             try {
                 await did.delete();
             } catch (err) {
@@ -206,10 +236,15 @@ describe("HcsDid", () => {
 
             await did.register();
 
-            await delay(process.env.WAIT_BEFORE_RESOLVE_DID_FOR);
+            let didDocument: any;
 
-            let didJSON = (await did.resolve()).toJsonTree();
-            expect(didJSON).toEqual({
+            await delayUntil(async () => {
+                const didDoc = await did.resolve();
+                didDocument = didDoc.toJsonTree();
+                return didDocument?.verificationMethod?.length === 1;
+            }, WAIT_BEFORE_RESOLVE_DID_FOR);
+
+            expect(didDocument).toEqual({
                 "@context": "https://www.w3.org/ns/did/v1",
                 assertionMethod: [`${did.getIdentifier()}#did-root-key`],
                 authentication: [`${did.getIdentifier()}#did-root-key`],
@@ -218,7 +253,7 @@ describe("HcsDid", () => {
                     {
                         controller: did.getIdentifier(),
                         id: `${did.getIdentifier()}#did-root-key`,
-                        publicKeyMultibase: Hashing.multibase.encode(didPrivateKey.publicKey.toBytes()),
+                        publicKeyBase58: Hashing.base58.encode(didPrivateKey.publicKey.toBytes()),
                         type: "Ed25519VerificationKey2018",
                     },
                 ],
@@ -226,17 +261,22 @@ describe("HcsDid", () => {
 
             await did.delete();
 
-            const messages = await readTopicMessages(did.getTopicId(), client);
-            expect(messages.length).toEqual(2);
+            await delayUntil(async () => {
+                const didDoc = await did.resolve();
+                didDocument = didDoc.toJsonTree();
+                return didDocument?.verificationMethod?.length === 0;
+            }, WAIT_BEFORE_RESOLVE_DID_FOR);
 
-            didJSON = (await did.resolve()).toJsonTree();
-            expect(didJSON).toEqual({
+            expect(didDocument).toEqual({
                 "@context": "https://www.w3.org/ns/did/v1",
                 assertionMethod: [],
                 authentication: [],
                 id: did.getIdentifier(),
                 verificationMethod: [],
             });
+
+            const messages = await readTopicMessages(did.getTopicId(), client);
+            expect(messages.length).toEqual(2);
         });
     });
 
@@ -248,7 +288,7 @@ describe("HcsDid", () => {
             const didPrivateKey = PrivateKey.generate();
             const did = new HcsDid({ privateKey: didPrivateKey, client: client });
 
-            let error = null;
+            let error;
             try {
                 await did.changeOwner({
                     controller: newOwnerIdentifier,
@@ -267,7 +307,7 @@ describe("HcsDid", () => {
                 client: client,
             });
 
-            let error = null;
+            let error;
             try {
                 await did.changeOwner({
                     controller: newOwnerIdentifier,
@@ -287,7 +327,7 @@ describe("HcsDid", () => {
                 privateKey: didPrivateKey,
             });
 
-            let error = null;
+            let error;
             try {
                 await did.changeOwner({
                     controller: newOwnerIdentifier,
@@ -308,11 +348,11 @@ describe("HcsDid", () => {
                 client: client,
             });
 
-            let error = null;
+            let error;
             try {
                 await did.changeOwner({
                     controller: newOwnerIdentifier,
-                    newPrivateKey: null,
+                    newPrivateKey: <any>null,
                 });
             } catch (err) {
                 error = err;
@@ -336,12 +376,15 @@ describe("HcsDid", () => {
                 newPrivateKey: newDidPrivateKey,
             });
 
-            const messages = await readTopicMessages(did.getTopicId(), client);
-            expect(messages.length).toEqual(2);
+            let didDocument: any;
 
-            const doc = (await did.resolve()).toJsonTree();
+            await delayUntil(async () => {
+                const didDoc = await did.resolve();
+                didDocument = didDoc.toJsonTree();
+                return didDocument?.controller === newOwnerIdentifier;
+            }, WAIT_BEFORE_RESOLVE_DID_FOR);
 
-            expect(doc).toEqual({
+            expect(didDocument).toEqual({
                 "@context": "https://www.w3.org/ns/did/v1",
                 assertionMethod: [`${did.getIdentifier()}#did-root-key`],
                 authentication: [`${did.getIdentifier()}#did-root-key`],
@@ -351,11 +394,14 @@ describe("HcsDid", () => {
                     {
                         controller: newOwnerIdentifier,
                         id: `${did.getIdentifier()}#did-root-key`,
-                        publicKeyMultibase: Hashing.multibase.encode(newDidPrivateKey.publicKey.toBytes()),
+                        publicKeyBase58: Hashing.base58.encode(newDidPrivateKey.publicKey.toBytes()),
                         type: "Ed25519VerificationKey2018",
                     },
                 ],
             });
+
+            const messages = await readTopicMessages(did.getTopicId(), client);
+            expect(messages.length).toEqual(2);
         });
     });
 
@@ -364,9 +410,9 @@ describe("HcsDid", () => {
             const identifier = "did:hedera:testnet:z6MkgUv5CvjRP6AsvEYqSRN7djB6p4zK9bcMQ93g5yK6Td7N_0.0.29613327";
             const did = new HcsDid({ identifier });
 
-            let error = null;
+            let error;
             try {
-                await did.addService({ id: null, type: null, serviceEndpoint: null });
+                await did.addService(<any>{ id: null, type: null, serviceEndpoint: null });
             } catch (err) {
                 error = err;
             }
@@ -378,9 +424,9 @@ describe("HcsDid", () => {
             const privateKey = PrivateKey.generate();
             const did = new HcsDid({ privateKey });
 
-            let error = null;
+            let error;
             try {
-                await did.addService({ id: null, type: null, serviceEndpoint: null });
+                await did.addService(<any>{ id: null, type: null, serviceEndpoint: null });
             } catch (err) {
                 error = err;
             }
@@ -392,9 +438,9 @@ describe("HcsDid", () => {
             const privateKey = PrivateKey.generate();
             const did = new HcsDid({ privateKey, client });
 
-            let error = null;
+            let error;
             try {
-                await did.addService({ id: null, type: null, serviceEndpoint: null });
+                await did.addService(<any>{ id: null, type: null, serviceEndpoint: null });
             } catch (err) {
                 error = err;
             }
@@ -406,7 +452,7 @@ describe("HcsDid", () => {
             const privateKey = PrivateKey.fromString(OPERATOR_KEY);
             const did = new HcsDid({ privateKey, client });
 
-            let error = null;
+            let error;
             try {
                 await did.register();
                 await did.addService({
@@ -432,12 +478,15 @@ describe("HcsDid", () => {
                 serviceEndpoint: "https://example.com/vcs",
             });
 
+            let didDocument: any;
+
+            await delayUntil(async () => {
+                const didDoc = await did.resolve();
+                didDocument = didDoc.toJsonTree();
+                return didDocument?.service?.length === 1;
+            }, WAIT_BEFORE_RESOLVE_DID_FOR);
+
             console.log(`https://testnet.dragonglass.me/hedera/topics/${did.getTopicId().toString()}`);
-
-            await delay(process.env.WAIT_BEFORE_RESOLVE_DID_FOR);
-
-            const didDoc = await did.resolve();
-            const didDocument = didDoc.toJsonTree();
 
             expect(didDocument).toEqual({
                 "@context": "https://www.w3.org/ns/did/v1",
@@ -448,7 +497,7 @@ describe("HcsDid", () => {
                     {
                         controller: did.getIdentifier(),
                         id: `${did.getIdentifier()}#did-root-key`,
-                        publicKeyMultibase: Hashing.multibase.encode(privateKey.publicKey.toBytes()),
+                        publicKeyBase58: Hashing.base58.encode(privateKey.publicKey.toBytes()),
                         type: "Ed25519VerificationKey2018",
                     },
                 ],
@@ -481,12 +530,15 @@ describe("HcsDid", () => {
                 serviceEndpoint: "https://example.com/did",
             });
 
+            let didDocument: any;
+
+            await delayUntil(async () => {
+                const didDoc = await did.resolve();
+                didDocument = didDoc.toJsonTree();
+                return didDocument?.service?.length === 1;
+            }, WAIT_BEFORE_RESOLVE_DID_FOR);
+
             console.log(`https://testnet.dragonglass.me/hedera/topics/${did.getTopicId().toString()}`);
-
-            await delay(process.env.WAIT_BEFORE_RESOLVE_DID_FOR);
-
-            const didDoc = await did.resolve();
-            const didDocument = didDoc.toJsonTree();
 
             expect(didDocument).toEqual({
                 "@context": "https://www.w3.org/ns/did/v1",
@@ -497,7 +549,7 @@ describe("HcsDid", () => {
                     {
                         controller: did.getIdentifier(),
                         id: `${did.getIdentifier()}#did-root-key`,
-                        publicKeyMultibase: Hashing.multibase.encode(privateKey.publicKey.toBytes()),
+                        publicKeyBase58: Hashing.base58.encode(privateKey.publicKey.toBytes()),
                         type: "Ed25519VerificationKey2018",
                     },
                 ],
@@ -527,12 +579,15 @@ describe("HcsDid", () => {
                 id: did.getIdentifier() + "#service-1",
             });
 
+            let didDocument: any;
+
+            await delayUntil(async () => {
+                const didDoc = await did.resolve();
+                didDocument = didDoc.toJsonTree();
+                return didDocument?.verificationMethod === 1 && !didDocument?.service;
+            }, WAIT_BEFORE_RESOLVE_DID_FOR);
+
             console.log(`https://testnet.dragonglass.me/hedera/topics/${did.getTopicId().toString()}`);
-
-            await delay(process.env.WAIT_BEFORE_RESOLVE_DID_FOR);
-
-            const didDoc = await did.resolve();
-            const didDocument = didDoc.toJsonTree();
 
             expect(didDocument).toEqual({
                 "@context": "https://www.w3.org/ns/did/v1",
@@ -543,7 +598,7 @@ describe("HcsDid", () => {
                     {
                         controller: did.getIdentifier(),
                         id: `${did.getIdentifier()}#did-root-key`,
-                        publicKeyMultibase: Hashing.multibase.encode(privateKey.publicKey.toBytes()),
+                        publicKeyBase58: Hashing.base58.encode(privateKey.publicKey.toBytes()),
                         type: "Ed25519VerificationKey2018",
                     },
                 ],
@@ -572,12 +627,15 @@ describe("HcsDid", () => {
                 serviceEndpoint: "https://meeco.me/vijay",
             });
 
+            let didDocument: any;
+
+            await delayUntil(async () => {
+                const didDoc = await did.resolve();
+                didDocument = didDoc.toJsonTree();
+                return didDocument?.service?.length === 1;
+            }, WAIT_BEFORE_RESOLVE_DID_FOR);
+
             console.log(`https://testnet.dragonglass.me/hedera/topics/${did.getTopicId().toString()}`);
-
-            await delay(process.env.WAIT_BEFORE_RESOLVE_DID_FOR);
-
-            const didDoc = await did.resolve();
-            const didDocument = didDoc.toJsonTree();
 
             expect(didDocument).toEqual({
                 "@context": "https://www.w3.org/ns/did/v1",
@@ -588,7 +646,7 @@ describe("HcsDid", () => {
                     {
                         controller: did.getIdentifier(),
                         id: `${did.getIdentifier()}#did-root-key`,
-                        publicKeyMultibase: Hashing.multibase.encode(privateKey.publicKey.toBytes()),
+                        publicKeyBase58: Hashing.base58.encode(privateKey.publicKey.toBytes()),
                         type: "Ed25519VerificationKey2018",
                     },
                 ],
@@ -610,9 +668,9 @@ describe("HcsDid", () => {
             const identifier = "did:hedera:testnet:z6MkgUv5CvjRP6AsvEYqSRN7djB6p4zK9bcMQ93g5yK6Td7N_0.0.29613327";
             const did = new HcsDid({ identifier });
 
-            let error = null;
+            let error;
             try {
-                await did.addVerificationMethod({ id: null, type: null, controller: null, publicKey: null });
+                await did.addVerificationMethod(<any>{ id: null, type: null, controller: null, publicKey: null });
             } catch (err) {
                 error = err;
             }
@@ -624,9 +682,9 @@ describe("HcsDid", () => {
             const privateKey = PrivateKey.generate();
             const did = new HcsDid({ privateKey });
 
-            let error = null;
+            let error;
             try {
-                await did.addVerificationMethod({ id: null, type: null, controller: null, publicKey: null });
+                await did.addVerificationMethod(<any>{ id: null, type: null, controller: null, publicKey: null });
             } catch (err) {
                 error = err;
             }
@@ -638,9 +696,9 @@ describe("HcsDid", () => {
             const privateKey = PrivateKey.generate();
             const did = new HcsDid({ privateKey, client });
 
-            let error = null;
+            let error;
             try {
-                await did.addVerificationMethod({ id: null, type: null, controller: null, publicKey: null });
+                await did.addVerificationMethod(<any>{ id: null, type: null, controller: null, publicKey: null });
             } catch (err) {
                 error = err;
             }
@@ -665,16 +723,16 @@ describe("HcsDid", () => {
                 publicKey,
             });
 
-            /**
-             *  wait for 9s so DIDOwner and VerificationMethod event to be propagated to mirror node
-             */
-            await delay(process.env.WAIT_BEFORE_RESOLVE_DID_FOR);
+            let didDocument: any;
+
+            await delayUntil(async () => {
+                const didDoc = await did.resolve();
+                didDocument = didDoc.toJsonTree();
+                return didDocument?.verificationMethod?.length === 2;
+            }, WAIT_BEFORE_RESOLVE_DID_FOR);
 
             console.log(`${did.getIdentifier()}`);
             console.log(`https://testnet.dragonglass.me/hedera/topics/${did.getTopicId().toString()}`);
-
-            const didDoc = await did.resolve();
-            const didDocument = didDoc.toJsonTree();
 
             expect(didDocument).toEqual({
                 "@context": "https://www.w3.org/ns/did/v1",
@@ -685,13 +743,13 @@ describe("HcsDid", () => {
                     {
                         controller: did.getIdentifier(),
                         id: `${did.getIdentifier()}#did-root-key`,
-                        publicKeyMultibase: Hashing.multibase.encode(privateKey.publicKey.toBytes()),
+                        publicKeyBase58: Hashing.base58.encode(privateKey.publicKey.toBytes()),
                         type: "Ed25519VerificationKey2018",
                     },
                     {
                         controller: did.getIdentifier(),
                         id: newVerificationDid,
-                        publicKeyMultibase: Hashing.multibase.encode(publicKey.toBytes()),
+                        publicKeyBase58: Hashing.base58.encode(publicKey.toBytes()),
                         type: "Ed25519VerificationKey2018",
                     },
                 ],
@@ -725,16 +783,16 @@ describe("HcsDid", () => {
                 publicKey: updatePublicKey,
             });
 
-            /**
-             *  wait for 9s so DIDOwner and VerificationMethod event to be propagated to mirror node
-             */
-            await delay(process.env.WAIT_BEFORE_RESOLVE_DID_FOR);
+            let didDocument: any;
+
+            await delayUntil(async () => {
+                const didDoc = await did.resolve();
+                didDocument = didDoc.toJsonTree();
+                return didDocument?.verificationMethod?.length === 2;
+            }, WAIT_BEFORE_RESOLVE_DID_FOR);
 
             console.log(`${did.getIdentifier()}`);
             console.log(`https://testnet.dragonglass.me/hedera/topics/${did.getTopicId().toString()}`);
-
-            const didDoc = await did.resolve();
-            const didDocument = didDoc.toJsonTree();
 
             expect(didDocument).toEqual({
                 "@context": "https://www.w3.org/ns/did/v1",
@@ -745,13 +803,13 @@ describe("HcsDid", () => {
                     {
                         controller: did.getIdentifier(),
                         id: `${did.getIdentifier()}#did-root-key`,
-                        publicKeyMultibase: Hashing.multibase.encode(privateKey.publicKey.toBytes()),
+                        publicKeyBase58: Hashing.base58.encode(privateKey.publicKey.toBytes()),
                         type: "Ed25519VerificationKey2018",
                     },
                     {
                         controller: did.getIdentifier(),
                         id: newVerificationDid,
-                        publicKeyMultibase: Hashing.multibase.encode(updatePublicKey.toBytes()),
+                        publicKeyBase58: Hashing.base58.encode(updatePublicKey.toBytes()),
                         type: "Ed25519VerificationKey2018",
                     },
                 ],
@@ -780,16 +838,16 @@ describe("HcsDid", () => {
                 id: newVerificationDid,
             });
 
-            /**
-             *  wait for 9s so DIDOwner and VerificationMethod event to be propagated to mirror node
-             */
-            await delay(process.env.WAIT_BEFORE_RESOLVE_DID_FOR);
+            let didDocument: any;
+
+            await delayUntil(async () => {
+                const didDoc = await did.resolve();
+                didDocument = didDoc.toJsonTree();
+                return didDocument?.verificationMethod?.length === 1;
+            }, WAIT_BEFORE_RESOLVE_DID_FOR);
 
             console.log(`${did.getIdentifier()}`);
             console.log(`https://testnet.dragonglass.me/hedera/topics/${did.getTopicId().toString()}`);
-
-            const didDoc = await did.resolve();
-            const didDocument = didDoc.toJsonTree();
 
             expect(didDocument).toEqual({
                 "@context": "https://www.w3.org/ns/did/v1",
@@ -800,7 +858,7 @@ describe("HcsDid", () => {
                     {
                         controller: did.getIdentifier(),
                         id: `${did.getIdentifier()}#did-root-key`,
-                        publicKeyMultibase: Hashing.multibase.encode(privateKey.publicKey.toBytes()),
+                        publicKeyBase58: Hashing.base58.encode(privateKey.publicKey.toBytes()),
                         type: "Ed25519VerificationKey2018",
                     },
                 ],
@@ -816,9 +874,9 @@ describe("HcsDid", () => {
             const identifier = "did:hedera:testnet:z6MkgUv5CvjRP6AsvEYqSRN7djB6p4zK9bcMQ93g5yK6Td7N_0.0.29613327";
             const did = new HcsDid({ identifier });
 
-            let error = null;
+            let error;
             try {
-                await did.addVerificationRelationship({
+                await did.addVerificationRelationship(<any>{
                     id: null,
                     relationshipType: null,
                     type: null,
@@ -836,9 +894,9 @@ describe("HcsDid", () => {
             const privateKey = PrivateKey.generate();
             const did = new HcsDid({ privateKey });
 
-            let error = null;
+            let error;
             try {
-                await did.addVerificationRelationship({
+                await did.addVerificationRelationship(<any>{
                     id: null,
                     relationshipType: null,
                     type: null,
@@ -856,9 +914,9 @@ describe("HcsDid", () => {
             const privateKey = PrivateKey.generate();
             const did = new HcsDid({ privateKey, client });
 
-            let error = null;
+            let error;
             try {
-                await did.addVerificationRelationship({
+                await did.addVerificationRelationship(<any>{
                     id: null,
                     relationshipType: null,
                     type: null,
@@ -891,10 +949,13 @@ describe("HcsDid", () => {
                 publicKey,
             });
 
-            await delay(process.env.WAIT_BEFORE_RESOLVE_DID_FOR);
+            let didDocument: any;
 
-            const didDoc = await did.resolve();
-            const didDocument = didDoc.toJsonTree();
+            await delayUntil(async () => {
+                const didDoc = await did.resolve();
+                didDocument = didDoc.toJsonTree();
+                return didDocument?.authentication?.length === 2;
+            }, WAIT_BEFORE_RESOLVE_DID_FOR);
 
             expect(didDocument).toEqual({
                 "@context": "https://www.w3.org/ns/did/v1",
@@ -905,13 +966,13 @@ describe("HcsDid", () => {
                     {
                         controller: did.getIdentifier(),
                         id: `${did.getIdentifier()}#did-root-key`,
-                        publicKeyMultibase: Hashing.multibase.encode(privateKey.publicKey.toBytes()),
+                        publicKeyBase58: Hashing.base58.encode(privateKey.publicKey.toBytes()),
                         type: "Ed25519VerificationKey2018",
                     },
                     {
                         controller: did.getIdentifier(),
                         id: newVerificationDid,
-                        publicKeyMultibase: Hashing.multibase.encode(publicKey.toBytes()),
+                        publicKeyBase58: Hashing.base58.encode(publicKey.toBytes()),
                         type: "Ed25519VerificationKey2018",
                     },
                 ],
@@ -951,10 +1012,13 @@ describe("HcsDid", () => {
                 publicKey: updatePublicKey,
             });
 
-            await delay(process.env.WAIT_BEFORE_RESOLVE_DID_FOR);
+            let didDocument: any;
 
-            const didDoc = await did.resolve();
-            const didDocument = didDoc.toJsonTree();
+            await delayUntil(async () => {
+                const didDoc = await did.resolve();
+                didDocument = didDoc.toJsonTree();
+                return didDocument?.authentication?.length === 2;
+            }, WAIT_BEFORE_RESOLVE_DID_FOR);
 
             expect(didDocument).toEqual({
                 "@context": "https://www.w3.org/ns/did/v1",
@@ -965,13 +1029,13 @@ describe("HcsDid", () => {
                     {
                         controller: did.getIdentifier(),
                         id: `${did.getIdentifier()}#did-root-key`,
-                        publicKeyMultibase: Hashing.multibase.encode(privateKey.publicKey.toBytes()),
+                        publicKeyBase58: Hashing.base58.encode(privateKey.publicKey.toBytes()),
                         type: "Ed25519VerificationKey2018",
                     },
                     {
                         controller: did.getIdentifier(),
                         id: newVerificationDid,
-                        publicKeyMultibase: Hashing.multibase.encode(updatePublicKey.toBytes()),
+                        publicKeyBase58: Hashing.base58.encode(updatePublicKey.toBytes()),
                         type: "Ed25519VerificationKey2018",
                     },
                 ],
@@ -1003,10 +1067,13 @@ describe("HcsDid", () => {
                 relationshipType: "authentication",
             });
 
-            await delay(process.env.WAIT_BEFORE_RESOLVE_DID_FOR);
+            let didDocument: any;
 
-            const didDoc = await did.resolve();
-            const didDocument = didDoc.toJsonTree();
+            await delayUntil(async () => {
+                const didDoc = await did.resolve();
+                didDocument = didDoc.toJsonTree();
+                return didDocument?.authentication?.length === 1;
+            }, WAIT_BEFORE_RESOLVE_DID_FOR);
 
             expect(didDocument).toEqual({
                 "@context": "https://www.w3.org/ns/did/v1",
@@ -1017,7 +1084,7 @@ describe("HcsDid", () => {
                     {
                         controller: did.getIdentifier(),
                         id: `${did.getIdentifier()}#did-root-key`,
-                        publicKeyMultibase: Hashing.multibase.encode(privateKey.publicKey.toBytes()),
+                        publicKeyBase58: Hashing.base58.encode(privateKey.publicKey.toBytes()),
                         type: "Ed25519VerificationKey2018",
                     },
                 ],
@@ -1032,28 +1099,3 @@ describe("HcsDid", () => {
 /**
  * Test Helpers
  */
-
-async function readTopicMessages(topicId, client, timeout = null) {
-    const messages: TopicMessage[] = [];
-
-    const query = new TopicMessageQuery()
-        .setTopicId(topicId)
-        .setStartTime(new Timestamp(0, 0))
-        .setEndTime(Timestamp.fromDate(new Date()));
-
-    query.setMaxBackoff(2000);
-    query.setMaxAttempts(15);
-
-    const querySubcription = query.subscribe(client, null, (msg) => {
-        messages.push(msg);
-    });
-
-    /**
-     * wait for READ_MESSAGES_TIMEOUT seconds and assume all messages were read
-     */
-    await delay(timeout || process.env.WAIT_BEFORE_RESOLVE_DID_FOR);
-
-    querySubcription.unsubscribe();
-
-    return messages;
-}
