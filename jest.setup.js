@@ -2,4 +2,4 @@
 // process.env.OPERATOR_KEY =
 //     "302e02...";
 
-process.env.WAIT_BEFORE_RESOLVE_DID_FOR = 9000;
+process.env.WAIT_BEFORE_RESOLVE_DID_FOR = 30000;
