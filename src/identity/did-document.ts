@@ -82,22 +82,22 @@ export class DidDocument {
                 msg.getEvent().targetName !== HcsDidEventTargetName.DID_DOCUMENT
             ) {
                 console.warn("DID document owner is not registered. Event will be ignored...");
-                return;
+                continue;
             }
 
             switch (msg.getOperation()) {
                 case DidMethodOperation.CREATE:
                     await this.processCreateMessage(msg);
-                    return;
+                    continue;
                 case DidMethodOperation.UPDATE:
                     await this.processUpdateMessage(msg);
-                    return;
+                    continue;
                 case DidMethodOperation.REVOKE:
                     await this.processRevokeMessage(msg);
-                    return;
+                    continue;
                 case DidMethodOperation.DELETE:
                     await this.processDeleteMessage(msg);
-                    return;
+                    continue;
                 default:
                     console.warn(`Operation ${msg.getOperation()} is not supported. Event will be ignored...`);
             }
