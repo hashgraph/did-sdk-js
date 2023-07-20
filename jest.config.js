@@ -3,4 +3,5 @@ module.exports = {
     testEnvironment: "node",
     setupFilesAfterEnv: ["./jest.setupAfterEnv.js"],
     setupFiles: ["./jest.setup.js"],
+    modulePathIgnorePatterns: ["<rootDir>/dist/"],
 };
