@@ -121,13 +121,21 @@ export class MessageEnvelope<T extends HcsDidMessage> {
      */
     public static fromJson<U extends HcsDidMessage>(json: string, messageClass: JsonClass<U>): MessageEnvelope<U> {
         const result = new MessageEnvelope<U>();
-        const root = JSON.parse(json);
-        result.signature = root[MessageEnvelope.SIGNATURE_KEY];
-        if (root.hasOwnProperty(MessageEnvelope.MESSAGE_KEY)) {
-            result.message = messageClass.fromJsonTree(root[MessageEnvelope.MESSAGE_KEY]);
-        } else {
+        let root;
+        try {
+            root = JSON.parse(json);
+            result.signature = root[MessageEnvelope.SIGNATURE_KEY];
+            if (root.hasOwnProperty(MessageEnvelope.MESSAGE_KEY)) {
+                result.message = messageClass.fromJsonTree(root[MessageEnvelope.MESSAGE_KEY]);
+            } else {
+                result.message = null;
+            }
+        } catch (err) {
+            console.warn(`Invalid message JSON message - it will be ignored`);
+            // Invalid json - ignore the message
             result.message = null;
         }
+
         return result;
     }
 
