@@ -3,6 +3,7 @@ import {
     DidDocument,
     DidMethodOperation,
     Hashing,
+    HcsDidCreateDidDocumentEvent,
     HcsDidCreateDidOwnerEvent,
     HcsDidCreateServiceEvent,
     HcsDidCreateVerificationMethodEvent,
@@ -21,8 +22,8 @@ describe("DidDocument", () => {
             privateKey.publicKey.toBytes()
         )}_0.0.29613327`;
 
-        it("returns empty document if not events were passed", () => {
-            const doc = new DidDocument(identifier, []);
+        it("returns empty document if not events were passed", async () => {
+            const doc = new DidDocument(identifier);
 
             expect(doc.toJsonTree()).toEqual({
                 "@context": "https://www.w3.org/ns/did/v1",
@@ -37,8 +38,9 @@ describe("DidDocument", () => {
             expect(doc.getVersionId()).toBeNull();
         });
 
-        it("ignores events til first create DIDOwner event", () => {
-            const doc = new DidDocument(identifier, [
+        it("ignores events til first create DIDOwner event", async () => {
+            const doc = new DidDocument(identifier);
+            await doc.processMessages([
                 new HcsDidMessage(
                     DidMethodOperation.CREATE,
                     identifier,
@@ -91,7 +93,70 @@ describe("DidDocument", () => {
             expect(doc.getVersionId()).toBeTruthy();
         });
 
-        it("handles create DIDOwner event", () => {
+        it("handles HcsDidCreateDidDocumentEvent events", async () => {
+            const messages = [
+                new HcsDidMessage(
+                    DidMethodOperation.CREATE,
+                    identifier,
+                    new HcsDidCreateDidDocumentEvent(`${identifier}#did-document`, "Qm123456")
+                ),
+            ];
+
+            const doc = new DidDocument(identifier);
+            const documents = {
+                Qm123456: {
+                    "@context": "https://www.w3.org/ns/did/v1",
+                    assertionMethod: [`${identifier}#did-root-key`],
+                    authentication: [`${identifier}#did-root-key`],
+                    id: identifier,
+                    service: [
+                        {
+                            id: `${identifier}#service-1`,
+                            serviceEndpoint: "https://example.com/vcs",
+                            type: "LinkedDomains",
+                        },
+                    ],
+                    verificationMethod: [
+                        {
+                            controller: identifier,
+                            id: `${identifier}#did-root-key`,
+                            publicKeyMultibase: Hashing.multibase.encode(privateKey.publicKey.toBytes()),
+                            type: "Ed25519VerificationKey2018",
+                        },
+                    ],
+                },
+            };
+
+            doc.setIpfsDownloader({
+                downloadDocument: (event: HcsDidCreateDidDocumentEvent) => documents[event.getCid()],
+            } as any);
+
+            await doc.processMessages(messages);
+
+            expect(doc.toJsonTree()).toEqual({
+                "@context": "https://www.w3.org/ns/did/v1",
+                assertionMethod: [`${identifier}#did-root-key`],
+                authentication: [`${identifier}#did-root-key`],
+                id: identifier,
+                service: [
+                    {
+                        id: `${identifier}#service-1`,
+                        serviceEndpoint: "https://example.com/vcs",
+                        type: "LinkedDomains",
+                    },
+                ],
+                verificationMethod: [
+                    {
+                        controller: identifier,
+                        id: `${identifier}#did-root-key`,
+                        publicKeyMultibase: Hashing.multibase.encode(privateKey.publicKey.toBytes()),
+                        type: "Ed25519VerificationKey2018",
+                    },
+                ],
+            });
+        });
+
+        it("handles create DIDOwner event", async () => {
             const messages = [
                 new HcsDidMessage(
                     DidMethodOperation.CREATE,
@@ -99,7 +164,8 @@ describe("DidDocument", () => {
                     new HcsDidCreateDidOwnerEvent(identifier + "#did-root-key", identifier, privateKey.publicKey)
                 ),
             ];
-            const doc = new DidDocument(identifier, messages);
+            const doc = new DidDocument(identifier);
+            await doc.processMessages(messages);
 
             expect(doc.toJsonTree()).toEqual({
                 "@context": "https://www.w3.org/ns/did/v1",
@@ -121,7 +187,7 @@ describe("DidDocument", () => {
             expect(doc.getVersionId()).toBeTruthy();
         });
 
-        it("handles DID delete event", () => {
+        it("handles DID delete event", async () => {
             const messages = [
                 new HcsDidMessage(
                     DidMethodOperation.CREATE,
@@ -130,7 +196,8 @@ describe("DidDocument", () => {
                 ),
                 new HcsDidMessage(DidMethodOperation.DELETE, identifier, new HcsDidDeleteEvent()),
             ];
-            const doc = new DidDocument(identifier, messages);
+            const doc = new DidDocument(identifier);
+            await doc.processMessages(messages);
 
             expect(doc.toJsonTree()).toEqual({
                 "@context": "https://www.w3.org/ns/did/v1",
@@ -145,7 +212,7 @@ describe("DidDocument", () => {
             expect(doc.getVersionId()).toBeNull();
         });
 
-        it("handles change DID owner event", () => {
+        it("handles change DID owner event", async () => {
             const otherOwnerKey = PrivateKey.generate();
             const otherOwnerIdentifier =
                 "did:hedera:testnet:" + Hashing.multibase.encode(otherOwnerKey.publicKey.toBytes()) + "_0.0.29999999";
@@ -178,7 +245,8 @@ describe("DidDocument", () => {
                     )
                 ),
             ];
-            const doc = new DidDocument(identifier, messages);
+            const doc = new DidDocument(identifier);
+            await doc.processMessages(messages);
 
             expect(doc.toJsonTree()).toEqual({
                 "@context": "https://www.w3.org/ns/did/v1",
@@ -208,7 +276,7 @@ describe("DidDocument", () => {
             expect(doc.getVersionId()).toBeTruthy();
         });
 
-        it("successfully handles add service, verificationMethod and verificationRelationship events", () => {
+        it("successfully handles add service, verificationMethod and verificationRelationship events", async () => {
             const key1 = PrivateKey.generate();
             const key2 = PrivateKey.generate();
 
@@ -249,7 +317,8 @@ describe("DidDocument", () => {
                     )
                 ),
             ];
-            const doc = new DidDocument(identifier, messages);
+            const doc = new DidDocument(identifier);
+            await doc.processMessages(messages);
 
             expect(doc.toJsonTree()).toEqual({
                 "@context": "https://www.w3.org/ns/did/v1",
@@ -291,7 +360,7 @@ describe("DidDocument", () => {
             expect(doc.getVersionId()).toBeTruthy();
         });
 
-        it("successfully handles update service, verificationMethod and verificationRelationship events", () => {
+        it("successfully handles update service, verificationMethod and verificationRelationship events", async () => {
             const key1 = PrivateKey.generate();
             const key2 = PrivateKey.generate();
             const key3 = PrivateKey.generate();
@@ -386,7 +455,8 @@ describe("DidDocument", () => {
                     )
                 ),
             ];
-            const doc = new DidDocument(identifier, messages);
+            const doc = new DidDocument(identifier);
+            await doc.processMessages(messages);
 
             expect(doc.toJsonTree()).toEqual({
                 "@context": "https://www.w3.org/ns/did/v1",
@@ -439,7 +509,7 @@ describe("DidDocument", () => {
             expect(doc.getVersionId()).toBeTruthy();
         });
 
-        it("successfully handles revoke service, verificationMethod and verificationRelationship events", () => {
+        it("successfully handles revoke service, verificationMethod and verificationRelationship events", async () => {
             const key1 = PrivateKey.generate();
             const key2 = PrivateKey.generate();
             const key3 = PrivateKey.generate();
@@ -531,7 +601,8 @@ describe("DidDocument", () => {
                     )
                 ),
             ];
-            const doc = new DidDocument(identifier, messages);
+            const doc = new DidDocument(identifier);
+            await doc.processMessages(messages);
 
             expect(doc.toJsonTree()).toEqual({
                 "@context": "https://www.w3.org/ns/did/v1",
