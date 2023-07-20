@@ -32,7 +32,7 @@ describe("HcsDidCreateDidDocumentEvent", () => {
 
     describe("#getId", () => {
         it("returns the id that was passed via constructor", () => {
-            expect(event.getId()).toEqual(identifier + "#did-root-key");
+            expect(event.getId()).toEqual(identifier);
         });
     });
 
@@ -70,7 +70,7 @@ describe("HcsDidCreateDidDocumentEvent", () => {
     describe("#toJSON", () => {
         it("returns stringified version of JSON tree", () => {
             expect(event.toJSON()).toEqual(
-                '{"DIDDocument":{"id":"did:hedera:testnet:z6MkogVzoGJMVVLhaz82cA5jZQKAAqUghhCrpzkSDFDwxfJa_0.0.29613327","type":"DIDDocument","cid":"QmaBcDeFgHiJkLmNoP","url":"https://ipfs.io/ifs/QmaBcDeFgHiJkLmNoP"}}'
+                '{"DIDDocument":{"id":"did:hedera:testnet:zAEExD23v9wrEUVHKvb7tiJmAMGCqHoxW8yqWNyFw3SXC_0.0.29613327","type":"DIDDocument","cid":"QmaBcDeFgHiJkLmNoP","url":"https://ipfs.io/ifs/QmaBcDeFgHiJkLmNoP"}}'
             );
         });
     });
