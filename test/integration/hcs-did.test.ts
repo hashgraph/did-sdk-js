@@ -535,7 +535,7 @@ describe("HcsDid", () => {
             await delayUntil(async () => {
                 const didDoc = await did.resolve();
                 didDocument = didDoc.toJsonTree();
-                return didDocument?.service?.length === 1;
+                return didDocument?.service[0]?.serviceEndpoint === "https://example.com/did";
             }, WAIT_BEFORE_RESOLVE_DID_FOR);
 
             console.log(`https://testnet.dragonglass.me/hedera/topics/${did.getTopicId().toString()}`);
@@ -788,7 +788,10 @@ describe("HcsDid", () => {
             await delayUntil(async () => {
                 const didDoc = await did.resolve();
                 didDocument = didDoc.toJsonTree();
-                return didDocument?.verificationMethod?.length === 2;
+                return (
+                    didDocument?.verificationMethod[1]?.publicKeyBase58 ===
+                    Hashing.base58.encode(updatePublicKey.toBytes())
+                );
             }, WAIT_BEFORE_RESOLVE_DID_FOR);
 
             console.log(`${did.getIdentifier()}`);
@@ -1017,7 +1020,10 @@ describe("HcsDid", () => {
             await delayUntil(async () => {
                 const didDoc = await did.resolve();
                 didDocument = didDoc.toJsonTree();
-                return didDocument?.authentication?.length === 2;
+                return (
+                    didDocument?.verificationMethod[1]?.publicKeyBase58 ===
+                    Hashing.base58.encode(updatePublicKey.toBytes())
+                );
             }, WAIT_BEFORE_RESOLVE_DID_FOR);
 
             expect(didDocument).toEqual({
