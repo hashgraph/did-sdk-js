@@ -77,7 +77,7 @@ describe("HcsDidCreateDidDocumentEvent", () => {
 
     describe("#fromJsonTree", () => {
         it("rebuilds the HcsDidCreateDidDocumentEvent", () => {
-            const eventFromJson = HcsDidCreateDidDocumentEvent.fromJSONTree({
+            const eventFromJson = HcsDidCreateDidDocumentEvent.fromJsonTree({
                 id: identifier,
                 type: "DIDDocument",
                 cid,
