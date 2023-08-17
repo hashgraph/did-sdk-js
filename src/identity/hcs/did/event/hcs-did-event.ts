@@ -21,7 +21,7 @@ export abstract class HcsDidEvent {
         return Hashing.base64.encode(this.toJSON());
     }
 
-    static fromJSONTree(tree: any): HcsDidEvent {
+    static fromJsonTree(tree: any): HcsDidEvent {
         throw new Error("not implemented");
     }
 
