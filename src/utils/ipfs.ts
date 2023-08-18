@@ -14,7 +14,7 @@ export class IpfsDidDocumentDownloader {
             throw new Error(`DID document could not be fetched from URL: ${url}`);
         }
         try {
-            const doc = await result.json();
+            return await result.json();
         } catch (err) {
             throw new Error(`DID document from URL could not be parsed as JSON: ${url}`);
         }
