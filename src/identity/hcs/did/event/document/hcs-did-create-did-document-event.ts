@@ -59,7 +59,7 @@ export class HcsDidCreateDidDocumentEvent extends HcsDidEvent {
         return JSON.stringify(this.toJsonTree());
     }
 
-    static fromJSONTree(tree: any): HcsDidCreateDidDocumentEvent {
+    static fromJsonTree(tree: any): HcsDidCreateDidDocumentEvent {
         return new HcsDidCreateDidDocumentEvent(tree?.id, tree?.cid, tree?.url);
     }
 }
