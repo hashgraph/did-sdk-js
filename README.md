@@ -1,6 +1,6 @@
 # did-sdk-js
 
-Support for the Hedera Hashgraph DID Method on the Hedera JavaScript/TypeScript SDK.
+Support for the [Hedera Hashgraph DID Method](https://github.com/hashgraph/did-method) on the [Hedera JavaScript/TypeScript SDK](https://github.com/hashgraph/hedera-sdk-js).
 
 This repository contains the Javascript SDK for managing [DID Documents][did-core] using the Hedera Consensus Service.
 
