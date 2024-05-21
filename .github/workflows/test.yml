@@ -6,20 +6,34 @@ on:
   push:
     branches: [ main ]
 
+defaults:
+  run:
+    shell: bash
+
+permissions:
+  contents: read
+
 jobs:
   build:
-    runs-on: ubuntu-latest
+    runs-on: [self-hosted, Linux, medium, ephemeral]
     strategy:
       matrix:
         node: [ '14', '16' ]
     steps:
-      - uses: actions/checkout@v2
-      - uses: actions/setup-node@v2
+      - name: Checkout Code
+        uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 # v4.1.1
+
+      - name: Setup Node
+        uses: actions/setup-node@60edb5dd545a775178f52524783378180af0d1f8 # v4.0.2
         with:
           cache: 'npm'
           node-version: ${{ matrix.node }}
-      - run: npm ci
-      - run: npm test
+
+      - name: Run CI
+        run: npm ci
+
+      - name: Test code
+        run: npm test
         env:
           OPERATOR_ID: ${{ secrets.OPERATOR_ID }}
           OPERATOR_KEY: ${{ secrets.OPERATOR_KEY }}
