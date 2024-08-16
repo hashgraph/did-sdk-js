@@ -24,7 +24,7 @@ permissions:
 
 jobs:
   build:
-    runs-on: [self-hosted, Linux, medium, ephemeral]
+    runs-on: decentralized-identity-linux-medium
     strategy:
       matrix:
         node: [ '14', '16' ]
@@ -54,7 +54,7 @@ jobs:
 
   publish:
     needs: build
-    runs-on: [self-hosted, Linux, medium, ephemeral]
+    runs-on: decentralized-identity-linux-medium
     steps:
       - name: Harden Runner
         uses: step-security/harden-runner@17d0e2bd7d51742c71671bd19fa12bdc9d40a3d6 # v2.8.1
