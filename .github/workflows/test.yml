@@ -2,9 +2,11 @@ name: Test
 
 on:
   pull_request:
-    branches: [ main ]
+    branches: 
+      - main
   push:
-    branches: [ main ]
+    branches: 
+      - main
 
 defaults:
   run:
@@ -18,7 +20,7 @@ jobs:
     runs-on: decentralized-identity-linux-medium
     strategy:
       matrix:
-        node: [ '14', '16' ]
+        node: [ '16' ]
     steps:
       - name: Checkout Code
         uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 # v4.1.7
