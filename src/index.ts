@@ -1,75 +1,72 @@
-import {AddressBook} from "./identity/hcs/address-book";
-import {ArraysUtils} from "./utils/arrays-utils";
-import {CredentialSubject} from "./identity/hcs/vc/credential-subject";
-import {DidDocumentBase} from "./identity/did-document-base";
-import {DidDocumentJsonProperties} from "./identity/did-document-json-properties";
-import {DidMethodOperation} from "./identity/did-method-operation";
-import {DidParser} from "./identity/did-parser";
-import {DidSyntax} from "./identity/did-syntax";
-import {Hashing} from "./utils/hashing";
-import {HcsDidMessage} from "./identity/hcs/did/hcs-did-message";
-import {HcsDidResolver} from "./identity/hcs/did/hcs-did-resolver";
-import {HcsDidRootKey} from "./identity/hcs/did/hcs-did-root-key";
-import {HcsDidTopicListener} from "./identity/hcs/did/hcs-did-topic-listener";
-import {HcsDidTransaction} from "./identity/hcs/did/hcs-did-transaction";
-import {HcsDid} from "./identity/hcs/did/hcs-did";
-import {HcsIdentityNetworkBuilder} from "./identity/hcs/hcs-identity-network-builder";
-import {HcsIdentityNetwork} from "./identity/hcs/hcs-identity-network";
-import {HcsVcDocumentBase} from "./identity/hcs/vc/hcs-vc-document-base";
-import {HcsVcDocumentHashBase} from "./identity/hcs/vc/hcs-vc-document-hash-base";
-import {HcsVcDocumentJsonProperties} from "./identity/hcs/vc/hcs-vc-document-json-properties";
-import {HcsVcMessage} from "./identity/hcs/vc/hcs-vc-message";
-import {HcsVcOperation} from "./identity/hcs/vc/hcs-vc-operation";
-import {HcsVcStatusResolver} from "./identity/hcs/vc/hcs-vc-status-resolver";
-import {HcsVcTopicListener} from "./identity/hcs/vc/hcs-vc-topic-listener";
-import {HederaDid} from "./identity/hedera-did";
-import {JsonClass} from "./identity/hcs/json-class";
-import {MessageEnvelope} from "./identity/hcs/message-envelope";
-import {MessageListener} from "./identity/hcs/message-listener";
-import {MessageMode} from "./identity/hcs/message-mode";
-import {MessageResolver} from "./identity/hcs/message-resolver";
-import {MessageTransaction} from "./identity/hcs/message-transaction";
-import {Message} from "./identity/hcs/message";
-import {SerializableMirrorConsensusResponse} from "./identity/hcs/serializable-mirror-consensus-response";
-import {TimestampUtils} from "./utils/timestamp-utils";
-import {Validator} from "./utils/validator";
-import {Issuer} from "./identity/hcs/vc/issuer";
+import { DidDocument } from "./identity/did-document";
+import { DidDocumentJsonProperties } from "./identity/did-document-json-properties";
+import { DidError, DidErrorCode } from "./identity/did-error";
+import { DidMethodOperation } from "./identity/did-method-operation";
+import { DidParser } from "./identity/did-parser";
+import { HederaDidResolver } from "./identity/did-resolver";
+import { DidSyntax } from "./identity/did-syntax";
+import { HcsDidCreateDidDocumentEvent } from "./identity/hcs/did/event/document/hcs-did-create-did-document-event";
+import { HcsDidDeleteEvent } from "./identity/hcs/did/event/document/hcs-did-delete-event";
+import { HcsDidEventTargetName } from "./identity/hcs/did/event/hcs-did-event-target-name";
+import { HcsDidCreateDidOwnerEvent } from "./identity/hcs/did/event/owner/hcs-did-create-did-owner-event";
+import { HcsDidUpdateDidOwnerEvent } from "./identity/hcs/did/event/owner/hcs-did-update-did-owner-event";
+import { HcsDidCreateServiceEvent } from "./identity/hcs/did/event/service/hcs-did-create-service-event";
+import { HcsDidRevokeServiceEvent } from "./identity/hcs/did/event/service/hcs-did-revoke-service-event";
+import { HcsDidUpdateServiceEvent } from "./identity/hcs/did/event/service/hcs-did-update-service-event";
+import { HcsDidCreateVerificationMethodEvent } from "./identity/hcs/did/event/verification-method/hcs-did-create-verification-method-event";
+import { HcsDidRevokeVerificationMethodEvent } from "./identity/hcs/did/event/verification-method/hcs-did-revoke-verification-method-event";
+import { HcsDidUpdateVerificationMethodEvent } from "./identity/hcs/did/event/verification-method/hcs-did-update-verification-method-event";
+import { HcsDidCreateVerificationRelationshipEvent } from "./identity/hcs/did/event/verification-relationship/hcs-did-create-verification-relationship-event";
+import { HcsDidRevokeVerificationRelationshipEvent } from "./identity/hcs/did/event/verification-relationship/hcs-did-revoke-verification-relationship-event";
+import { HcsDidUpdateVerificationRelationshipEvent } from "./identity/hcs/did/event/verification-relationship/hcs-did-update-verification-relationship-event";
+import { HcsDid } from "./identity/hcs/did/hcs-did";
+import { HcsDidEventMessageResolver } from "./identity/hcs/did/hcs-did-event-message-resolver";
+import { HcsDidMessage } from "./identity/hcs/did/hcs-did-message";
+import { HcsDidTopicListener } from "./identity/hcs/did/hcs-did-topic-listener";
+import { HcsDidTransaction } from "./identity/hcs/did/hcs-did-transaction";
+import { JsonClass } from "./identity/hcs/json-class";
+import { MessageEnvelope } from "./identity/hcs/message-envelope";
+import { SerializableMirrorConsensusResponse } from "./identity/hcs/serializable-mirror-consensus-response";
+import { ArraysUtils } from "./utils/arrays-utils";
+import { Ed25519PubCodec } from "./utils/ed25519PubCodec";
+import { Hashing } from "./utils/hashing";
+import { TimestampUtils } from "./utils/timestamp-utils";
+import { Validator } from "./utils/validator";
 
 export {
-    AddressBook,
     ArraysUtils,
-    CredentialSubject,
-    DidDocumentBase,
+    DidDocument,
     DidDocumentJsonProperties,
+    DidError,
+    DidErrorCode,
     DidMethodOperation,
     DidParser,
     DidSyntax,
+    Ed25519PubCodec,
     Hashing,
     HcsDid,
+    HcsDidCreateDidDocumentEvent,
+    HcsDidCreateDidOwnerEvent,
+    HcsDidCreateServiceEvent,
+    HcsDidCreateVerificationMethodEvent,
+    HcsDidCreateVerificationRelationshipEvent,
+    HcsDidDeleteEvent,
+    HcsDidEventMessageResolver,
+    HcsDidEventTargetName,
     HcsDidMessage,
-    HcsDidResolver,
-    HcsDidRootKey,
+    HcsDidRevokeServiceEvent,
+    HcsDidRevokeVerificationMethodEvent,
+    HcsDidRevokeVerificationRelationshipEvent,
     HcsDidTopicListener,
     HcsDidTransaction,
-    HcsIdentityNetwork,
-    HcsIdentityNetworkBuilder,
-    HcsVcDocumentBase,
-    HcsVcDocumentHashBase,
-    HcsVcDocumentJsonProperties,
-    HcsVcMessage,
-    HcsVcOperation,
-    HcsVcStatusResolver,
-    HcsVcTopicListener,
-    HederaDid,
+    HcsDidUpdateDidOwnerEvent,
+    HcsDidUpdateServiceEvent,
+    HcsDidUpdateVerificationMethodEvent,
+    HcsDidUpdateVerificationRelationshipEvent,
+    HederaDidResolver,
     JsonClass,
-    Message,
     MessageEnvelope,
-    MessageListener,
-    MessageMode,
-    MessageResolver,
-    MessageTransaction,
     SerializableMirrorConsensusResponse,
     TimestampUtils,
     Validator,
-    Issuer
-}
+};
