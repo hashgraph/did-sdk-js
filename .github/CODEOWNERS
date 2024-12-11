@@ -11,11 +11,11 @@
 /.github/workflows/                             @hashgraph/devops-ci @hashgraph/devops-ci-committers @hashgraph/release-engineering-managers @hashgraph/developer-advocates
 
 # Self-protection for root CODEOWNERS files (this file should not exist and should definitely require approval)
-/CODEOWNERS                                     @hashgraph/release-engineering-managers @hashgraph/developer-advocates
+/CODEOWNERS                                     @hashgraph/release-engineering-managers
 
 # Protect the repository root files
 /README.md                                      @hashgraph/devops-ci @hashgraph/release-engineering-managers @hashgraph/developer-advocates
-**/LICENSE                                      @hashgraph/devops-ci @hashgraph/release-engineering-managers @hashgraph/developer-advocates
+**/LICENSE                                      @hashgraph/devops-ci @hashgraph/release-engineering-managers
 
 # Git Ignore definitions
 **/.gitignore                                   @hashgraph/devops-ci @hashgraph/devops-ci-committers @hashgraph/release-engineering-managers @hashgraph/developer-advocates
