@@ -35,7 +35,7 @@
     "typescript": "^4.3.2"
   },
   "dependencies": {
-    "@hashgraph/sdk": "^2.0.20",
+    "@hashgraph/sdk": "^2.45.0",
     "bs58": "^4.0.1",
     "js-base64": "^3.6.1",
     "moment": "^2.29.1"
