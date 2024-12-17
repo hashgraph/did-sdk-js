@@ -1,5 +1,5 @@
 import { Timestamp } from "@hashgraph/sdk";
-import moment from 'moment';
+import moment from "moment";
 
 export class TimestampUtils {
     public static ISO = "YYYY-MM-DDTHH:mm:ss.SSS[Z]";
