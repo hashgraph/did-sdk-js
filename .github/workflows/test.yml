@@ -2,9 +2,11 @@ name: Test
 
 on:
   pull_request:
-    branches: [ main ]
+    branches: 
+      - main
   push:
-    branches: [ main ]
+    branches: 
+      - main
 
 defaults:
   run:
@@ -18,7 +20,7 @@ jobs:
     runs-on: decentralized-identity-linux-medium
     strategy:
       matrix:
-        node: [ '14', '16' ]
+        node: [ '16' ]
     steps:
       - name: Harden Runner
         uses: step-security/harden-runner@91182cccc01eb5e619899d80e4e971d6181294a7 # v2.10.1
