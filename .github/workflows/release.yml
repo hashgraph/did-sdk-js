@@ -64,6 +64,11 @@ jobs:
     outputs:
       npm-artifact-name: ${{ steps.set-publish-data.outputs.artifact-name }}
     steps:
+      - name: Harden the runner (Audit all outbound calls)
+        uses: step-security/harden-runner@20cf305ff2072d973412fa9b1e3a4f227bda3c76 # v2.14.0
+        with:
+          egress-policy: audit
+
       - name: Prepare Runner
         uses: pandaswhocode/initialize-github-job@ed4a98646fe0235e6ecf3af5414b355d2abe3bf3 # v1.0.3
         with:
@@ -105,6 +110,11 @@ jobs:
     needs:
       - build-npm-package
     steps:
+      - name: Harden the runner (Audit all outbound calls)
+        uses: step-security/harden-runner@20cf305ff2072d973412fa9b1e3a4f227bda3c76 # v2.14.0
+        with:
+          egress-policy: audit
+
       - name: Prepare Runner
         uses: pandaswhocode/initialize-github-job@ed4a98646fe0235e6ecf3af5414b355d2abe3bf3 # v1.0.3
         with:
