@@ -19,19 +19,25 @@ export class SerializableMirrorConsensusResponse {
     }
 
     public toString(): string {
-        return "ConsensusMessage{"
-            + "consensusTimestamp=" + TimestampUtils.toJSON(this.consensusTimestamp)
-            + ", message=" + ArraysUtils.toString(this.message)
-            + ", runningHash=" + ArraysUtils.toString(this.runningHash)
-            + ", sequenceNumber=" + this.sequenceNumber.toNumber()
-            + '}';
+        return (
+            "ConsensusMessage{" +
+            "consensusTimestamp=" +
+            TimestampUtils.toJSON(this.consensusTimestamp) +
+            ", message=" +
+            ArraysUtils.toString(this.message) +
+            ", runningHash=" +
+            ArraysUtils.toString(this.runningHash) +
+            ", sequenceNumber=" +
+            this.sequenceNumber.toNumber() +
+            "}"
+        );
     }
 
     public toJsonTree(): any {
         const result: any = {};
         result.consensusTimestamp = {
             seconds: this.consensusTimestamp.seconds,
-            nanos: this.consensusTimestamp.nanos
+            nanos: this.consensusTimestamp.nanos,
         };
         result.message = this.message.toString();
         result.runningHash = this.runningHash.toString();
