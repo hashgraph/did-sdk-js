@@ -1,0 +1,19 @@
+sequenceDiagram
+Title: Update DID attribute
+  autonumber
+  participant App as Application
+  participant SDK as DID JS SDK
+  participant HSDK as Hashgraph JS SDK
+  participant HCS as Hedera Consensus Service
+  participant HMN as Hedera Mirror Node
+
+
+alt Update DID attribute
+
+App ->> SDK: Send Update attribute DID request with identifier and PK
+SDK ->> HSDK: Build Client (Set account that will pay for transaction)
+SDK ->> HMN: Send Update DID attribute Event message
+HCS ->> HMN: Propagate Message <br> to Topic
+SDK ->> HSDK: Subscribe to the topic and <br /> wait till message is successfully submited
+SDK -->> App: Send DID Identifier
+end

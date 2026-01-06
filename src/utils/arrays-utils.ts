@@ -1,14 +1,13 @@
-
 export class ArraysUtils {
     public static equals(a: Uint8Array, b: Uint8Array): boolean {
         if (a == b) {
-            return true
+            return true;
         }
         if (!a || !b) {
-            return false
+            return false;
         }
         if (a.length != b.length) {
-            return false
+            return false;
         }
         for (let i = 0; i < a.length; i++) {
             if (a[i] != b[i]) return false;
@@ -21,6 +20,6 @@ export class ArraysUtils {
     }
 
     public static fromString(text: string): Uint8Array {
-        return new Uint8Array(Buffer.from(text, "utf8"))
+        return new Uint8Array(Buffer.from(text, "utf8"));
     }
 }

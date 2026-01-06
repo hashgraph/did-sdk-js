@@ -1,6 +1,6 @@
-import {HederaDid} from "./hedera-did";
-import {DidSyntax} from "./did-syntax";
-import {HcsDid} from "./hcs/did/hcs-did";
+import { DidError } from "./did-error";
+import { DidSyntax } from "./did-syntax";
+import { HcsDid } from "./hcs/did/hcs-did";
 
 /**
  * Parses the given DID string into it's corresponding Hedera DID object.
@@ -9,16 +9,16 @@ import {HcsDid} from "./hcs/did/hcs-did";
  * @return {@link HederaDid} instance.
  */
 export class DidParser {
-    public static parse(didString: string): HederaDid {
+    public static parse(didString: string): HcsDid {
         const methodIndex = DidSyntax.DID_PREFIX.length + 1;
         if (!didString || didString.length <= methodIndex) {
-            throw new Error('DID string cannot be null');
+            throw new DidError("DID string cannot be null");
         }
 
         if (didString.startsWith(HcsDid.DID_METHOD + DidSyntax.DID_METHOD_SEPARATOR, methodIndex)) {
-            return HcsDid.fromString(didString);
+            return new HcsDid({ identifier: didString });
         } else {
-            throw new Error('DID string is invalid.');
+            throw new DidError("DID string is invalid.");
         }
     }
 }
